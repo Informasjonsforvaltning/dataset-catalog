@@ -1,0 +1,13 @@
+openapi: 3.0.2
+info:
+  title: Dataset Catalog
+  description: A back end service service for creating dataset catalogues and datasets. Exposes a dcat-ap-no endpoint.
+  version: '1.0'
+  contact:
+    name: Digitaliseringsdirektoratet
+    url: 'https://fellesdatakatalog.digdir.no'
+    email: fellesdatakatalog@digdir.no
+  license:
+    name: License of API
+    url: 'http://data.norge.no/nlod/no/2.0'
+
