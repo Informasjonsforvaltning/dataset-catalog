@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository
 
 
 @Repository
-interface DatasetRepository : MongoRepository<Dataset, String?>
+interface DatasetRepository : MongoRepository<Dataset, String?> {
+    fun findByCatalogId(catalogId: String) : Collection<Dataset>
+}
