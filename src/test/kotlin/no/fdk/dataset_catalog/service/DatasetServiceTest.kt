@@ -13,7 +13,8 @@ import kotlin.test.assertNull
 @Tag("unit")
 class DatasetServiceTest {
     private val datasetRepository: DatasetRepository = mock()
-    private val datasetService = DatasetService(datasetRepository)
+    val conceptCatClientService: ConceptCatClientService = mock()
+    private val datasetService = DatasetService(datasetRepository, conceptCatClientService)
 
     @Nested
     internal inner class GetById {
