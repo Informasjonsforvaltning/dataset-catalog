@@ -1,3 +1,8 @@
+application:
+  catalogURI: http://dataset-catalogue:8080/catalogs/
+  openDataEnhet: https://data.brreg.no/enhetsregisteret/api/enheter/
+  openDataEnhetProxy: https://organization-catalogue.staging.fellesdatakatalog.digdir.no/organizations/
+
 logging:
   level.root: WARN
   level.no: ${LOG_LEVEL:DEBUG}

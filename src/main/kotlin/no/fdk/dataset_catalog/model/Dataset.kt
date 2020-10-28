@@ -196,23 +196,23 @@ data class Concept (
 
     val identifier: String? = null,
 
-    val application: List<Map<String, String>> = emptyList(),
+    val application: List<Map<String, String>>? = null,
 
     val definition: Definition? = null,
 
     val alternativeDefinition: Definition? = null,
 
-    val subject: Map<String, String> = emptyMap(),
+    val subject: Map<String, String>? = null,
 
-    val prefLabel: Map<String, String> = emptyMap(),
+    val prefLabel: Map<String, String>? = null,
 
-    val altLabel: List<Map<String, String>> = emptyList(),
+    val altLabel: List<Map<String, String>>? = null,
 
-    val hiddenLabel: List<Map<String, String>> = emptyList(),
+    val hiddenLabel: List<Map<String, String>>? = null,
 
     val contactPoint: ContactPoint? = null,
 
-    val example: Map<String, String> = emptyMap(),
+    val example: Map<String, String>? = null,
 )
 
 data class ContactPoint(
@@ -221,13 +221,13 @@ data class ContactPoint(
 )
 
 data class Definition(
-    val text: Map<String, String> = emptyMap(),
-    val remark: Map<String, String> = emptyMap(),
+    val text: Map<String, String>? = null,
+    val remark: Map<String, String>? = null,
     val source: Source? = null,
     val targetGroup: String? = null, // TODO this is string-enum
     val sourceRelationship: String? = null,
     val range: TextAndURI? = null,
-    val sources: List<TextAndURI> = emptyList(),
+    val sources: List<TextAndURI>? = null,
     val lastUpdated: Long? = null,
 )
 
@@ -237,7 +237,7 @@ data class Source(
 )
 
 data class TextAndURI(
-    val text: Map<String, String> = emptyMap(),
+    val text: Map<String, String>? = null,
     val uri: String? = null,
 )
 
@@ -245,7 +245,7 @@ data class HarvestMetadata (
     val firstHarvested: Long? = null,
     val lastHarvested: Long? = null,
     val lastChanged: Long? = null,
-    val changed: List<Long> = emptyList(),
+    val changed: List<Long>? = null,
 )
 
 data class Contact (
@@ -264,13 +264,13 @@ data class Publisher (
     val id: String? = null,
     val name: String? = null,
     val orgPath: String? = null,
-    val prefLabel: Map<String, String> = emptyMap(),
+    val prefLabel: Map<String, String>? = null,
 )
 
 data class SkosCode (
     val uri: String? = null,
     val code: String? = null,
-    val prefLabel: Map<String, String> = emptyMap(),
+    val prefLabel: Map<String, String>? = null,
 )
 
 data class DataTheme (
@@ -279,7 +279,7 @@ data class DataTheme (
     val code: String? = null,
     val pickedDate: String? = null,
     val startUse: String? = null,
-    val title: Map<String, String> = emptyMap(),
+    val title: Map<String, String>? = null,
     val conceptSchema: ConceptSchema? = null,
     val numberOfHits: Int? = null,
 )
@@ -287,16 +287,16 @@ data class DataTheme (
 data class Distribution (
     val id: String? = null,
     val uri: String? = null,
-    val title: Map<String, String> = emptyMap(),
-    val description: Map<String, String> = emptyMap(),
-    val downloadURL: List<String> = emptyList(),
-    val accessURL: List<String> = emptyList(),
+    val title: Map<String, String>? = null,
+    val description: Map<String, String>? = null,
+    val downloadURL: List<String>? = null,
+    val accessURL: List<String>? = null,
     val license: SkosConcept? = null,
     val openLicense: Boolean? = null,
-    val conformsTo: List<SkosConcept> = emptyList(),
-    val page: List<SkosConcept> = emptyList(),
-    val format: List<String> = emptyList(),
-    val accessService: List<DataDistributionService> = emptyList(),
+    val conformsTo: List<SkosConcept>? = null,
+    val page: List<SkosConcept>? = null,
+    val format: List<String>? = null,
+    val accessService: List<DataDistributionService>? = null,
 )
 
 data class PeriodOfTime (
@@ -319,7 +319,7 @@ data class SkosConcept (
 data class QualityAnnotation (
     val inDimension: String? = null,
     val motivatedBy: String? = null,
-    val hasBody: Map<String, String> = emptyMap()
+    val hasBody: Map<String, String>? = null
 )
 
 data class Reference (
@@ -329,7 +329,7 @@ data class Reference (
 
 data class ConceptSchema (
     val id: String? = null,
-    val title: Map<String, String> = emptyMap(),
+    val title: Map<String, String>? = null,
     val versioninfo: String? = null,
     val versionnumber: String? = null,
 )
@@ -340,7 +340,7 @@ data class DataDistributionService (
 
     //dct:title
     //Norwgian: Tittel
-    val title: Map<String, String> = emptyMap(),
+    val title: Map<String, String>? = null,
 
     //dct:publisher
     //Norwegian: Utgiver
@@ -348,19 +348,8 @@ data class DataDistributionService (
 
     //dct:description
     //Norwegian: Beskrivelse
-    val description: Map<String, String> = emptyMap(),
+    val description: Map<String, String>? = null,
 
     //dcatapi:endpointDescription
-    val endpointDescription: List<SkosConcept> = emptyList(),
-)
-
-data class Organization (
-    @JsonProperty("organizationId")
-    val organizationId: String? = null,
-
-    @JsonProperty("name")
-    val name: String? = null,
-
-    @JsonProperty("allowDelegatedRegistration")
-    val allowDelegatedRegistration: Boolean? = null,
+    val endpointDescription: List<SkosConcept>? = null,
 )
