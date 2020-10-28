@@ -1,4 +1,4 @@
-package no.fdk.catalog_catalog.controller
+package no.fdk.dataset_catalog.controller
 
 import no.fdk.dataset_catalog.model.Catalog
 import no.fdk.dataset_catalog.service.CatalogService
@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*
 @CrossOrigin
 @RequestMapping(value = ["/catalogs"])
 class CatalogController (val catalogService: CatalogService) {
-    //    TODO: Add permission checks
 
     @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getAll() = catalogService.getAll()
@@ -31,7 +30,6 @@ class CatalogController (val catalogService: CatalogService) {
             ResponseEntity(HttpStatus.BAD_REQUEST)
         }
 
-
     @DeleteMapping(value = ["/{id}"])
     fun remove(@PathVariable("id") id: String): ResponseEntity<Unit> =
         try {
@@ -41,4 +39,9 @@ class CatalogController (val catalogService: CatalogService) {
             ResponseEntity(HttpStatus.BAD_REQUEST)
         }
 
+    @PutMapping(value = ["/{id}"])
+    fun update(@PathVariable("id") id: String, @RequestBody catalog: Catalog): ResponseEntity<Catalog> =
+        catalogService.update(id, catalog)
+            ?.let { ResponseEntity(it, HttpStatus.OK) }
+            ?: ResponseEntity(HttpStatus.BAD_REQUEST)
 }
