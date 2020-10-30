@@ -28,15 +28,15 @@ data class Dataset(
 
     val concepts: Collection<Concept>? = null,
 
+//    dct:subject
     val subjects: Collection<Subject>? = null,
 
     val uri: String? = null,
 
     val originalUri: String? = null,
 
+//    dct:source
     val source: String? = null,
-
-    val harvest: HarvestMetadata? = null,
 
     // dct:title
     // Norwegian: Tittel
@@ -133,7 +133,7 @@ data class Dataset(
     val hasRelevanceAnnotation: QualityAnnotation? = null,
 
     //dct:references
-    //Norwegian: Refererer til.
+    //Norwegian: Referer til.
     val references: List<Reference>? = null,
 
     //dct:relation
@@ -165,12 +165,13 @@ data class Dataset(
     val admsIdentifier: List<String>? = null,
 
     //dcat:conformsTo
-    //Norwegian: I samsval med
+    //Norwegian: I samsvar med
     val conformsTo: List<SkosConcept>? = null,
 
     // NEW FIELDS DCAT-AP-NO 1.2?
     // dct: informationModel
     // Norwegian: informasjonsmodell
+//    a: SkosConcept
     val informationModel: List<SkosConcept>? = null,
 
     // prov:qualifiedAttribution
@@ -181,6 +182,7 @@ data class Dataset(
     //Norwegian: type
     val type: String? = null,
 
+//    dcat:catalogue
     val catalog: Catalog? = null,
 
     )
@@ -190,6 +192,7 @@ enum class REGISTRATION_STATUS {
 }
 
 data class Concept (
+//    a Skos:Concept
     val id: String? = null,
 
     val uri: String? = null,
@@ -239,13 +242,6 @@ data class Source(
 data class TextAndURI(
     val text: Map<String, String>? = null,
     val uri: String? = null,
-)
-
-data class HarvestMetadata (
-    val firstHarvested: Long? = null,
-    val lastHarvested: Long? = null,
-    val lastChanged: Long? = null,
-    val changed: List<Long>? = null,
 )
 
 data class Contact (

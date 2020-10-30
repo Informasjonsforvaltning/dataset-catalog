@@ -24,7 +24,6 @@ fun Dataset.update(newValues: Dataset): Dataset =
         uri = newValues.uri ?: uri,
         originalUri = newValues.originalUri ?: originalUri,
         source = newValues.source ?: source,
-        harvest = newValues.harvest ?: harvest,
         title = newValues.title ?: title,
         description = newValues.description ?: description,
         descriptionFormatted = newValues.descriptionFormatted,
