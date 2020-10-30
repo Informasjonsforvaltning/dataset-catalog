@@ -6,7 +6,7 @@ data class Subject (
     val prefLabel: Map<String, String> = emptyMap(),
     val id: String? = null,
     val identifier: String? = null,
-    val altLabel: List<Map<String, String>?> = emptyList(),
+    val altLabel: List<Map<String, String>>? = emptyList(),
     val note: Map<String, String>? = null,
     val source: String? = null,
     val creator: Publisher? = null,
