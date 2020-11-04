@@ -53,6 +53,7 @@ class CatalogService(val catalogRepository: CatalogRepository,
             )
         } else this
 
+    fun getByIDs(permittedOrgs: Set<String>): List<Catalog> = catalogRepository.findAllById(permittedOrgs).toList()
 
 
 }
