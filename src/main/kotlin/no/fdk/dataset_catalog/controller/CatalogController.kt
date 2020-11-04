@@ -3,12 +3,15 @@ package no.fdk.dataset_catalog.controller
 import no.fdk.dataset_catalog.model.Catalog
 import no.fdk.dataset_catalog.security.EndpointPermissions
 import no.fdk.dataset_catalog.service.CatalogService
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.web.bind.annotation.*
+
+private val logger = LoggerFactory.getLogger(CatalogController::class.java)
 
 @RestController
 @CrossOrigin
@@ -20,6 +23,7 @@ class CatalogController (
     @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getAllPermitted(@AuthenticationPrincipal jwt: Jwt): ResponseEntity<List<Catalog>> {
         val permittedOrgs = endpointPermissions.getOrgsByReadPermission(jwt)
+        logger.info(if (permittedOrgs.isEmpty()) "No permitted catalogs to fetch" else "Fetching catalogs for organizations in $permittedOrgs")
         return when {
             endpointPermissions.hasSysAdminPermission(jwt) ->
                 ResponseEntity(catalogService.getAll(), HttpStatus.OK)
@@ -32,6 +36,7 @@ class CatalogController (
     @GetMapping(value = ["/{id}"], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getById(@AuthenticationPrincipal jwt: Jwt, @PathVariable id: String): ResponseEntity<Catalog> =
         if (endpointPermissions.hasOrgReadPermission(jwt, id)) {
+            logger.info("Fetching catalog with ID $id")
             catalogService.getByID(id)
                 ?.let { ResponseEntity(it, HttpStatus.OK) }
                 ?: ResponseEntity(HttpStatus.NOT_FOUND)
@@ -42,8 +47,10 @@ class CatalogController (
         if (catalog.id != null && endpointPermissions.hasOrgWritePermission(jwt, catalog.id)) {
             try {
                 catalogService.create(catalog)
+                logger.info("Created catalog with ID ${catalog.id}")
                 ResponseEntity(HttpStatus.CREATED)
             } catch (e : Exception) {
+                logger.info("Failed to create catalog with ID ${catalog.id}")
                 ResponseEntity(HttpStatus.BAD_REQUEST)
             }
         } else ResponseEntity(HttpStatus.FORBIDDEN)
@@ -54,8 +61,10 @@ class CatalogController (
         if (endpointPermissions.hasOrgWritePermission(jwt, id)) {
             try {
                 catalogService.delete(id)
+                logger.info("Deleted catalog with ID $id")
                 ResponseEntity(HttpStatus.OK)
             } catch (e : Exception) {
+                logger.info("Failed to delete catalog with ID $id")
                 ResponseEntity(HttpStatus.BAD_REQUEST)
             }
         } else ResponseEntity(HttpStatus.FORBIDDEN)
@@ -66,6 +75,7 @@ class CatalogController (
                @PathVariable("id") id: String,
                @RequestBody catalog: Catalog): ResponseEntity<Catalog> =
         if (catalog.id == id && endpointPermissions.hasOrgWritePermission(jwt, catalog.id)) {
+            logger.info("Updating catalog with ID $id")
             catalogService.update(id, catalog)
                 ?.let { ResponseEntity(it, HttpStatus.OK) }
                 ?: ResponseEntity(HttpStatus.BAD_REQUEST)
