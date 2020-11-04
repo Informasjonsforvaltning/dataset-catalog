@@ -3,12 +3,15 @@ package no.fdk.dataset_catalog.controller
 import no.fdk.dataset_catalog.model.Dataset
 import no.fdk.dataset_catalog.security.EndpointPermissions
 import no.fdk.dataset_catalog.service.DatasetService
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.web.bind.annotation.*
+
+private val logger = LoggerFactory.getLogger(DatasetController::class.java)
 
 @RestController
 @CrossOrigin
@@ -21,6 +24,7 @@ class DatasetController(
     fun getAll(@AuthenticationPrincipal jwt: Jwt,
                @PathVariable("catalogId") catalogId: String): ResponseEntity<Collection<Dataset>> =
         if (endpointPermissions.hasOrgReadPermission(jwt, catalogId)) {
+            logger.info("Fetching datasets for catalog with ID $catalogId")
             datasetService.getAll(catalogId)
                 .let { ResponseEntity(it, HttpStatus.OK) }
         } else ResponseEntity(HttpStatus.FORBIDDEN)
@@ -31,6 +35,7 @@ class DatasetController(
                 @PathVariable("catalogId") catalogId: String,
                 @PathVariable id: String): ResponseEntity<Dataset> =
         if (endpointPermissions.hasOrgReadPermission(jwt, catalogId)) {
+            logger.info("Fetching dataset with ID $id from catalog with ID $catalogId")
             datasetService.getByID(catalogId, id)
                 ?.let { ResponseEntity(it, HttpStatus.OK) }
                 ?: ResponseEntity(HttpStatus.NOT_FOUND)
@@ -43,6 +48,7 @@ class DatasetController(
                @RequestBody dataset: Dataset): ResponseEntity<Unit> =
         if (endpointPermissions.hasOrgWritePermission(jwt, catalogId)) {
             try {
+                logger.info("Creating dataset in catalog $catalogId with ID ${dataset.id}")
                 datasetService.create(catalogId, dataset)
                 ResponseEntity<Unit>(HttpStatus.CREATED)
             } catch (e : Exception) {
@@ -58,6 +64,7 @@ class DatasetController(
                       @RequestBody patch: Dataset): ResponseEntity<Unit> =
         if (endpointPermissions.hasOrgWritePermission(jwt, catalogId)) {
             try {
+                logger.info("Updating dataset with ID $id for catalog with ID $catalogId")
                 datasetService.updateDataset(catalogId, id, patch)
                     ?.let { ResponseEntity(HttpStatus.OK) }
                     ?: ResponseEntity(HttpStatus.BAD_REQUEST)
@@ -74,8 +81,10 @@ class DatasetController(
         if (endpointPermissions.hasOrgWritePermission(jwt, catalogId)) {
             try {
                 datasetService.delete(catalogId, id)
+                logger.info("Successfully deleted dataset with ID $id from catalog with ID $catalogId")
                 ResponseEntity(HttpStatus.OK)
             } catch (e : Exception) {
+                logger.info("Failed to delete dataset with ID $id from catalog with ID $catalogId")
                 ResponseEntity(HttpStatus.BAD_REQUEST)
             }
         } else ResponseEntity(HttpStatus.FORBIDDEN)
