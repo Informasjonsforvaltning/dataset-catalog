@@ -16,13 +16,15 @@ private val logger = LoggerFactory.getLogger(CatalogController::class.java)
 @RestController
 @CrossOrigin
 @RequestMapping(value = ["/catalogs"])
-class CatalogController (
+class CatalogController(
     private val catalogService: CatalogService,
     private val endpointPermissions: EndpointPermissions) {
 
     @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getAllPermitted(@AuthenticationPrincipal jwt: Jwt): ResponseEntity<List<Catalog>> {
-        val permittedOrgs = endpointPermissions.getOrgsByReadPermission(jwt)
+        val permittedOrgs = endpointPermissions.getOrgsByPermission(jwt, "read")
+        val adminableOrgs = endpointPermissions.getOrgsByPermission(jwt, "admin")
+        catalogService.createCatalogsIfNeeded(adminableOrgs)
         logger.info(if (permittedOrgs.isEmpty()) "No permitted catalogs to fetch" else "Fetching catalogs for organizations in $permittedOrgs")
         return when {
             endpointPermissions.hasSysAdminPermission(jwt) ->
@@ -49,7 +51,7 @@ class CatalogController (
                 catalogService.create(catalog)
                 logger.info("Created catalog with ID ${catalog.id}")
                 ResponseEntity(HttpStatus.CREATED)
-            } catch (e : Exception) {
+            } catch (e: Exception) {
                 logger.info("Failed to create catalog with ID ${catalog.id}")
                 ResponseEntity(HttpStatus.BAD_REQUEST)
             }
@@ -63,7 +65,7 @@ class CatalogController (
                 catalogService.delete(id)
                 logger.info("Deleted catalog with ID $id")
                 ResponseEntity(HttpStatus.OK)
-            } catch (e : Exception) {
+            } catch (e: Exception) {
                 logger.info("Failed to delete catalog with ID $id")
                 ResponseEntity(HttpStatus.BAD_REQUEST)
             }
