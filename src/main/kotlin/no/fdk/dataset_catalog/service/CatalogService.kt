@@ -23,6 +23,22 @@ class CatalogService(val catalogRepository: CatalogRepository,
             .updateUriIfNeeded()
             .let { catalogRepository.save(it) }
     }
+
+    fun createCatalogsIfNeeded(adminableOrgs: Set<String>) =
+        adminableOrgs.forEach{
+            if (getByID(it) == null){
+                try {
+                    val organizationName: String? = organizationService.getByOrgNr(it)?.name
+                    if (organizationName != null) {
+                        create(Catalog(id=it, title = mapOf( Pair("nb", "Datakatalog for $organizationName") )))
+                    } else {
+                        create(Catalog(id=it))
+                    }
+                } catch (e: Exception) {
+                }
+            }
+        }
+
     fun delete(catalogId: String) {
         getByID(catalogId)
             ?.let { catalogRepository.delete(it) }?: throw Exception()

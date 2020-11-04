@@ -2,7 +2,6 @@ package no.fdk.dataset_catalog.security
 
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.stereotype.Component
-import javax.servlet.http.HttpServletRequest
 
 private const val ROLE_ROOT_ADMIN = "system:root:admin"
 private fun roleOrgAdmin(orgnr: String) = "organization:$orgnr:admin"
@@ -12,13 +11,17 @@ private fun roleOrgRead(orgnr: String) = "organization:$orgnr:read"
 @Component
 class EndpointPermissions {
 
-    fun getOrgsByReadPermission(jwt: Jwt): Set<String> {
+    fun getOrgsByPermission(jwt: Jwt, permission: String): Set<String> {
         val authorities: String? = jwt.claims["authorities"] as? String
-        val regex = Regex("""[0-9]{9}""")
+        val regex = when(permission){
+            "read" -> Regex("""[0-9]{9}""")
+            else -> Regex("""[0-9]{9}:$permission""")
+        }
 
         return authorities
             ?.let { regex.findAll(it)}
-            ?.map { matchResult -> matchResult.value }
+            ?.map { matchResult -> matchResult.value
+                .replace(Regex("[A-Za-z:]"), "")}
             ?.toSet()
             ?: emptySet()
     }
