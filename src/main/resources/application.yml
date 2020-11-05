@@ -1,5 +1,6 @@
 application:
   catalogURI: http://dataset-catalogue:8080/catalogs/
+  apiRootUrl: http://fdk-nginx-search:8080/api
   openDataEnhet: https://data.brreg.no/enhetsregisteret/api/enheter/
   openDataEnhetProxy: https://organization-catalogue.staging.fellesdatakatalog.digdir.no/organizations/
 
@@ -18,8 +19,12 @@ spring:
 spring:
   profiles: develop
   data.mongodb.uri: mongodb://admin:admin@localhost:27017/datasetCatalog?authSource=admin&authMechanism=SCRAM-SHA-1
+application:
+  apiRootUrl: http://localhost:8112/api
+
 
 ---
 spring:
   profiles: contract-test
 server.port: 5555
+
