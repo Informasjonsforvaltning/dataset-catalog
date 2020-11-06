@@ -21,8 +21,8 @@ class DatasetController(
     private val endpointPermissions: EndpointPermissions) {
 
     @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun getAll(@AuthenticationPrincipal jwt: Jwt,
-               @PathVariable("catalogId") catalogId: String): ResponseEntity<Collection<Dataset>> =
+    fun getAllDatasets(@AuthenticationPrincipal jwt: Jwt,
+                       @PathVariable("catalogId") catalogId: String): ResponseEntity<Collection<Dataset>> =
         if (endpointPermissions.hasOrgReadPermission(jwt, catalogId)) {
             logger.info("Fetching datasets for catalog with ID $catalogId")
             datasetService.getAll(catalogId)
@@ -31,9 +31,9 @@ class DatasetController(
 
 
     @GetMapping(value = ["/{id}"], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun getById(@AuthenticationPrincipal jwt: Jwt,
-                @PathVariable("catalogId") catalogId: String,
-                @PathVariable id: String): ResponseEntity<Dataset> =
+    fun getDatasetById(@AuthenticationPrincipal jwt: Jwt,
+                       @PathVariable("catalogId") catalogId: String,
+                       @PathVariable id: String): ResponseEntity<Dataset> =
         if (endpointPermissions.hasOrgReadPermission(jwt, catalogId)) {
             logger.info("Fetching dataset with ID $id from catalog with ID $catalogId")
             datasetService.getByID(catalogId, id)
@@ -43,9 +43,9 @@ class DatasetController(
 
 
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun create(@AuthenticationPrincipal jwt: Jwt,
-               @PathVariable("catalogId") catalogId: String,
-               @RequestBody dataset: Dataset): ResponseEntity<Unit> =
+    fun createDataset(@AuthenticationPrincipal jwt: Jwt,
+                      @PathVariable("catalogId") catalogId: String,
+                      @RequestBody dataset: Dataset): ResponseEntity<Unit> =
         if (endpointPermissions.hasOrgWritePermission(jwt, catalogId)) {
             try {
                 logger.info("Creating dataset in catalog $catalogId with ID ${dataset.id}")
@@ -75,9 +75,9 @@ class DatasetController(
 
 
     @DeleteMapping(value = ["/{id}"])
-    fun remove(@AuthenticationPrincipal jwt: Jwt,
-               @PathVariable("catalogId") catalogId: String,
-               @PathVariable("id") id: String): ResponseEntity<Unit> =
+    fun removeDataset(@AuthenticationPrincipal jwt: Jwt,
+                      @PathVariable("catalogId") catalogId: String,
+                      @PathVariable("id") id: String): ResponseEntity<Unit> =
         if (endpointPermissions.hasOrgWritePermission(jwt, catalogId)) {
             try {
                 datasetService.delete(catalogId, id)
