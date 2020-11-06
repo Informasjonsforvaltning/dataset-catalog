@@ -10,4 +10,932 @@ info:
   license:
     name: License of API
     url: 'http://data.norge.no/nlod/no/2.0'
-
+externalDocs:
+  description: Dokumentasjon på Informasjonsforvaltning GitHub
+  url: https://informasjonsforvaltning.github.io
+tags:
+  - name: catalog
+    description: Dataset catalog
+  - name: dataset
+    description: Dataset
+paths:
+  /catalogs:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - catalog
+      summary: Create new dataset catalog
+      description: Create new dataset catalog
+      operationId: createCatalog
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Catalog'
+      responses:
+        '201':
+          description: New catalog created
+        '400':
+          description: Bad Request
+        '401':
+          description: Not logged in
+        '403':
+          description: Forbidden
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - catalog
+      summary: Get all permitted catalogs
+      description: Get all permitted catalogs
+      operationId: getAllPermitted
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Catalog"
+          description: OK
+  /catalogs/{catalogId}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - catalog
+      summary: Get a specific catalog
+      description: Get a specific catalog
+      operationId: getCatalogById
+      parameters:
+        - name: catalogId
+          in: path
+          description: catalog id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Catalog"
+        '401':
+          description: Not logged in
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+    delete:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - catalog
+      summary: Delete a specific catalog
+      description: Delete a specific catalog
+      operationId: removeCatalog
+      parameters:
+        - name: catalogId
+          in: path
+          description: catalog id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Not logged in
+        '403':
+          description: Forbidden
+    put:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - catalog
+      summary: Update a specific catalog
+      description: Update a specific catalog
+      operationId: updateCatalog
+      parameters:
+        - name: catalogId
+          in: path
+          description: catalog id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Catalog'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Catalog"
+        '400':
+          description: Bad request
+        '401':
+          description: Not logged in
+        '403':
+          description: Forbidden
+  /catalogs/{catalogId}/datasets:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - dataset
+      summary: Get all datasets in specified catalog
+      description: Get all datasets in specified catalog
+      operationId: getAllDatasets
+      parameters:
+        - name: catalogId
+          in: path
+          description: catalog id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Dataset"
+          description: OK
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - dataset
+      summary: Create dataset in specified catalog
+      description: Create dataset in specified catalog
+      operationId: createDataset
+      parameters:
+        - name: catalogId
+          in: path
+          description: catalog id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Dataset'
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+  /catalogs/{catalogId}/datasets/{id}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - dataset
+      summary: Get a specific dataset from specififed catalog
+      description: Get a specific dataset specififed catalog
+      operationId: getDatasetById
+      parameters:
+        - name: catalogId
+          in: path
+          description: catalog id
+          required: true
+          schema:
+            type: string
+        - name: id
+          in: path
+          description: dataset id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dataset"
+        '401':
+          description: Not logged in
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+    patch:
+      security:
+        - bearerAuth: []
+      tags:
+        - dataset
+      summary: Update dataset in specified catalog
+      description: Update dataset in specified catalog
+      operationId: updateDataset
+      parameters:
+        - name: catalogId
+          in: path
+          description: catalog id
+          required: true
+          schema:
+            type: string
+        - name: id
+          in: path
+          description: dataset id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Dataset'
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: Not logged in
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+    delete:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - dataset
+      summary: Delete a specific dataset
+      description: Delete a specific dataset
+      operationId: removeDataset
+      parameters:
+        - name: catalogId
+          in: path
+          description: catalog id
+          required: true
+          schema:
+            type: string
+        - name: id
+          in: path
+          description: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Not logged in
+        '403':
+          description: Forbidden
+components:
+  schemas:
+    Catalog:
+      type: object
+      description: Dataset catalog
+      properties:
+        id:
+          type: string
+          description: Catalog id
+        uri:
+          type: string
+          description: Unique resource identifier for catalog
+        title:
+          $ref: "#/components/schemas/MultiLanguageText"
+          description: Title of catalog in a given language
+        description:
+          $ref: "#/components/schemas/MultiLanguageText"
+          description: Description of catalog in a given language
+        publisher:
+          $ref: '#/components/schemas/Publisher'
+          description: Publisher of the catalog
+        issued:
+          type: string
+          format: date
+          description: Issue date of the catalog
+        modified:
+          type: string
+          format: date
+          description: Date of last modification
+        language:
+          type: string
+        dataset:
+          type: array
+          items:
+            $ref: "#/components/schemas/Dataset"
+          description: List of datasets in the catalog
+    Publisher:
+      type: object
+      description: Publisher of a resource
+      properties:
+        uri:
+          type: string
+          description: Unique resource identifier of publisher
+        id:
+          type: string
+          description: Publisher ID
+        name:
+          type: string
+          description: Name of publisher
+        orgPath:
+          type: string
+          description: Organization identifier with its parent organizations i.e. STAT/{parent org-id}/{org-id}
+        prefLabel:
+          $ref: "#/components/schemas/MultiLanguageText"
+          description: Label of publisher in a given language
+    Dataset:
+      type: object
+      description: Dataset
+      properties:
+        id:
+          type: string
+          description: Dataset ID
+        catalogId:
+          type: string
+          description: ID of catalog this dataset belongs to
+        lastModified:
+          type: string
+          format: date
+          description: Date of last modification
+        registrationStatus:
+          type: string
+          enum: [ DRAFT, APPROVE, PUBLISH ]
+          description: Registration status
+        concepts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Concept"
+          description: Associated concepts
+        subjects:
+          type: array
+          items:
+            $ref: "#/components/schemas/Subject"
+          description: Associated concepts mapped as SkosConcept
+        uri:
+          type: string
+          description: Unique resource identifier for the dataset
+        originalUri:
+          type: string
+          description: Original unique resource identifier for the dataset
+        source:
+          type: string
+          description: Source of the dataset
+        title:
+          $ref: "#/components/schemas/MultiLanguageText"
+          description: Title of dataset in a given language
+        description:
+          $ref: "#/components/schemas/MultiLanguageText"
+          description: Description of dataset in a given language
+        descriptionFormatted:
+          $ref: "#/components/schemas/MultiLanguageText"
+          description: Formatted description of dataset in a given language
+        objective:
+          $ref: "#/components/schemas/MultiLanguageText"
+          description: Purpose of dataset in a given language
+        contactPoint:
+          type: array
+          items:
+            $ref: "#/components/schemas/Contact"
+          description: List of associated contact points
+        keyword:
+          type: array
+          items:
+            $ref: "#/components/schemas/MultiLanguageText"
+          description: List of associated keywords in a given language
+        publisher:
+          type: object
+          $ref: '#/components/schemas/Publisher'
+          description: Publisher of the dataset
+        issued:
+          type: string
+          format: date
+          description: Issue date of dataset
+        modified:
+          type: string
+          format: date
+          description: Modification date of dataset
+        language:
+          type: array
+          items:
+            $ref: "#/components/schemas/SkosCode"
+          description: List of languages mapped as SkosCode
+        landingPage:
+          type: array
+          items:
+            type: string
+          description: List of associated landing pages
+        theme:
+          type: array
+          items:
+            $ref: "#/components/schemas/DataTheme"
+          description: List of associated data themes
+        distribution:
+          type: array
+          items:
+            $ref: "#/components/schemas/Distribution"
+          description: List of associated distributions
+        sample:
+          type: array
+          items:
+            $ref: "#/components/schemas/Distribution"
+          description: List of associated data samples mapped as distributions
+        temporal:
+          type: array
+          items:
+            $ref: "#/components/schemas/PeriodOfTime"
+          description: List of associated time periods mapped as PeriodOfTime
+        spatial:
+          type: array
+          items:
+            $ref: "#/components/schemas/SkosCode"
+          description: List of associated geographical areas mapped as SkosCode
+        accessRights:
+          type: object
+          $ref: "#/components/schemas/SkosCode"
+          description: Associated access rights mapped as SkosCode
+        accessRightsComment:
+          type: array
+          items:
+            type: string
+          description: Comments regarding access rights to dataset
+        legalBasisForRestriction:
+          type: array
+          items:
+            $ref: "#/components/schemas/SkosConcept"
+          description: Legal basis for restriction of dataset mapped as SkosConcept
+        legalBasisForProcessing:
+          type: array
+          items:
+            $ref: "#/components/schemas/SkosConcept"
+          description: Legal basis for processing of dataset mapped as SkosConcept
+        legalBasisForAccess:
+          type: array
+          items:
+            $ref: "#/components/schemas/SkosConcept"
+          description: Legal basis for access to dataset mapped as SkosConcept
+        hasAccuracyAnnotation:
+          type: object
+          $ref: "#/components/schemas/QualityAnnotation"
+          description: Existence of associated accuracy annotation
+        hasCompletenessAnnotation:
+          type: object
+          $ref: "#/components/schemas/QualityAnnotation"
+          description: Existence of associated completeness annotation
+        hasCurrentnessAnnotation:
+          type: object
+          $ref: "#/components/schemas/QualityAnnotation"
+          description: Existence of associated currentness annotation
+        hasAvailabilityAnnotation:
+          type: object
+          $ref: "#/components/schemas/QualityAnnotation"
+          description: Existence of associated availability annotation
+        hasRelevanceAnnotation:
+          type: object
+          $ref: "#/components/schemas/QualityAnnotation"
+          description: Existence of associated relevance annotation
+        references:
+          type: array
+          items:
+            $ref: "#/components/schemas/Reference"
+          description: List of associated references
+        relations:
+          type: array
+          items:
+            $ref: "#/components/schemas/SkosConcept"
+          description: List of associated relations to resources mapped as SkosConcept
+        provenance:
+          type: object
+          $ref: "#/components/schemas/SkosCode"
+          description: Provenance of dataset mapped as SkosCode
+        identifier:
+          type: array
+          items:
+            type: string
+          description: List of associated indentifiers
+        page:
+          type: array
+          items:
+            type: string
+          description: List of associated documentation pages
+        accrualPeriodicity:
+          type: object
+          $ref: "#/components/schemas/SkosCode"
+          description: The frequency with which items are added to the dataset mapped as SkosCode
+        subject:
+          type: array
+          items:
+            type: string
+          description: List of associated subjects
+        admsIdentifier:
+          type: array
+          items:
+            type: string
+          description: List of additional associated identifiers
+        conformsTo:
+          type: array
+          items:
+            $ref: "#/components/schemas/SkosConcept"
+          description: List of established standards to which the dataset conforms
+        informationModel:
+          type: array
+          items:
+            $ref: "#/components/schemas/SkosConcept"
+          description: List of associated information models mapped as SkosConcept
+        qualifiedAttributions:
+          type: array
+          items:
+            type: string
+          description: Set of qualified content publishers
+        type:
+          type: string
+          description: Associated type
+        catalog:
+          type: object
+          $ref: "#/components/schemas/Catalog"
+          description: Associated catalog
+    Concept:
+      type: object
+      description: Concept
+      properties:
+        id:
+          type: string
+          description: Identifier
+        uri:
+          type: string
+          description: Unique resource identifier for concept
+        identifier:
+          type: string
+          description: Identifier
+        application:
+          type: array
+          items:
+            $ref: "#/components/schemas/MultiLanguageText"
+          description: Application associated with this concept
+        definition:
+          type: object
+          $ref: "#/components/schemas/Definition"
+          description: Associated definition
+        alternativeDefinition:
+          type: object
+          $ref: "#/components/schemas/Definition"
+          description: Associated definition
+        subject:
+          $ref: "#/components/schemas/MultiLanguageText"
+          description: Associated subjects in a given language
+        prefLabel:
+          $ref: "#/components/schemas/MultiLanguageText"
+          description: Associated labels in a given language
+        altLabel:
+          type: array
+          items:
+            $ref: "#/components/schemas/MultiLanguageText"
+          description: List of associated alternative labels in a given language
+        hiddenLabel:
+          type: array
+          items:
+            $ref: "#/components/schemas/MultiLanguageText"
+          description: List of associated hidden labels in a given language
+        contactPoint:
+          type: object
+          $ref: "#/components/schemas/ContactPoint"
+          description: Associated contact point
+        example:
+          $ref: "#/components/schemas/MultiLanguageText"
+          description: Associated examples in a given language
+    Subject:
+      type: object
+      description: Subject
+      properties:
+        uri:
+          type: string
+          description: Unique resource identifier
+        definition:
+          $ref: "#/components/schemas/MultiLanguageText"
+          description: Associated definitions in a given language
+        prefLabel:
+          $ref: "#/components/schemas/MultiLanguageText"
+          description: Associated preferred labels in a given language
+        id:
+          type: string
+          description: Subject ID
+        identifier:
+          type: string
+          description: Subject identifier
+        altLabel:
+          type: array
+          items:
+            $ref: "#/components/schemas/MultiLanguageText"
+          description: List of associated alternative labels in a given language
+        note:
+          $ref: "#/components/schemas/MultiLanguageText"
+          description: Associated notes in a given language
+        source:
+          type: string
+          description: Source of the subject
+        creator:
+          $ref: '#/components/schemas/Publisher'
+          description: Creator of the subject mapped as publisher
+        inScheme:
+          type: array
+          items:
+            type: string
+          description: List of associated inSchemes
+        datasets:
+          type: array
+          items:
+            type: string
+          description: List of associated datasets
+    Contact:
+      type: object
+      description: Contact
+      properties:
+        id:
+          type: string
+          description: Id
+        uri:
+          type: string
+          description: Unique resource identifier
+        fullname:
+          type: string
+          description: Full name of contact
+        email:
+          type: string
+          description: Associated e-mail address
+        organizationName:
+          type: string
+          description: Name of associated organization
+        organizationUnit:
+          type: string
+          description: Unit of associated organization
+        hasURL:
+          type: string
+          description: Associated URL
+        hasTelephone:
+          type: string
+          description: Associated telephone
+    SkosCode:
+      type: object
+      description: Skos Code
+      properties:
+        uri:
+          type: string
+          description: Unique resource identifier
+        code:
+          type: string
+          description: Associated code
+        prefLabel:
+          $ref: "#/components/schemas/MultiLanguageText"
+          description: Label of SkosCode in a given language
+    DataTheme:
+      type: object
+      description: Data theme
+      properties:
+        id:
+          type: string
+          description: ID
+        uri:
+          type: string
+          description: Unique resource identifier
+        code:
+          type: string
+          description: Associated code
+        pickedDate:
+          type: string
+          description: Date theme was picked
+        startUse:
+          type: string
+          description: Associated start of use
+        title:
+          $ref: "#/components/schemas/MultiLanguageText"
+          description: Title of DataTheme in a given language
+        conceptSchema:
+          type: object
+          $ref: "#/components/schemas/ConceptSchema"
+          description: Associated concept schema
+        numberOfHits:
+          type: integer
+          description: Associated number of hits
+    Distribution:
+      type: object
+      description: Distribution
+      properties:
+        id:
+          type: string
+          description: ID
+        uri:
+          type: string
+          description: Unique resource identifier
+        title:
+          $ref: "#/components/schemas/MultiLanguageText"
+            description: Title of Distribution in a given language
+        description:
+          $ref: "#/components/schemas/MultiLanguageText"
+            description: Description of Distribution in a given language
+        downloadURL:
+          type: array
+          items:
+            type: string
+          description: Associated download URLs
+        accessURL:
+          type: array
+          items:
+            type: string
+          description: Associated access URLs
+        license:
+          $ref: '#/components/schemas/SkosConcept'
+          description: Associated license mapped as SkosConcept
+        openLicense:
+          type: boolean
+          description: Boolean representing whether associated license is open
+        conformsTo:
+          type: array
+          items:
+            $ref: '#/components/schemas/SkosConcept'
+          description: List of established standards to which the distribution conforms mapped as SkosConcept
+        page:
+          type: array
+          items:
+            $ref: '#/components/schemas/SkosConcept'
+          description: List of associated pages mapped as SkosConcept
+        format:
+          type: array
+          items:
+            type: string
+          description: Associated formats
+        accessService:
+          type: array
+          items:
+            $ref: '#/components/schemas/SkosConcept'
+          description: List of associated access services mapped as SkosConcept
+    PeriodOfTime:
+      type: object
+      description: Object representing a period of time
+      properties:
+        id:
+          type: string
+          description: ID
+        name:
+          type: string
+          description: Period name
+        startDate:
+          type: string
+          format: date
+          description: Date of period start
+        endDate:
+          type: string
+          format: date
+          description: Date of period end
+    SkosConcept:
+      type: object
+      description: Skos Concept
+      properties:
+        uri:
+          type: string
+          description: Unique resource identifier of SkosConcept
+        extraType:
+          type: string
+          description: Additional type of SkosConcept
+        prefLabel:
+          $ref: "#/components/schemas/MultiLanguageText"
+          description: Label of SkosConcept in a given language
+    QualityAnnotation:
+      type: object
+      description: Quality Annotation
+      properties:
+        inDimension:
+          type: string
+          description: Associated dimension
+        motivatedBy:
+          type: string
+          description: Associated motivation
+        hasBody:
+          $ref: "#/components/schemas/MultiLanguageText"
+          description: Body text in a given language
+    Reference:
+      type: object
+      description: Reference
+      properties:
+        referenceType:
+          $ref: '#/components/schemas/SkosCode'
+          description: Reference type mapped as SkosCode
+        source:
+          $ref: '#/components/schemas/SkosConcept'
+          description: Reference source mapped as SkosConcept
+    Definition:
+      type: object
+      description: Definition
+      properties:
+        text:
+          $ref: "#/components/schemas/MultiLanguageText"
+          description: Body text in a given language
+        remark:
+          $ref: "#/components/schemas/MultiLanguageText"
+            description: Body text in a given language
+        source:
+          $ref: '#/components/schemas/Source'
+          description: Associated source
+        targetGroup:
+          type: string
+          description: Associated target group
+        sourceRelationship:
+          type: string
+          description: Source relationship
+        range:
+          $ref: '#/components/schemas/TextAndURI'
+          description: Range of definition
+        sources:
+          type: array
+          items:
+            $ref: '#/components/schemas/TextAndURI'
+          description: List of sources
+        lastUpdated:
+          type: integer
+          description: Last updated date formatted as long
+    ContactPoint:
+      type: object
+      description: Contact information
+      properties:
+        email:
+          type: string
+          description: E-mail address
+        telephone:
+          type: string
+          description: Telephone
+    ConceptSchema:
+      type: object
+      description: Concept Schema
+      properties:
+        id:
+          type: string
+          description: ID
+        title:
+          $ref: "#/components/schemas/MultiLanguageText"
+          description: Title in a given language
+        versioninfo:
+          type: string
+          description: Version info
+        versionnumber:
+          type: string
+          description: Version number
+    Source:
+      type: object
+      description: Source descriptor
+      properties:
+        uri:
+          type: string
+          description: Unique resource identifier
+        prefLabel:
+          $ref: "#/components/schemas/MultiLanguageText"
+          description: Preferred label in a given language
+    TextAndURI:
+      type: object
+      description: Text and URI
+      properties:
+        uri:
+          type: string
+          description: Unique resource identifier
+        text:
+          $ref: "#/components/schemas/MultiLanguageText"
+          description: Associated text in a given language
+    MultiLanguageText:
+      type: object
+      description: A text field represented in one or more languages
+      properties:
+        nb:
+          type: string
+          description: the text in Bokmål(Norwegian)
+        nn:
+          type: string
+          description: the text in Nynorsk(Norwegian)
+        no:
+          type: string
+          description: the text in Norwegian(general)
+        en:
+          type: string
+          description: the text in English
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - bearerAuth: []

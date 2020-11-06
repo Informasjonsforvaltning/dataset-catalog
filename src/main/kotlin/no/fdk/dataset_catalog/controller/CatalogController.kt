@@ -31,12 +31,12 @@ class CatalogController(
                 ResponseEntity(catalogService.getAll(), HttpStatus.OK)
             permittedOrgs.isNotEmpty() ->
                 ResponseEntity(catalogService.getByIDs(permittedOrgs), HttpStatus.OK)
-            else -> ResponseEntity(HttpStatus.FORBIDDEN)
+            else -> ResponseEntity(emptyList(), HttpStatus.OK)
         }
     }
 
-    @GetMapping(value = ["/{id}"], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun getById(@AuthenticationPrincipal jwt: Jwt, @PathVariable id: String): ResponseEntity<Catalog> =
+    @GetMapping(value = ["/{catalogId}"], produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun getCatalogById(@AuthenticationPrincipal jwt: Jwt, @PathVariable id: String): ResponseEntity<Catalog> =
         if (endpointPermissions.hasOrgReadPermission(jwt, id)) {
             logger.info("Fetching catalog with ID $id")
             catalogService.getByID(id)
@@ -45,7 +45,7 @@ class CatalogController(
         } else ResponseEntity(HttpStatus.FORBIDDEN)
 
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun create(@AuthenticationPrincipal jwt: Jwt, @RequestBody catalog: Catalog): ResponseEntity<Unit> =
+    fun createCatalog(@AuthenticationPrincipal jwt: Jwt, @RequestBody catalog: Catalog): ResponseEntity<Unit> =
         if (catalog.id != null && endpointPermissions.hasOrgWritePermission(jwt, catalog.id)) {
             try {
                 catalogService.create(catalog)
@@ -58,8 +58,8 @@ class CatalogController(
         } else ResponseEntity(HttpStatus.FORBIDDEN)
 
 
-    @DeleteMapping(value = ["/{id}"])
-    fun remove(@AuthenticationPrincipal jwt: Jwt, @PathVariable("id") id: String): ResponseEntity<Unit> =
+    @DeleteMapping(value = ["/{catalogId}"])
+    fun removeCatalog(@AuthenticationPrincipal jwt: Jwt, @PathVariable("catalogId") id: String): ResponseEntity<Unit> =
         if (endpointPermissions.hasOrgWritePermission(jwt, id)) {
             try {
                 catalogService.delete(id)
@@ -72,10 +72,10 @@ class CatalogController(
         } else ResponseEntity(HttpStatus.FORBIDDEN)
 
 
-    @PutMapping(value = ["/{id}"])
-    fun update(@AuthenticationPrincipal jwt: Jwt,
-               @PathVariable("id") id: String,
-               @RequestBody catalog: Catalog): ResponseEntity<Catalog> =
+    @PutMapping(value = ["/{catalogId}"])
+    fun updateCatalog(@AuthenticationPrincipal jwt: Jwt,
+                      @PathVariable("catalogId") id: String,
+                      @RequestBody catalog: Catalog): ResponseEntity<Catalog> =
         if (catalog.id == id && endpointPermissions.hasOrgWritePermission(jwt, catalog.id)) {
             logger.info("Updating catalog with ID $id")
             catalogService.update(id, catalog)
