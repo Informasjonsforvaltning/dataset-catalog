@@ -48,7 +48,7 @@ class DatasetService (
             ?.let { datasetRepository.save(it) }
 
 
-    private fun Dataset.updateConcepts(): Dataset =
+    fun Dataset.updateConcepts(): Dataset =
         if (concepts != null && concepts.isNotEmpty()) {
             copy(concepts = getConceptsByID(concepts))
         } else this
