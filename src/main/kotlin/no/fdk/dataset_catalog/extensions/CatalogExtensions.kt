@@ -26,4 +26,8 @@ fun Catalog.update(newValues: Catalog): Catalog =
         dataset = newValues.dataset ?: dataset,
     )
 
-private fun getCatalogURI(id: String) = catalogURI + id
+private fun getCatalogURI(id: String): String? {
+    return if (catalogURI != null) {
+        catalogURI + id
+    } else null
+}

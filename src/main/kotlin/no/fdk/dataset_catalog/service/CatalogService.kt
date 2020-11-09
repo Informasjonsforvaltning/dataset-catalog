@@ -53,18 +53,19 @@ class CatalogService(val catalogRepository: CatalogRepository,
             ?.let { catalogRepository.save(it) }
 
 
-    private fun Catalog.updatePublisherIfNeeded(): Catalog =
+    fun Catalog.updatePublisherIfNeeded(): Catalog =
         if (publisher == null) {
             updatePublisher()
         } else this
 
-    private fun Catalog.updatePublisher(): Catalog =
+    fun Catalog.updatePublisher(): Catalog =
         if (id != null) {
+            val publisherUri = if (openDataEnhetsregisteret != null) (openDataEnhetsregisteret + id) else null
             copy(
                 publisher = Publisher(
                     id = id,
                     name = organizationService.getByOrgNr(id)?.name,
-                    uri = openDataEnhetsregisteret + id
+                    uri = publisherUri
                 )
             )
         } else this

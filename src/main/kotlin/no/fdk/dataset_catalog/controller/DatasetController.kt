@@ -48,7 +48,7 @@ class DatasetController(
                       @RequestBody dataset: Dataset): ResponseEntity<Unit> =
         if (endpointPermissions.hasOrgWritePermission(jwt, catalogId)) {
             try {
-                logger.info("Creating dataset in catalog $catalogId with ID ${dataset.id}")
+                logger.info("Creating dataset in catalog $catalogId")
                 datasetService.create(catalogId, dataset)
                 ResponseEntity<Unit>(HttpStatus.CREATED)
             } catch (e : Exception) {
