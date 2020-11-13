@@ -57,12 +57,6 @@ class DatasetController(
         } else ResponseEntity(HttpStatus.FORBIDDEN)
 
 
-    @PostMapping(value = ["/{id}"], consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE], headers = ["X-HTTP-Method-Override=PATCH"])
-    fun updateDatasetOverride(@AuthenticationPrincipal jwt: Jwt,
-                              @PathVariable("catalogId") catalogId: String,
-                              @PathVariable id: String,
-                              @RequestBody patch: Dataset): ResponseEntity<Unit> = updateDataset(jwt, catalogId, id, patch)
-
     @PatchMapping(value = ["/{id}"], consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun updateDataset(@AuthenticationPrincipal jwt: Jwt,
                       @PathVariable("catalogId") catalogId: String,
