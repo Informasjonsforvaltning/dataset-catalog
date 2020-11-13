@@ -9,8 +9,8 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
-class CatalogService(val catalogRepository: CatalogRepository,
-                     val organizationService: OrganizationService) {
+class CatalogService(private val catalogRepository: CatalogRepository,
+                     private val organizationService: OrganizationService) {
     @Value("\${application.openDataEnhet}")
     private val openDataEnhetsregisteret: String? = null
 

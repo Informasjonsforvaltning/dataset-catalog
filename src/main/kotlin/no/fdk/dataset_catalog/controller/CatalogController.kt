@@ -36,10 +36,10 @@ class CatalogController(
     }
 
     @GetMapping(value = ["/{catalogId}"], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun getCatalogById(@AuthenticationPrincipal jwt: Jwt, @PathVariable id: String): ResponseEntity<Catalog> =
-        if (endpointPermissions.hasOrgReadPermission(jwt, id)) {
-            logger.info("Fetching catalog with ID $id")
-            catalogService.getByID(id)
+    fun getCatalogById(@AuthenticationPrincipal jwt: Jwt, @PathVariable catalogId: String): ResponseEntity<Catalog> =
+        if (endpointPermissions.hasOrgReadPermission(jwt, catalogId)) {
+            logger.info("Fetching catalog with ID $catalogId")
+            catalogService.getByID(catalogId)
                 ?.let { ResponseEntity(it, HttpStatus.OK) }
                 ?: ResponseEntity(HttpStatus.NOT_FOUND)
         } else ResponseEntity(HttpStatus.FORBIDDEN)
@@ -52,21 +52,21 @@ class CatalogController(
                 logger.info("Created catalog with ID ${catalog.id}")
                 ResponseEntity(HttpStatus.CREATED)
             } catch (e: Exception) {
-                logger.info("Failed to create catalog with ID ${catalog.id}")
+                logger.info("Failed to create catalog with ID ${catalog.id}. Reason:", e)
                 ResponseEntity(HttpStatus.BAD_REQUEST)
             }
         } else ResponseEntity(HttpStatus.FORBIDDEN)
 
 
     @DeleteMapping(value = ["/{catalogId}"])
-    fun removeCatalog(@AuthenticationPrincipal jwt: Jwt, @PathVariable("catalogId") id: String): ResponseEntity<Unit> =
-        if (endpointPermissions.hasOrgWritePermission(jwt, id)) {
+    fun removeCatalog(@AuthenticationPrincipal jwt: Jwt, @PathVariable("catalogId") catalogId: String): ResponseEntity<Unit> =
+        if (endpointPermissions.hasOrgWritePermission(jwt, catalogId)) {
             try {
-                catalogService.delete(id)
-                logger.info("Deleted catalog with ID $id")
+                catalogService.delete(catalogId)
+                logger.info("Deleted catalog with ID $catalogId")
                 ResponseEntity(HttpStatus.OK)
             } catch (e: Exception) {
-                logger.info("Failed to delete catalog with ID $id")
+                logger.info("Failed to delete catalog with ID $catalogId.", e)
                 ResponseEntity(HttpStatus.BAD_REQUEST)
             }
         } else ResponseEntity(HttpStatus.FORBIDDEN)
@@ -74,11 +74,11 @@ class CatalogController(
 
     @PutMapping(value = ["/{catalogId}"])
     fun updateCatalog(@AuthenticationPrincipal jwt: Jwt,
-                      @PathVariable("catalogId") id: String,
+                      @PathVariable("catalogId") catalogId: String,
                       @RequestBody catalog: Catalog): ResponseEntity<Catalog> =
-        if (catalog.id == id && endpointPermissions.hasOrgWritePermission(jwt, catalog.id)) {
-            logger.info("Updating catalog with ID $id")
-            catalogService.update(id, catalog)
+        if (catalog.id == catalogId && endpointPermissions.hasOrgWritePermission(jwt, catalog.id)) {
+            logger.info("Updating catalog with ID $catalogId")
+            catalogService.update(catalogId, catalog)
                 ?.let { ResponseEntity(it, HttpStatus.OK) }
                 ?: ResponseEntity(HttpStatus.BAD_REQUEST)
         } else ResponseEntity(HttpStatus.FORBIDDEN)
