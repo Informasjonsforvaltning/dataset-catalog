@@ -2,9 +2,7 @@ package no.fdk.dataset_catalog.service
 
 import com.nhaarman.mockitokotlin2.*
 import no.fdk.dataset_catalog.extensions.updateSubjects
-import no.fdk.dataset_catalog.model.Concept
-import no.fdk.dataset_catalog.model.Dataset
-import no.fdk.dataset_catalog.model.Subject
+import no.fdk.dataset_catalog.model.*
 import no.fdk.dataset_catalog.repository.DatasetRepository
 import org.junit.jupiter.api.*
 import java.lang.Exception
@@ -16,16 +14,23 @@ import kotlin.test.assertNull
 @Tag("unit")
 class DatasetServiceTest {
     private val datasetRepository: DatasetRepository = mock()
+    private val catalogService: CatalogService = mock()
     private val conceptCatClientService: ConceptCatClientService = mock()
-    private val datasetService = DatasetService(datasetRepository, conceptCatClientService)
+    private val organizationService: OrganizationService = mock()
+    private val datasetService = DatasetService(datasetRepository, catalogService, organizationService, conceptCatClientService)
 
     @Nested
     internal inner class Create {
         @Test
         fun `persists new dataset`() {
-            val ds = Dataset("dsId", "catID")
-            datasetService.create("catId", ds)
-            verify(datasetRepository, times(1)).save(any())
+            val ds = Dataset(
+                "dsId",
+                "catId",
+                registrationStatus = REGISTRATION_STATUS.DRAFT)
+            whenever(datasetRepository.save(any())).thenReturn(ds)
+            whenever(catalogService.getByID("catId")).thenReturn(Catalog("catId"))
+            val actual = datasetService.create("catId", ds)
+            assertEquals(ds.copy(lastModified = actual.lastModified), actual)
         }
     }
 
