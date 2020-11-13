@@ -2,6 +2,7 @@ package no.fdk.dataset_catalog.utils
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
+import no.fdk.dataset_catalog.utils.jwk.JwkStore
 
 private val mockserver = WireMockServer(LOCAL_SERVER_PORT)
 
@@ -11,7 +12,8 @@ fun startMockServer() {
                 .willReturn(aResponse()
                         .withStatus(200))
         )
-
+        mockserver.stubFor(get(urlEqualTo("/auth/realms/fdk/protocol/openid-connect/certs"))
+            .willReturn(okJson(JwkStore.get())))
         mockserver.start()
     }
 }
