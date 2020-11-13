@@ -45,16 +45,16 @@ class DatasetController(
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun createDataset(@AuthenticationPrincipal jwt: Jwt,
                       @PathVariable("catalogId") catalogId: String,
-                      @RequestBody dataset: Dataset): ResponseEntity<Unit> =
+                      @RequestBody dataset: Dataset): ResponseEntity<Dataset> =
         if (endpointPermissions.hasOrgWritePermission(jwt, catalogId)) {
             try {
                 logger.info("Creating dataset in catalog $catalogId")
-                datasetService.create(catalogId, dataset)
-                ResponseEntity<Unit>(HttpStatus.CREATED)
+                ResponseEntity(datasetService.create(catalogId, dataset), HttpStatus.CREATED)
             } catch (e : Exception) {
+                logger.error("Failed to create dataset. Reason:", e)
                 ResponseEntity(HttpStatus.BAD_REQUEST)
             }
-        } else ResponseEntity<Unit>(HttpStatus.FORBIDDEN)
+        } else ResponseEntity(HttpStatus.FORBIDDEN)
 
 
     @PostMapping(value = ["/{id}"], consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE], headers = ["X-HTTP-Method-Override=PATCH"])
@@ -75,6 +75,7 @@ class DatasetController(
                     ?.let { ResponseEntity(HttpStatus.OK) }
                     ?: ResponseEntity(HttpStatus.BAD_REQUEST)
             } catch (e : Exception) {
+                logger.error("Failed to update dataset. Reason:", e)
                 ResponseEntity(HttpStatus.BAD_REQUEST)
             }
         } else ResponseEntity<Unit>(HttpStatus.FORBIDDEN)
@@ -90,7 +91,7 @@ class DatasetController(
                 logger.info("Successfully deleted dataset with ID $id from catalog with ID $catalogId")
                 ResponseEntity(HttpStatus.OK)
             } catch (e : Exception) {
-                logger.info("Failed to delete dataset with ID $id from catalog with ID $catalogId")
+                logger.info("Failed to delete dataset with ID $id from catalog with ID $catalogId. ",e)
                 ResponseEntity(HttpStatus.BAD_REQUEST)
             }
         } else ResponseEntity(HttpStatus.FORBIDDEN)
