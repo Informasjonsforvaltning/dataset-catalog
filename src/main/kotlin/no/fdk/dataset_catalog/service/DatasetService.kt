@@ -18,7 +18,7 @@ class DatasetService(
     private val datasetRepository: DatasetRepository,
     private val catalogService: CatalogService,
     private val organizationService: OrganizationService,
-    private val conceptCatClientService: ConceptCatClientService,
+    private val conceptService: ConceptService,
 ) {
 
     fun getAll(catalogId: String): Collection<Dataset> =
@@ -87,6 +87,6 @@ class DatasetService(
     }
 
     private fun getConceptsByID(patchConcepts: Collection<Concept>): List<Concept> =
-        conceptCatClientService.getByIds(patchConcepts.mapNotNull { it.id })
+        conceptService.getConcepts(patchConcepts.mapNotNull { it.id })
 
 }
