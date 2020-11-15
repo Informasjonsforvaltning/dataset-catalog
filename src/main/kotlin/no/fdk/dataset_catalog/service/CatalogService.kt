@@ -11,8 +11,6 @@ import org.springframework.stereotype.Service
 @Service
 class CatalogService(private val catalogRepository: CatalogRepository,
                      private val organizationService: OrganizationService) {
-    @Value("\${application.openDataEnhet}")
-    private val openDataEnhetsregisteret: String? = null
 
     fun getAll(): List<Catalog> = catalogRepository.findAll()
 
@@ -28,7 +26,7 @@ class CatalogService(private val catalogRepository: CatalogRepository,
         adminableOrgs.forEach{
             if (getByID(it) == null){
                 try {
-                    val organizationName: String? = organizationService.getByOrgNr(it)?.name
+                    val organizationName: String? = organizationService.getOrganization(it)?.name
                     if (organizationName != null) {
                         create(Catalog(id=it, title = mapOf( Pair("nb", "Datakatalog for $organizationName") )))
                     } else {
@@ -60,11 +58,11 @@ class CatalogService(private val catalogRepository: CatalogRepository,
 
     fun Catalog.updatePublisher(): Catalog =
         if (id != null) {
-            val publisherUri = if (openDataEnhetsregisteret != null) (openDataEnhetsregisteret + id) else null
+            val publisherUri = "https://data.brreg.no/enhetsregisteret/api/enheter/$id"
             copy(
                 publisher = Publisher(
                     id = id,
-                    name = organizationService.getByOrgNr(id)?.name,
+                    name = organizationService.getOrganization(id)?.name,
                     uri = publisherUri
                 )
             )

@@ -15,9 +15,9 @@ import kotlin.test.assertNull
 class DatasetServiceTest {
     private val datasetRepository: DatasetRepository = mock()
     private val catalogService: CatalogService = mock()
-    private val conceptCatClientService: ConceptCatClientService = mock()
+    private val conceptService: ConceptService = mock()
     private val organizationService: OrganizationService = mock()
-    private val datasetService = DatasetService(datasetRepository, catalogService, organizationService, conceptCatClientService)
+    private val datasetService = DatasetService(datasetRepository, catalogService, organizationService, conceptService)
 
     @Nested
     internal inner class Create {
@@ -108,7 +108,7 @@ class DatasetServiceTest {
         fun `updates concepts`() {
             val ds = Dataset("dsId", "catId", concepts = listOf(Concept("1")))
             val expected = Dataset("dsId", "catId", concepts = listOf(Concept("1", uri="uri")))
-            whenever(conceptCatClientService.getByIds(listOf("1"))).thenReturn(listOf(Concept("1", uri="uri")))
+            whenever(conceptService.getConcepts(listOf("1"))).thenReturn(listOf(Concept("1", uri="uri")))
             val actual = with(datasetService) {ds.updateConcepts()}
             assertEquals(expected, actual)
         }
