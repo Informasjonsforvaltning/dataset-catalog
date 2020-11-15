@@ -308,7 +308,7 @@ data class PeriodOfTime (
 
 data class SkosConcept (
     val uri: String? = null,
-    val prefLabel: MutableMap<String, String> = mutableMapOf(),
+    val prefLabel: Map<String, String> = mutableMapOf(),
     val extraType: String? = null,
 )
 
