@@ -75,8 +75,8 @@ class CatalogContractTest: ApiTestContext() {
 
         @Test
         fun `Both read and write can read`() {
-            val rspRead = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1", null, JwtToken(Access.ORG_READ).toString(), "GET")
-            val rspWrite = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1", null, JwtToken(Access.ORG_WRITE).toString(), "GET")
+            val rspRead = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_5", null, JwtToken(Access.ORG_READ).toString(), "GET")
+            val rspWrite = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_5", null, JwtToken(Access.ORG_WRITE).toString(), "GET")
 
             Assumptions.assumeTrue(HttpStatus.OK.value() == rspRead["status"])
             Assumptions.assumeTrue(HttpStatus.OK.value() == rspWrite["status"])
@@ -84,8 +84,8 @@ class CatalogContractTest: ApiTestContext() {
             val bodyRead: Catalog = mapper.readValue(rspRead["body"] as String)
             val bodyWrite: Catalog = mapper.readValue(rspWrite["body"] as String)
 
-            assertEquals(DB_CATALOG_1.copy(publisher = bodyRead.publisher), bodyRead)
-            assertEquals(DB_CATALOG_1.copy(publisher = bodyRead.publisher), bodyWrite)
+            assertEquals(DB_CATALOG_5.copy(publisher = bodyRead.publisher), bodyRead)
+            assertEquals(DB_CATALOG_5.copy(publisher = bodyRead.publisher), bodyWrite)
         }
 
         @Test
@@ -93,7 +93,7 @@ class CatalogContractTest: ApiTestContext() {
             val rspRead = apiAuthorizedRequest("/catalogs/", null, JwtToken(Access.ORG_READ).toString(), "GET")
             val bodyRead: List<Catalog> = mapper.readValue(rspRead["body"] as String)
 
-            assertEquals(listOf(DB_CATALOG_1), bodyRead)
+            assertEquals(setOf(DB_CATALOG_ID_1, DB_CATALOG_ID_5) , bodyRead.map { it.id }.toSet())
         }
 
     }
@@ -122,18 +122,18 @@ class CatalogContractTest: ApiTestContext() {
 
         @Test
         fun `Able to get before and after update`() {
-            val preUpdate = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1", null, JwtToken(Access.ORG_WRITE).toString(), "GET")
+            val preUpdate = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_5", null, JwtToken(Access.ORG_WRITE).toString(), "GET")
             Assumptions.assumeTrue(HttpStatus.OK.value() == preUpdate["status"])
             val bodyPreUpdate: Catalog = mapper.readValue(preUpdate["body"] as String)
-            Assumptions.assumeTrue(DB_CATALOG_1 == bodyPreUpdate)
+            Assumptions.assumeTrue(DB_CATALOG_5 == bodyPreUpdate)
 
-            val toUpdate = DB_CATALOG_1.copy(language = "English")
-            Assumptions.assumeFalse(DB_CATALOG_1 == toUpdate)
+            val toUpdate = DB_CATALOG_5.copy(language = "English")
+            Assumptions.assumeFalse(DB_CATALOG_5 == toUpdate)
 
-            val rspUpdate = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1", mapper.writeValueAsString(toUpdate), JwtToken(Access.ORG_WRITE).toString(), "PUT")
+            val rspUpdate = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_5", mapper.writeValueAsString(toUpdate), JwtToken(Access.ORG_WRITE).toString(), "PUT")
             Assumptions.assumeTrue(HttpStatus.OK.value() == rspUpdate["status"])
 
-            val postUpdate = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1", null, JwtToken(Access.ORG_WRITE).toString(), "GET")
+            val postUpdate = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_5", null, JwtToken(Access.ORG_WRITE).toString(), "GET")
             Assumptions.assumeTrue(HttpStatus.OK.value() == postUpdate["status"])
             val bodyPostUpdate: Catalog = mapper.readValue(postUpdate["body"] as String)
             assertEquals(toUpdate.copy(publisher = bodyPostUpdate.publisher), bodyPostUpdate)

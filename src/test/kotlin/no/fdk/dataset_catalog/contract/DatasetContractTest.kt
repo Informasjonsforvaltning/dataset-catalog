@@ -60,7 +60,27 @@ class DatasetContractTest: ApiTestContext() {
             assertEquals(DATASET_1.copy(lastModified = bodyGet.lastModified, uri = bodyGet.uri, publisher = bodyGet.publisher), bodyGet)
 
             apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/$DATASET_ID_1", null, JwtToken(Access.ORG_WRITE).toString(), "DELETE")
+        }
 
+        @Test
+        fun `All fields are persisted`() {
+            val rspCreate = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/", mapper.writeValueAsString(DATASET_2), JwtToken(Access.ORG_WRITE).toString(), "POST")
+            Assumptions.assumeTrue(HttpStatus.CREATED.value() == rspCreate["status"])
+
+
+            val rspGet = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/$DATASET_ID_2", null, JwtToken(Access.ORG_WRITE).toString(), "GET")
+            Assumptions.assumeTrue(HttpStatus.OK.value() == rspGet["status"])
+
+            val bodyGet: Dataset = mapper.readValue(rspGet["body"] as String)
+            assertEquals(
+                DATASET_2.copy(
+                    lastModified = bodyGet.lastModified,
+                    concepts = bodyGet.concepts,
+                    subjects = bodyGet.subjects,
+                    uri = bodyGet.uri)
+                , bodyGet)
+
+            apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/$DATASET_ID_2", null, JwtToken(Access.ORG_WRITE).toString(), "DELETE")
         }
 
     }
@@ -96,7 +116,7 @@ class DatasetContractTest: ApiTestContext() {
             val rspRead = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets", null, JwtToken(Access.ORG_READ).toString(), "GET")
             val bodyRead: List<Dataset> = mapper.readValue(rspRead["body"] as String)
 
-            assertEquals(listOf(DB_DATASET_1, DB_DATASET_2, DB_DATASET_3), bodyRead)
+            assertEquals(listOf(DB_DATASET_ID_1, DB_DATASET_ID_2, DB_DATASET_ID_3), bodyRead.map { it.id })
         }
 
     }
@@ -140,6 +160,29 @@ class DatasetContractTest: ApiTestContext() {
             Assumptions.assumeTrue(HttpStatus.OK.value() == postUpdate["status"])
             val bodyPostUpdate: Dataset = mapper.readValue(postUpdate["body"] as String)
             assertEquals(toUpdate.copy(lastModified = bodyPostUpdate.lastModified), bodyPostUpdate)
+        }
+
+        @Test
+        fun `Only specified fields are updated`() {
+            val updated = DB_DATASET_2.copy(
+                source = "brreg",
+                catalog = DB_CATALOG_1
+            )
+
+            val rspUpdate = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_2}", mapper.writeValueAsString(updated), JwtToken(Access.ORG_WRITE).toString(), "PATCH")
+            Assumptions.assumeTrue(HttpStatus.OK.value() == rspUpdate["status"])
+
+            val postUpdate = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_2}", null, JwtToken(Access.ORG_WRITE).toString(), "GET")
+            Assumptions.assumeTrue(HttpStatus.OK.value() == postUpdate["status"])
+
+            val bodyPostUpdate: Dataset = mapper.readValue(postUpdate["body"] as String)
+
+            assertEquals(
+                updated.copy(
+                    lastModified = bodyPostUpdate.lastModified,
+                    concepts = bodyPostUpdate.concepts,
+                    subjects = bodyPostUpdate.subjects,)
+                , bodyPostUpdate)
         }
     }
 
