@@ -22,7 +22,7 @@ mvn spring-boot:run -Dspring.profiles.active=develop
 
 Then in another terminal e.g.
 ```
-% curl http://localhost:8080/catalogs
+% curl http://localhost:8080/ping
 ```
 
 ## Datastore
