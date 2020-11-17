@@ -28,6 +28,6 @@ spring:
   profiles: contract-test
   security.oauth2.resourceserver.jwt.jwk-set-uri: http://localhost:5000/auth/realms/fdk/protocol/openid-connect/certs
 server.port: 5555
-
-
-
+application:
+  conceptCatalogueHost: http://localhost:5000/api
+  organizationCatalogueHost: http://localhost:5000/organizations
