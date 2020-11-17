@@ -3,6 +3,7 @@ package no.fdk.dataset_catalog.contract
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.fdk.dataset_catalog.model.Catalog
+import no.fdk.dataset_catalog.model.CatalogDTO
 import no.fdk.dataset_catalog.utils.*
 import no.fdk.dataset_catalog.utils.jwk.Access
 import no.fdk.dataset_catalog.utils.jwk.JwtToken
@@ -48,7 +49,6 @@ class CatalogContractTest: ApiTestContext() {
         @Test
         fun `Able to get after create`() {
             val rspCreate = apiAuthorizedRequest("/catalogs/", mapper.writeValueAsString(CATALOG_1), JwtToken(Access.ORG_WRITE).toString(), "POST")
-            println(rspCreate)
             Assumptions.assumeTrue(HttpStatus.CREATED.value() == rspCreate["status"])
 
 
@@ -91,9 +91,9 @@ class CatalogContractTest: ApiTestContext() {
         @Test
         fun `Get All catalogs returns all permitted catalogs`() {
             val rspRead = apiAuthorizedRequest("/catalogs/", null, JwtToken(Access.ORG_READ).toString(), "GET")
-            val bodyRead: List<Catalog> = mapper.readValue(rspRead["body"] as String)
+            val bodyRead: CatalogDTO = mapper.readValue(rspRead["body"] as String)
 
-            assertEquals(setOf(DB_CATALOG_ID_1, DB_CATALOG_ID_5) , bodyRead.map { it.id }.toSet())
+            assertEquals(setOf(DB_CATALOG_ID_1, DB_CATALOG_ID_5) , bodyRead._embedded?.get("catalogs")?.map { it.id }?.toSet())
         }
 
     }

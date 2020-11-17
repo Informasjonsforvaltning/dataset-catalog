@@ -3,6 +3,8 @@ package no.fdk.dataset_catalog.extensions
 import no.fdk.dataset_catalog.model.*
 import java.time.LocalDateTime
 
+fun List<Dataset>.toDTO() : DatasetDTO = DatasetDTO(mapOf(Pair("datasets", this)))
+
 fun Dataset.updateSubjects(): Dataset =
     copy(subjects = concepts?.map {
         Subject(
