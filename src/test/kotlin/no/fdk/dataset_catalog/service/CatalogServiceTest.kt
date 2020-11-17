@@ -1,6 +1,7 @@
 package no.fdk.dataset_catalog.service
 
 import com.nhaarman.mockitokotlin2.*
+import no.fdk.dataset_catalog.configuration.ApplicationProperties
 import no.fdk.dataset_catalog.extensions.updateUriIfNeeded
 import no.fdk.dataset_catalog.model.Catalog
 import no.fdk.dataset_catalog.repository.CatalogRepository
@@ -21,7 +22,8 @@ import kotlin.test.assertNull
 class CatalogServiceTest {
     private val catalogRepository: CatalogRepository = mock()
     private val organizationService: OrganizationService = mock()
-    private val catalogService = CatalogService(catalogRepository, organizationService)
+    private val applicationProperties = ApplicationProperties("localhost:5000", "localhost:5000")
+    private val catalogService = CatalogService(catalogRepository, organizationService, applicationProperties)
 
     @Nested
     internal inner class Create{

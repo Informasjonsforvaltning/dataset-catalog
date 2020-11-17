@@ -2,9 +2,9 @@ package no.fdk.dataset_catalog.service
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import no.fdk.dataset_catalog.configuration.ApplicationProperties
 import no.fdk.dataset_catalog.model.Organization
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.*
 import org.springframework.stereotype.Service
 import java.io.BufferedReader
@@ -15,8 +15,7 @@ private val logger = LoggerFactory.getLogger(OrganizationService::class.java)
 
 @Service
 class OrganizationService(
-    @Value("\${application.organizationCatalogueHost}")
-    private val organizationCatalogueHost: String? = null) {
+    private val applicationProperties: ApplicationProperties) {
 
     fun hasDelegationPermission(id: String): Boolean {
         val allowDelegatedRegistration: Boolean? = getOrganization(id)?.allowDelegatedRegistration
@@ -24,7 +23,7 @@ class OrganizationService(
     }
 
     fun getOrganization(organizationNumber: String?): Organization? {
-        URL("$organizationCatalogueHost/organizations/$organizationNumber")
+        URL("${applicationProperties.organizationCatalogueHost}/organizations/$organizationNumber")
             .openConnection()
             .run {
                 this as HttpURLConnection

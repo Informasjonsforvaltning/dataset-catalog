@@ -1,16 +1,17 @@
 package no.fdk.dataset_catalog.service
 
+import no.fdk.dataset_catalog.configuration.ApplicationProperties
 import no.fdk.dataset_catalog.extensions.*
 import no.fdk.dataset_catalog.model.Catalog
 import no.fdk.dataset_catalog.model.Publisher
 import no.fdk.dataset_catalog.repository.CatalogRepository
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
 class CatalogService(private val catalogRepository: CatalogRepository,
-                     private val organizationService: OrganizationService) {
+                     private val organizationService: OrganizationService,
+                     private val applicationProperties: ApplicationProperties) {
 
     fun getAll(): List<Catalog> = catalogRepository.findAll()
 
@@ -56,14 +57,13 @@ class CatalogService(private val catalogRepository: CatalogRepository,
             updatePublisher()
         } else this
 
-    fun Catalog.updatePublisher(): Catalog =
+    private fun Catalog.updatePublisher(): Catalog =
         if (id != null) {
-            val publisherUri = "https://data.brreg.no/enhetsregisteret/api/enheter/$id"
             copy(
                 publisher = Publisher(
                     id = id,
                     name = organizationService.getOrganization(id)?.name,
-                    uri = publisherUri
+                    uri = "${applicationProperties.organizationCatalogueHost}/organizations/$id"
                 )
             )
         } else this
