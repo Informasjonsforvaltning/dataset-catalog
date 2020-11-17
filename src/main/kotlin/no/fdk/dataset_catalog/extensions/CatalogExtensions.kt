@@ -1,10 +1,13 @@
 package no.fdk.dataset_catalog.extensions
 
 import no.fdk.dataset_catalog.model.Catalog
+import no.fdk.dataset_catalog.model.CatalogDTO
 import org.springframework.beans.factory.annotation.Value
 
 @Value("\${application.catalogURI}")
 private val catalogURI: String? = null
+
+fun List<Catalog>.toDTO() : CatalogDTO = CatalogDTO(mapOf(Pair("catalogs", this)))
 
 fun Catalog.verifyId(other: Catalog): Catalog? = if (this.id.equals(other.id)) this else null
 

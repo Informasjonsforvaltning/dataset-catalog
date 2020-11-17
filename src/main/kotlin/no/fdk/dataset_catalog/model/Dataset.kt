@@ -1,5 +1,6 @@
 package no.fdk.dataset_catalog.model
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
@@ -12,7 +13,12 @@ import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDate
 import java.time.LocalDateTime
 
+data class DatasetDTO(
+    val _embedded: Map<String, List<Dataset>>?
+)
+
 @Document( collection = "datasets" )
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class Dataset(
     @Id
     val id: String? = null,

@@ -1,6 +1,8 @@
 package no.fdk.dataset_catalog.controller
 
+import no.fdk.dataset_catalog.extensions.toDTO
 import no.fdk.dataset_catalog.model.Dataset
+import no.fdk.dataset_catalog.model.DatasetDTO
 import no.fdk.dataset_catalog.security.EndpointPermissions
 import no.fdk.dataset_catalog.service.DatasetService
 import org.slf4j.LoggerFactory
@@ -22,11 +24,10 @@ class DatasetController(
 
     @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getAllDatasets(@AuthenticationPrincipal jwt: Jwt,
-                       @PathVariable("catalogId") catalogId: String): ResponseEntity<Collection<Dataset>> =
+                       @PathVariable("catalogId") catalogId: String): ResponseEntity<DatasetDTO> =
         if (endpointPermissions.hasOrgReadPermission(jwt, catalogId)) {
             logger.info("Fetching datasets for catalog with ID $catalogId")
-            datasetService.getAll(catalogId)
-                .let { ResponseEntity(it, HttpStatus.OK) }
+            ResponseEntity(datasetService.getAll(catalogId).toDTO(), HttpStatus.OK)
         } else ResponseEntity(HttpStatus.FORBIDDEN)
 
 

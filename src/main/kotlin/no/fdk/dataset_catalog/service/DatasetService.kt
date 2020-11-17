@@ -21,8 +21,8 @@ class DatasetService(
     private val conceptService: ConceptService,
 ) {
 
-    fun getAll(catalogId: String): Collection<Dataset> =
-        datasetRepository.findByCatalogId(catalogId)
+    fun getAll(catalogId: String): List<Dataset> =
+        datasetRepository.findByCatalogId(catalogId) as List<Dataset>
 
     fun getByID(catalogId: String, id: String): Dataset? {
         val dataset = datasetRepository.findByIdOrNull(id)
@@ -53,7 +53,6 @@ class DatasetService(
             .updateSubjects()
             .let { datasetRepository.save(it) }
     }
-
 
     fun count() {
         datasetRepository.count()

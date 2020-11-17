@@ -2,8 +2,8 @@ package no.fdk.dataset_catalog.contract
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import no.fdk.dataset_catalog.model.Catalog
 import no.fdk.dataset_catalog.model.Dataset
+import no.fdk.dataset_catalog.model.DatasetDTO
 import no.fdk.dataset_catalog.utils.*
 import no.fdk.dataset_catalog.utils.jwk.Access
 import no.fdk.dataset_catalog.utils.jwk.JwtToken
@@ -114,9 +114,9 @@ class DatasetContractTest: ApiTestContext() {
         @Test
         fun `Get All datasets returns all datasets in catalog`() {
             val rspRead = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets", null, JwtToken(Access.ORG_READ).toString(), "GET")
-            val bodyRead: List<Dataset> = mapper.readValue(rspRead["body"] as String)
+            val bodyRead: DatasetDTO = mapper.readValue(rspRead["body"] as String)
 
-            assertEquals(listOf(DB_DATASET_ID_1, DB_DATASET_ID_2, DB_DATASET_ID_3), bodyRead.map { it.id })
+            assertEquals(listOf(DB_DATASET_ID_1, DB_DATASET_ID_2, DB_DATASET_ID_3), bodyRead._embedded?.get("datasets")?.map { it.id })
         }
 
     }

@@ -1,6 +1,8 @@
 package no.fdk.dataset_catalog.controller
 
+import no.fdk.dataset_catalog.extensions.toDTO
 import no.fdk.dataset_catalog.model.Catalog
+import no.fdk.dataset_catalog.model.CatalogDTO
 import no.fdk.dataset_catalog.security.EndpointPermissions
 import no.fdk.dataset_catalog.service.CatalogService
 import org.slf4j.LoggerFactory
@@ -21,17 +23,17 @@ class CatalogController(
     private val endpointPermissions: EndpointPermissions) {
 
     @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun getAllPermitted(@AuthenticationPrincipal jwt: Jwt): ResponseEntity<List<Catalog>> {
+    fun getAllPermitted(@AuthenticationPrincipal jwt: Jwt): ResponseEntity<CatalogDTO> {
         val permittedOrgs = endpointPermissions.getOrgsByPermission(jwt, "read")
         val adminableOrgs = endpointPermissions.getOrgsByPermission(jwt, "admin")
         catalogService.createCatalogsIfNeeded(adminableOrgs)
         logger.info(if (permittedOrgs.isEmpty()) "No permitted catalogs to fetch" else "Fetching catalogs for organizations in $permittedOrgs")
         return when {
             endpointPermissions.hasSysAdminPermission(jwt) ->
-                ResponseEntity(catalogService.getAll(), HttpStatus.OK)
+                ResponseEntity(catalogService.getAll().toDTO(), HttpStatus.OK)
             permittedOrgs.isNotEmpty() ->
-                ResponseEntity(catalogService.getByIDs(permittedOrgs), HttpStatus.OK)
-            else -> ResponseEntity(emptyList(), HttpStatus.OK)
+                ResponseEntity(catalogService.getByIDs(permittedOrgs).toDTO(), HttpStatus.OK)
+            else -> ResponseEntity(CatalogDTO(null), HttpStatus.OK)
         }
     }
 
