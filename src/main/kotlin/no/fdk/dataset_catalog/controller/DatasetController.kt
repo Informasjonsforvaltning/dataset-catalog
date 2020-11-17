@@ -62,18 +62,18 @@ class DatasetController(
     fun updateDataset(@AuthenticationPrincipal jwt: Jwt,
                       @PathVariable("catalogId") catalogId: String,
                       @PathVariable id: String,
-                      @RequestBody patch: Dataset): ResponseEntity<Unit> =
+                      @RequestBody patch: Dataset): ResponseEntity<Dataset> =
         if (endpointPermissions.hasOrgWritePermission(jwt, catalogId)) {
             try {
                 logger.info("Updating dataset with ID $id for catalog with ID $catalogId")
                 datasetService.updateDataset(catalogId, id, patch)
-                    ?.let { ResponseEntity(HttpStatus.OK) }
+                    ?.let {ResponseEntity(it, HttpStatus.OK) }
                     ?: ResponseEntity(HttpStatus.BAD_REQUEST)
             } catch (e : Exception) {
                 logger.error("Failed to update dataset. Reason:", e)
                 ResponseEntity(HttpStatus.BAD_REQUEST)
             }
-        } else ResponseEntity<Unit>(HttpStatus.FORBIDDEN)
+        } else ResponseEntity(HttpStatus.FORBIDDEN)
 
 
     @DeleteMapping(value = ["/{id}"])
