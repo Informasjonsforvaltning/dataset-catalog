@@ -1,5 +1,5 @@
 # dataset-catalog
-A back end service service for creating dataset catalogues and datasets. Exposes a dcat-ap-no endpoint.
+A back end service for creating dataset catalogues and datasets. Exposes a dcat-ap-no endpoint.
 
 
 ## Requirements
@@ -17,7 +17,7 @@ mvn verify
 ## Run locally
 ```
 docker-compose up -d
-mvn spring-boot:run -Dspring.profiles.active=develop
+mvn spring-boot:run -Dspring-boot.run.profiles=develop
 ```
 
 Then in another terminal e.g.
