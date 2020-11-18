@@ -23,23 +23,13 @@ class CatalogController(
     private val endpointPermissions: EndpointPermissions) {
 
     @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun getAllPermitted(@AuthenticationPrincipal jwt: Jwt): ResponseEntity<CatalogDTO> {
-        val permittedOrgs = endpointPermissions.getOrgsByPermission(jwt, "read")
-        val adminableOrgs = endpointPermissions.getOrgsByPermission(jwt, "admin")
-        catalogService.createCatalogsIfNeeded(adminableOrgs)
-        logger.info(if (permittedOrgs.isEmpty()) "No permitted catalogs to fetch" else "Fetching catalogs for organizations in $permittedOrgs")
-        return when {
-            endpointPermissions.hasSysAdminPermission(jwt) ->
-                ResponseEntity(catalogService.getAll().toDTO(), HttpStatus.OK)
-            permittedOrgs.isNotEmpty() ->
-                ResponseEntity(catalogService.getByIDs(permittedOrgs).toDTO(), HttpStatus.OK)
-            else -> ResponseEntity(CatalogDTO(null), HttpStatus.OK)
-        }
+    fun getAllPermitted(): ResponseEntity<CatalogDTO> {
+        return ResponseEntity(catalogService.getAll().toDTO(), HttpStatus.OK)
     }
 
     @GetMapping(value = ["/{catalogId}"], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun getCatalogById(@AuthenticationPrincipal jwt: Jwt, @PathVariable catalogId: String): ResponseEntity<Catalog> =
-        if (endpointPermissions.hasOrgReadPermission(jwt, catalogId)) {
+    fun getCatalogById(@PathVariable catalogId: String): ResponseEntity<Catalog> =
+        if (true) {
             logger.info("Fetching catalog with ID $catalogId")
             catalogService.getByID(catalogId)
                 ?.let { ResponseEntity(it, HttpStatus.OK) }
@@ -47,8 +37,8 @@ class CatalogController(
         } else ResponseEntity(HttpStatus.FORBIDDEN)
 
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun createCatalog(@AuthenticationPrincipal jwt: Jwt, @RequestBody catalog: Catalog): ResponseEntity<Unit> =
-        if (catalog.id != null && endpointPermissions.hasOrgWritePermission(jwt, catalog.id)) {
+    fun createCatalog(@RequestBody catalog: Catalog): ResponseEntity<Unit> =
+        if (catalog.id != null) {
             try {
                 catalogService.create(catalog)
                 logger.info("Created catalog with ID ${catalog.id}")
@@ -61,8 +51,8 @@ class CatalogController(
 
 
     @DeleteMapping(value = ["/{catalogId}"])
-    fun removeCatalog(@AuthenticationPrincipal jwt: Jwt, @PathVariable("catalogId") catalogId: String): ResponseEntity<Unit> =
-        if (endpointPermissions.hasOrgWritePermission(jwt, catalogId)) {
+    fun removeCatalog(@PathVariable("catalogId") catalogId: String): ResponseEntity<Unit> =
+        if (true) {
             try {
                 catalogService.delete(catalogId)
                 logger.info("Deleted catalog with ID $catalogId")
@@ -75,10 +65,10 @@ class CatalogController(
 
 
     @PutMapping(value = ["/{catalogId}"])
-    fun updateCatalog(@AuthenticationPrincipal jwt: Jwt,
+    fun updateCatalog(
                       @PathVariable("catalogId") catalogId: String,
                       @RequestBody catalog: Catalog): ResponseEntity<Catalog> =
-        if (catalog.id == catalogId && endpointPermissions.hasOrgWritePermission(jwt, catalog.id)) {
+        if (catalog.id == catalogId) {
             logger.info("Updating catalog with ID $catalogId")
             catalogService.update(catalogId, catalog)
                 ?.let { ResponseEntity(it, HttpStatus.OK) }

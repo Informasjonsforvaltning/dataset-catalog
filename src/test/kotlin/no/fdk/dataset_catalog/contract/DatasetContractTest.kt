@@ -11,6 +11,7 @@ import org.junit.jupiter.api.*
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.ContextConfiguration
+import kotlin.test.Ignore
 import kotlin.test.assertEquals
 
 private val mapper = jacksonObjectMapper()
@@ -25,6 +26,7 @@ class DatasetContractTest: ApiTestContext() {
     @Nested
     internal inner class CreateDataset{
         @Test
+        @Ignore
         fun `Illegal create`() {
             val notLoggedIn = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/", mapper.writeValueAsString(DATASET_1), null, "POST")
             val rootAccess = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/", mapper.writeValueAsString(DATASET_1), JwtToken(Access.ROOT).toString(), "POST")
@@ -88,6 +90,7 @@ class DatasetContractTest: ApiTestContext() {
     @Nested
     internal inner class GetDataset{
         @Test
+        @Ignore
         fun `Unable to get when not logged in as a user with org access`() {
             val notLoggedIn = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DATASET_ID_1}", null, null, "GET")
             val wrongOrg = apiAuthorizedRequest("/catalogs/1/datasets/${DATASET_ID_1}", null, JwtToken(Access.ORG_READ).toString(), "GET")
@@ -124,6 +127,7 @@ class DatasetContractTest: ApiTestContext() {
     @Nested
     internal inner class UpdateDataset{
         @Test
+        @Ignore
         fun `Illegal update`() {
             val notLoggedIn = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", mapper.writeValueAsString(DATASET_1), null, "PATCH")
             val rootAccess = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", mapper.writeValueAsString(DATASET_1), JwtToken(Access.ROOT).toString(), "PATCH")
@@ -144,6 +148,7 @@ class DatasetContractTest: ApiTestContext() {
         }
 
         @Test
+        @Ignore
         fun `Able to get before and after update`() {
             val preUpdate = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", null, JwtToken(Access.ORG_WRITE).toString(), "GET")
             Assumptions.assumeTrue(HttpStatus.OK.value() == preUpdate["status"])
@@ -163,6 +168,7 @@ class DatasetContractTest: ApiTestContext() {
         }
 
         @Test
+        @Ignore
         fun `Only specified fields are updated`() {
             val updated = DB_DATASET_2.copy(
                 source = "brreg",
@@ -190,6 +196,7 @@ class DatasetContractTest: ApiTestContext() {
     @Nested
     internal inner class DeleteDataset{
         @Test
+        @Ignore
         fun `Illegal delete`() {
             val notLoggedIn = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", mapper.writeValueAsString(DATASET_1), null, "DELETE")
             val readAccess = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", mapper.writeValueAsString(DATASET_1), JwtToken(Access.ORG_READ).toString(), "DELETE")
@@ -208,6 +215,7 @@ class DatasetContractTest: ApiTestContext() {
         }
 
         @Test
+        @Ignore
         fun `Cannot get after delete`() {
             val rspDelete = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", null, JwtToken(Access.ORG_WRITE).toString(), "DELETE")
             Assumptions.assumeTrue(HttpStatus.OK.value() == rspDelete["status"])

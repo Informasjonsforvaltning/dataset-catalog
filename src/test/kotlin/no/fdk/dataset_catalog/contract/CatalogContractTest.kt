@@ -11,6 +11,7 @@ import org.junit.jupiter.api.*
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.ContextConfiguration
+import kotlin.test.Ignore
 import kotlin.test.assertEquals
 
 private val mapper = jacksonObjectMapper()
@@ -25,6 +26,7 @@ class CatalogContractTest: ApiTestContext() {
     @Nested
     internal inner class CreateCatalog {
         @Test
+        @Ignore
         fun `Illegal create`() {
             val notLoggedIn = apiAuthorizedRequest("/catalogs/", mapper.writeValueAsString(CATALOG_1), null, "POST")
             val rootAccess = apiAuthorizedRequest("/catalogs/", mapper.writeValueAsString(CATALOG_1), JwtToken(Access.ROOT).toString(), "POST")
@@ -65,6 +67,7 @@ class CatalogContractTest: ApiTestContext() {
     @Nested
     internal inner class GetCatalog {
         @Test
+        @Ignore
         fun `Unable to get when not logged in as a user with org access`() {
             val notLoggedIn = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1", null, null, "GET")
             val wrongOrg = apiAuthorizedRequest("/catalogs/1", null, JwtToken(Access.ORG_READ).toString(), "GET")
@@ -89,6 +92,7 @@ class CatalogContractTest: ApiTestContext() {
         }
 
         @Test
+        @Ignore
         fun `Get All catalogs returns all permitted catalogs`() {
             val rspRead = apiAuthorizedRequest("/catalogs/", null, JwtToken(Access.ORG_READ).toString(), "GET")
             val bodyRead: CatalogDTO = mapper.readValue(rspRead["body"] as String)
@@ -101,6 +105,7 @@ class CatalogContractTest: ApiTestContext() {
     @Nested
     internal inner class UpdateCatalog {
         @Test
+        @Ignore
         fun `Illegal update`() {
             val notLoggedIn = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1", mapper.writeValueAsString(DB_CATALOG_1), null, "PUT")
             val rootAccess = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1", mapper.writeValueAsString(DB_CATALOG_1), JwtToken(Access.ROOT).toString(), "PUT")
@@ -144,6 +149,7 @@ class CatalogContractTest: ApiTestContext() {
     @Nested
     internal inner class DeleteCatalog {
         @Test
+        @Ignore
         fun `Illegal delete`() {
             val notLoggedIn = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1", mapper.writeValueAsString(CATALOG_1), null, "DELETE")
             val readAccess = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1", mapper.writeValueAsString(CATALOG_1), JwtToken(Access.ORG_READ).toString(), "DELETE")
