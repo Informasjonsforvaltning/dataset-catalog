@@ -23,7 +23,7 @@ class ConceptService(
     }
 
     private fun getConcept(id: String): Concept? {
-        URL("${applicationProperties.conceptCatalogueHost}/concepts/$id")
+        URL("${applicationProperties.conceptCatalogueHost}/api/concepts/$id")
             .openConnection()
             .run {
                 this as HttpURLConnection
