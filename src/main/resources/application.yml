@@ -8,8 +8,8 @@ logging:
   level.org.springframework: WARN
   level.org.springframework.web: WARN
 application:
-  conceptCatalogueHost: {FDK_BASE_HOST:https://staging.fellesdatakatalog.digdir.no}
-  organizationCatalogueHost: {ORGANIZATION_CATALOGUE_HOST:https://organization-catalogue.staging.fellesdatakatalog.digdir.no}
+  conceptCatalogueHost: ${FDK_BASE_HOST:https://staging.fellesdatakatalog.digdir.no}
+  organizationCatalogueHost: ${ORGANIZATION_CATALOGUE_HOST:https://organization-catalogue.staging.fellesdatakatalog.digdir.no}
 
 
 ---
