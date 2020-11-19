@@ -27,13 +27,11 @@ class CatalogContractTest: ApiTestContext() {
         @Test
         fun `Illegal create`() {
             val notLoggedIn = apiAuthorizedRequest("/catalogs/", mapper.writeValueAsString(CATALOG_1), null, "POST")
-            val rootAccess = apiAuthorizedRequest("/catalogs/", mapper.writeValueAsString(CATALOG_1), JwtToken(Access.ROOT).toString(), "POST")
             val readAccess = apiAuthorizedRequest("/catalogs/", mapper.writeValueAsString(CATALOG_1), JwtToken(Access.ORG_READ).toString(), "POST")
             val wrongOrg = apiAuthorizedRequest("/catalogs/", mapper.writeValueAsString(CATALOG_1.copy(id="1")), JwtToken(Access.ORG_WRITE).toString(), "POST")
             val noID = apiAuthorizedRequest("/catalogs/", mapper.writeValueAsString(Catalog()), JwtToken(Access.ORG_WRITE).toString(), "POST")
 
             assertEquals(HttpStatus.UNAUTHORIZED.value(), notLoggedIn["status"])
-            assertEquals(HttpStatus.FORBIDDEN.value(), rootAccess["status"])
             assertEquals(HttpStatus.FORBIDDEN.value(), readAccess["status"])
             assertEquals(HttpStatus.FORBIDDEN.value(), wrongOrg["status"])
             assertEquals(HttpStatus.FORBIDDEN.value(), noID["status"])
@@ -103,12 +101,10 @@ class CatalogContractTest: ApiTestContext() {
         @Test
         fun `Illegal update`() {
             val notLoggedIn = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1", mapper.writeValueAsString(DB_CATALOG_1), null, "PUT")
-            val rootAccess = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1", mapper.writeValueAsString(DB_CATALOG_1), JwtToken(Access.ROOT).toString(), "PUT")
             val readAccess = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1", mapper.writeValueAsString(DB_CATALOG_1), JwtToken(Access.ORG_READ).toString(), "PUT")
             val wrongOrg = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_2", mapper.writeValueAsString(DB_CATALOG_1), JwtToken(Access.ORG_WRITE).toString(), "PUT")
 
             assertEquals(HttpStatus.UNAUTHORIZED.value(), notLoggedIn["status"])
-            assertEquals(HttpStatus.FORBIDDEN.value(), rootAccess["status"])
             assertEquals(HttpStatus.FORBIDDEN.value(), readAccess["status"])
             assertEquals(HttpStatus.FORBIDDEN.value(), wrongOrg["status"])
         }
