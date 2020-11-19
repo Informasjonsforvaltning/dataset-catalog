@@ -1,5 +1,6 @@
 package no.fdk.dataset_catalog.model
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
@@ -197,6 +198,7 @@ enum class REGISTRATION_STATUS {
     DRAFT, APPROVE, PUBLISH
 }
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class Concept (
 //    a Skos:Concept
     val id: String? = null,

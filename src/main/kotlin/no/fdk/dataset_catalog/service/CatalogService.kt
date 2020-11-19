@@ -19,7 +19,7 @@ class CatalogService(private val catalogRepository: CatalogRepository,
 
     fun create(catalog: Catalog) {
         catalog.updatePublisher()
-            .updateUriIfNeeded()
+            .updateUriIfNeeded(applicationProperties.catalogUriHost)
             .let { catalogRepository.save(it) }
     }
 
@@ -47,7 +47,7 @@ class CatalogService(private val catalogRepository: CatalogRepository,
         getByID(catalogId)
             ?.verifyId(catalog)
             ?.updatePublisherIfNeeded()
-            ?.updateUriIfNeeded()
+            ?.updateUriIfNeeded(applicationProperties.catalogUriHost)
             ?.update(catalog)
             ?.let { catalogRepository.save(it) }
 

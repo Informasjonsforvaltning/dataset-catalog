@@ -22,7 +22,7 @@ import kotlin.test.assertNull
 class CatalogServiceTest {
     private val catalogRepository: CatalogRepository = mock()
     private val organizationService: OrganizationService = mock()
-    private val applicationProperties = ApplicationProperties("localhost:5000", "localhost:5000")
+    private val applicationProperties = ApplicationProperties("localhost:5000", "localhost:5000", "localhost:5000")
     private val catalogService = CatalogService(catalogRepository, organizationService, applicationProperties)
 
     @Nested
@@ -112,7 +112,7 @@ class CatalogServiceTest {
             val expected = with(catalogService) { new
                 .copy()
                 .updatePublisherIfNeeded()
-                .updateUriIfNeeded() }
+                .updateUriIfNeeded(applicationProperties.catalogUriHost) }
             whenever(catalogRepository.findById("catId")).thenReturn(Optional.of(cat))
             whenever(catalogRepository.save(expected)).thenReturn(expected)
             val actual = catalogService.update("catId", new)

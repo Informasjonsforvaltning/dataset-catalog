@@ -10,7 +10,7 @@ logging:
 application:
   conceptCatalogueHost: ${FDK_BASE_HOST:https://staging.fellesdatakatalog.digdir.no}
   organizationCatalogueHost: ${ORGANIZATION_CATALOGUE_HOST:https://organization-catalogue.staging.fellesdatakatalog.digdir.no}
-
+  catalogUriHost: https://registrering.fellesdatakatalog.digdir.no
 
 ---
 spring:
@@ -19,7 +19,7 @@ spring:
 application:
   conceptCatalogueHost: https://staging.fellesdatakatalog.digdir.no
   organizationCatalogueHost: https://organization-catalogue.staging.fellesdatakatalog.digdir.no
-
+  catalogUriHost: https://registrering.fellesdatakatalog.digdir.no
 
 ---
 spring:
@@ -29,3 +29,4 @@ server.port: 5555
 application:
   conceptCatalogueHost: http://localhost:5000
   organizationCatalogueHost: http://localhost:5000
+  catalogUriHost: https://registrering.fellesdatakatalog.digdir.no

@@ -8,4 +8,5 @@ import org.springframework.boot.context.properties.ConstructorBinding
 data class ApplicationProperties(
     val conceptCatalogueHost: String,
     val organizationCatalogueHost: String,
+    val catalogUriHost: String,
 )

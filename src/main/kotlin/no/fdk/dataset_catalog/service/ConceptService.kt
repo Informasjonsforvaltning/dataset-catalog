@@ -27,6 +27,7 @@ class ConceptService(
             .openConnection()
             .run {
                 this as HttpURLConnection
+                this.setRequestProperty("Accept", "application/json")
                 if (responseCode != HttpStatus.OK.value()) {
                     logger.error("Error: $responseCode")
                     return null
