@@ -56,7 +56,7 @@ class CatalogContractTest: ApiTestContext() {
             Assumptions.assumeTrue(HttpStatus.OK.value() == rspGet["status"])
 
             val bodyGet: Catalog = mapper.readValue(rspGet["body"] as String)
-            assertEquals(CATALOG_1.copy(publisher = bodyGet.publisher), bodyGet)
+            assertEquals(CATALOG_1.copy(publisher = bodyGet.publisher, uri = bodyGet.uri), bodyGet)
 
             apiAuthorizedRequest("/catalogs/$CATALOG_ID_1", null, JwtToken(Access.ORG_WRITE).toString(), "DELETE")
         }
@@ -136,7 +136,7 @@ class CatalogContractTest: ApiTestContext() {
             val postUpdate = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_5", null, JwtToken(Access.ORG_WRITE).toString(), "GET")
             Assumptions.assumeTrue(HttpStatus.OK.value() == postUpdate["status"])
             val bodyPostUpdate: Catalog = mapper.readValue(postUpdate["body"] as String)
-            assertEquals(toUpdate.copy(publisher = bodyPostUpdate.publisher), bodyPostUpdate)
+            assertEquals(toUpdate.copy(publisher = bodyPostUpdate.publisher, uri = bodyPostUpdate.uri), bodyPostUpdate)
         }
 
     }

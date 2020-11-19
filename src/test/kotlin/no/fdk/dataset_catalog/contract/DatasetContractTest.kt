@@ -217,11 +217,7 @@ class DatasetContractTest: ApiTestContext() {
             assertEquals(HttpStatus.NOT_FOUND.value(), rspGet["status"])
 
             apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/", mapper.writeValueAsString(DB_DATASET_1), JwtToken(Access.ORG_WRITE).toString(), "POST")
-
-
         }
     }
-
-
 
 }

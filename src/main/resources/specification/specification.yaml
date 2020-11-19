@@ -19,6 +19,30 @@ tags:
   - name: dataset
     description: Dataset
 paths:
+  /search:
+    post:
+      summary: "Returns a list of results according the the query object posted."
+      operationId: search
+      description: "Search for content in dataset catalogue"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchRequest'
+      responses:
+        '200':
+          description: OK. Returns datasets and/or catalogs accoring to search.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResult'
+        '400':
+          description: Bad Request
+        '401':
+          description: Not logged in
+        '403':
+          description: Forbidden
   /catalogs:
     post:
       security:
@@ -159,7 +183,7 @@ paths:
       parameters:
         - name: catalogId
           in: path
-          description: catalog id
+          description: ID of catalog to retrieve datasets from.
           required: true
           schema:
             type: string
@@ -307,6 +331,7 @@ paths:
           description: Not logged in
         '403':
           description: Forbidden
+
 components:
   schemas:
     Catalog:
@@ -746,10 +771,10 @@ components:
           description: Unique resource identifier
         title:
           $ref: "#/components/schemas/MultiLanguageText"
-            description: Title of Distribution in a given language
+          description: Title of Distribution in a given language
         description:
           $ref: "#/components/schemas/MultiLanguageText"
-            description: Description of Distribution in a given language
+          description: Description of Distribution in a given language
         downloadURL:
           type: array
           items:
@@ -849,7 +874,7 @@ components:
           description: Body text in a given language
         remark:
           $ref: "#/components/schemas/MultiLanguageText"
-            description: Body text in a given language
+          description: Body text in a given language
         source:
           $ref: '#/components/schemas/Source'
           description: Associated source
@@ -932,6 +957,33 @@ components:
         en:
           type: string
           description: the text in English
+    SearchRequest:
+      type: object
+      description: A search request
+      properties:
+        searchType:
+          type: string
+          description: Enum describing search operation to perform
+        catalogIDs:
+          type: array
+          items:
+            type: string
+          description: IDs of catalogs to retrieve datasets from, if applicable
+        query:
+          type: string
+          description: Query text to search for, if applicable
+    SearchResult:
+      type: object
+      description: Search result set containing relevant datasets and/or catalogs.
+      properties:
+        datasets:
+          type: array
+          items:
+            $ref: '#/components/schemas/Dataset'
+        catalogs:
+          type: array
+          items:
+            $ref: '#/components/schemas/Catalog'
   securitySchemes:
     bearerAuth:
       type: http
