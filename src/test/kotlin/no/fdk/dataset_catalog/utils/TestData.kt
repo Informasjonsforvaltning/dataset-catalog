@@ -49,7 +49,7 @@ val DB_DATASET_ID_6 = UUID.randomUUID().toString()
 val DATASET_1 = Dataset(
     DATASET_ID_1,
     DB_CATALOG_ID_1,
-    registrationStatus = REGISTRATION_STATUS.DRAFT
+    registrationStatus = REGISTRATION_STATUS.DRAFT,
 )
 
 val DATASET_2 = DATASET_BIG.copy(
@@ -59,17 +59,21 @@ val DATASET_2 = DATASET_BIG.copy(
 
 val DB_DATASET_1 = Dataset(
     DB_DATASET_ID_1,
-    DB_CATALOG_ID_1
+    DB_CATALOG_ID_1,
+    title = mapOf(Pair("nb", "test tittel"))
 )
 
 val DB_DATASET_2 = DATASET_BIG.copy(
     DB_DATASET_ID_2,
-    DB_CATALOG_ID_1
+    DB_CATALOG_ID_1,
+    title = mapOf(Pair("nb", "enda en")),
+    description = mapOf(Pair("en", "test words"))
 )
 
 val DB_DATASET_3 = Dataset(
     DB_DATASET_ID_3,
-    DB_CATALOG_ID_1
+    DB_CATALOG_ID_1,
+    description = mapOf(Pair("en", "the description"))
 )
 
 val DB_DATASET_4 = Dataset(
@@ -128,6 +132,9 @@ private fun Dataset.mapDBO(): org.bson.Document =
     org.bson.Document()
         .append("_id", id)
         .append("catalogId", catalogId)
+        .append("title", title)
+        .append("description", description)
+
 
 private fun Catalog.mapDBO(): org.bson.Document =
     org.bson.Document()
