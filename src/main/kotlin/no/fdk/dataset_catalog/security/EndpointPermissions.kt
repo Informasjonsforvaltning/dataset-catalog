@@ -28,33 +28,25 @@ class EndpointPermissions {
 
 
     fun hasOrgReadPermission(jwt: Jwt, orgnr: String): Boolean {
-        return if (hasSysAdminPermission(jwt)) {
-            true
-        } else {
-            val authorities: String? = jwt.claims["authorities"] as? String
-
-            when {
-                authorities == null -> false
-                authorities.contains(roleOrgAdmin(orgnr)) -> true
-                authorities.contains(roleOrgWrite(orgnr)) -> true
-                authorities.contains(roleOrgRead(orgnr)) -> true
-                else -> false
-            }
+        val authorities: String? = jwt.claims["authorities"] as? String
+        return when {
+            authorities == null -> false
+            hasSysAdminPermission(jwt) -> true
+            authorities.contains(roleOrgAdmin(orgnr)) -> true
+            authorities.contains(roleOrgWrite(orgnr)) -> true
+            authorities.contains(roleOrgRead(orgnr)) -> true
+            else -> false
         }
     }
 
     fun hasOrgWritePermission(jwt: Jwt, orgnr: String): Boolean {
-        return if (hasSysAdminPermission(jwt)) {
-            true
-        } else {
-            val authorities: String? = jwt.claims["authorities"] as? String
-
-            when {
-                authorities == null -> false
-                authorities.contains(roleOrgAdmin(orgnr)) -> true
-                authorities.contains(roleOrgWrite(orgnr)) -> true
-                else -> false
-            }
+        val authorities: String? = jwt.claims["authorities"] as? String
+        return when {
+            authorities == null -> false
+            hasSysAdminPermission(jwt) -> true
+            authorities.contains(roleOrgAdmin(orgnr)) -> true
+            authorities.contains(roleOrgWrite(orgnr)) -> true
+            else -> false
         }
     }
 
