@@ -29,4 +29,4 @@ server.port: 5555
 application:
   conceptCatalogueHost: http://localhost:5000
   organizationCatalogueHost: http://localhost:5000
-  catalogUriHost: https://registrering.fellesdatakatalog.digdir.no
+  catalogUriHost: http://localhost:5000
