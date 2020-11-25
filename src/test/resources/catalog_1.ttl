@@ -1,0 +1,17 @@
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix dcat:  <http://www.w3.org/ns/dcat#> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+
+<http://catalog/1/dataset/1>
+    a                          dcat:Dataset ;
+    prov:qualifiedAttribution  [ a             prov:Attribution ;
+                                 dcat:hadRole  <http://registry.it.csiro.au/def/isotc211/CI_RoleCode/contributor> ;
+                                 prov:agent    <https://data.brreg.no/enhetsregisteret/api/enheter/123456789>
+                               ] ;
+    prov:qualifiedAttribution  [ a             prov:Attribution ;
+                                 dcat:hadRole  <http://registry.it.csiro.au/def/isotc211/CI_RoleCode/contributor> ;
+                                 prov:agent    <https://data.brreg.no/enhetsregisteret/api/enheter/987654321>
+                               ] .
+
+<http://catalog/1>  a  dcat:Catalog ;
+                    dcat:dataset  <http://catalog/1/dataset/1> .

@@ -43,7 +43,7 @@ val CONCEPT_EX = Concept(
     hiddenLabel = listOf(mapOf(Pair("en", "hidden stuff"))),
     contactPoint = CONTACTPOINT_EX,
     example = mapOf(Pair("en", "an example"))
-    )
+)
 
 val SUBJECT_EX = Subject(
     uri = "http://test.uri",
@@ -84,9 +84,9 @@ val PUBLISHER_EX = Publisher(
 )
 
 val SKOSCODE_EX = SkosCode(
-        uri = "http://test.uri",
-        code = "Skos code",
-        prefLabel = mapOf(Pair("nb", "foretrukket navn"))
+    uri = "http://test.uri",
+    code = "Skos code",
+    prefLabel = mapOf(Pair("nb", "foretrukket navn"))
 )
 
 val DATATHEME_EX = DataTheme(
@@ -163,7 +163,7 @@ val CATALOG_EX = Catalog(
     dataset = listOf(Dataset("Id", "catalogId")),
 )
 
-val DATASET_BIG = Dataset(
+val TEST_DATASET_0 = Dataset(
     id = UUID.randomUUID().toString(),
     catalogId = UUID.randomUUID().toString(),
     registrationStatus = REGISTRATION_STATUS.DRAFT,
@@ -211,5 +211,4 @@ val DATASET_BIG = Dataset(
     qualifiedAttributions = setOf("910244132"),
     type = "type",
     catalog = CATALOG_EX,
-
 )

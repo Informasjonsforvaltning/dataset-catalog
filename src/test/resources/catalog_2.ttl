@@ -1,0 +1,188 @@
+@prefix schema: <http://schema.org/> .
+@prefix dcatapi: <http://dcat.no/dcatapi/> .
+@prefix adms:  <http://www.w3.org/ns/adms#> .
+@prefix iso:   <http://www.w3.org/ns/dqvNS#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix dqv:   <http://www.w3.org/ns/dqvNS#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix dcatno: <http://difi.no/dcatno#> .
+@prefix dcat:  <http://www.w3.org/ns/dcat#> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+
+<http://www.hjem.no/>
+        a                            dcatapi:DataDistributionService ;
+        dcatapi:endpointDescription  [ a               foaf:Document , skos:Concept ;
+                                       dct:source      "http://lenke/til/en/api-beskrivelse" ;
+                                       skos:prefLabel  "Oppføring i API-katalog"@nb
+                                     ] ;
+        dct:description              "Dette er eksempel på et API som er referert fra en distribusjon"@nb ;
+        dct:publisher                <http://data.brreg.no/enhetsregisteret/enhet/987654321> ;
+        dct:title                    "Eksempel-API"@nb .
+
+<http://contact/someContactURI/123>
+        a                        vcard:Organization ;
+        vcard:hasEmail           <mailto:digitalisering@kartverket.no> ;
+        vcard:hasTelephone       <tel:22306022> ;
+        vcard:hasURL             <http://testetaten.no/url> ;
+        vcard:organization-unit  "Avdeling for digitalisering" .
+
+<http://publications.europa.eu/resource/authority/language/NOR>
+        a               dct:LinguisticSystem ;
+        <http://publications.europa.eu/ontology/authority/authority-code>
+                "NOR" ;
+        skos:prefLabel  "Norsk"@nb .
+
+<http://brreg.no/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d/samples/d2>
+        a                dcat:Distribution ;
+        dct:description  "Dette er beskrivelsen av eksempeldataene. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor."@nb ;
+        dct:format       "application/rdf+xml" ;
+        dcat:accessURL   <http://www.detteerenlenke.no/til-nedlasting> .
+
+<http://brreg.no/catalogs/987654321>
+        a                dcat:Catalog ;
+        dct:description  "Beskrivelse"@nb ;
+        dct:publisher    <http://data.brreg.no/enhetsregisteret/enhet/987654321> ;
+        dct:title        "Tittel"@nb ;
+        dcat:dataset     <http://brreg.no/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d> .
+
+<http://uri-2>  a   rdfs:Resource ;
+        rdfs:label  "label-2-en"@en , "label-2-nb"@nb .
+
+<http://publications.europa.eu/resource/authority/language/ENG>
+        a               dct:LinguisticSystem ;
+        <http://publications.europa.eu/ontology/authority/authority-code>
+                "ENG" ;
+        skos:prefLabel  "Engelsk"@nb .
+
+<http://data.brreg.no/enhetsregisteret/enhet/987654321>
+        a               foaf:Agent ;
+        dct:identifier  "987654321" ;
+        foaf:name       "TESTETATEN" .
+
+<http://uri-1>  a   rdfs:Resource ;
+        rdfs:label  "label-1-en"@en , "label-1-nb"@nb .
+
+<http://brreg.no/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d/distributions/d1>
+        a                      dcat:Distribution ;
+        dcatapi:accessService  <http://www.hjem.no/> ;
+        dct:conformsTo         [ a               dct:Standard , skos:Concept ;
+                                 dct:source      "https://www.kartverket.no/geodataarbeid/standarder/sosi/" ;
+                                 skos:prefLabel  "SOSI"@nb
+                               ] ;
+        dct:description        "Dette er beskrivelsen av distribusjonen. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Vestibulum id ligula porta felis euismod semper con desbit arum. Se dokumentasjon for denne distribusjonen."@nb ;
+        dct:format             "application/json" ;
+        dct:license            [ a               dct:LicenseDocument , skos:Concept ;
+                                 dct:source      "https://data.norge.no/nlod/no/2.0" ;
+                                 skos:prefLabel  "NODL"@nb
+                               ] ;
+        dcat:accessURL         <http://www.detteerentredjelenke.no/til-en-tredje-nedlasting> , <http://www.detteerenannenlenke.no/til-en-annen-nedlasting> , <http://www.detteerenlenke.no/til-nedlasting> ;
+        foaf:page              [ a               foaf:Document , skos:Concept ;
+                                 dct:source      "http://lenke/til/mer/info" ;
+                                 skos:prefLabel  "Dokumentasjon av distribusjonen"@nb
+                               ] .
+
+<http://brreg.no/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d>
+        a                               dcat:Dataset ;
+        dcatno:informationModel         [ a               dct:Standard , skos:Concept ;
+                                          dct:source      "https://www.w3.org/2004/02/skos/" ;
+                                          skos:prefLabel  "SKOS"@nb
+                                        ] ;
+        dcatno:legalBasisForAccess      [ a               dct:RightsStatement , skos:Concept ;
+                                          dct:source      "http://lovdata/paragraph/10" ;
+                                          skos:prefLabel  "Den siste loven med den lengste tittelen § 10"@nb
+                                        ] ;
+        dcatno:legalBasisForProcessing  [ a               dct:RightsStatement , skos:Concept ;
+                                          dct:source      "http://lovdata/paragraph/2" ;
+                                          skos:prefLabel  "Den andre loven med lenger tittel § 2"@nb
+                                        ] ;
+        dcatno:legalBasisForRestriction
+                [ a               dct:RightsStatement , skos:Concept ;
+                  dct:source      "https://lovdata.no/dokument/NL/lov/1992-12-04-126" ;
+                  skos:prefLabel  "Lov om arkiv [arkivlova]"@nb
+                ] ;
+        dcatno:legalBasisForRestriction
+                [ a               dct:RightsStatement , skos:Concept ;
+                  dct:source      "http://lovdata/paragraph/20" ;
+                  skos:prefLabel  "Den spesifikke loven § 20"@nb
+                ] ;
+        dcatno:legalBasisForRestriction
+                [ a               dct:RightsStatement , skos:Concept ;
+                  dct:source      "http://lovdata/paragraph/26" ;
+                  skos:prefLabel  "Den mindre spesifikke loven § 26"@nb
+                ] ;
+        dcatno:objective                "Datasettes formål er nullam quis rius eget urna mollis ornare vel eu leo. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Cras mattis consectetur purus sit amet fermentum. Vestibulum id ligula porta felis euismod semper."@nb ;
+        dct:accessRights                <http://publications.europa.eu/resource/authority/access-right/RESTRICTED> ;
+        dct:accrualPeriodicity          <http://publications.europa.eu/resource/authority/frequency/ANNUAL> ;
+        dct:conformsTo                  [ a               dct:Standard , skos:Concept ;
+                                          dct:source      "https://www.kartverket.no/geodataarbeid/standarder/sosi/" ;
+                                          skos:prefLabel  "SOSI"@nb
+                                        ] ;
+        dct:description                 "Datasettet avgrenser område for virkeområdet til lov 6. juni 2009 nr. 35 om naturområder i Oslo og nærliggende kommuner (markaloven) som trådte i kraft 1. september 2009. Markalovens virkeområde er fastsatt i forskrift 4. september 2015 nr. 1032 om justering av markagrensen fastlegger markalovens geografiske virkeområde med tilhørende kart."@nb ;
+        dct:hasVersion                  [ a               dcat:Dataset ;
+                                          dct:source      <http://referenced/dataset> ;
+                                          skos:prefLabel  "The first one"@nb
+                                        ] ;
+        dct:identifier                  "42" ;
+        dct:issued                      "2012-01-01"^^xsd:date ;
+        dct:language                    <http://publications.europa.eu/resource/authority/language/ENG> , <http://publications.europa.eu/resource/authority/language/NOR> ;
+        dct:modified                    "2016-09-21"^^xsd:date ;
+        dct:provenance                  <http://data.brreg.no/datakatalog/provenance/vedtak> ;
+        dct:publisher                   <http://data.brreg.no/enhetsregisteret/enhet/987654321> ;
+        dct:relation                    <http://uri-2> , <http://uri-1> ;
+        dct:spatial                     <http://www.geonames.org/3162656/asker.html> , <http://www.geonames.org/3141104/royken.html> , <http://www.geonames.org/3162212/baerum.html> , <http://www.geonames.org/3151404/hurum.html> ;
+        dct:subject                     <https://data-david.github.io/Begrep/begrep/Enhet> ;
+        dct:temporal                    [ a                 dct:PeriodOfTime ;
+                                          schema:endDate    "2017-12-31"^^xsd:date ;
+                                          schema:startDate  "2017-01-01"^^xsd:date
+                                        ] ;
+        dct:temporal                    [ a               dct:PeriodOfTime ;
+                                          schema:endDate  "2018-10-20"^^xsd:date
+                                        ] ;
+        dct:title                       "Markagrensen Oslo Kommune og nærliggende kommuner"@nb ;
+        dct:type                        "Kodeliste" ;
+        adms:identifier                 <http://adms.identifier.no/scheme/42> ;
+        adms:sample                     <http://brreg.no/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d/samples/d2> ;
+        dcat:contactPoint               <http://contact/someContactURI/123> ;
+        dcat:contactPoint               [ a               vcard:Organization ;
+                                          vcard:hasEmail  <mailto:anonymous@anonym.org.no>
+                                        ] ;
+        dcat:distribution               <http://brreg.no/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d/distributions/d1> ;
+        dcat:keyword                    "Bestemmelse"@nb , "statlig bestemmelse"@nb , "regulering"@nb , "jord"@nb ;
+        dcat:landingPage                <http://testetaten.no/landingsside/nr1> ;
+        dcat:theme                      <http://publications.europa.eu/resource/authority/data-theme/ENVI> , <http://publications.europa.eu/resource/authority/data-theme/GOVE> ;
+        dqv:hasQualityAnnotation        [ a                dqv:QualityAnnotation ;
+                                          dqv:inDimension  <http://iso.org/25012/2008/dataquality/Currentness> ;
+                                          prov:hasBody     [ rdf:value  "Denne teksten sier noe om aktualiteten. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras mattis consectetur purus sit amet fermentum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus."@no ]
+                                        ] ;
+        dqv:hasQualityAnnotation        [ a                dqv:QualityAnnotation ;
+                                          dqv:inDimension  <http://iso.org/25012/2008/dataquality/Completeness> ;
+                                          prov:hasBody     [ rdf:value  "Denne teksten sier noe om komplettheten. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras mattis consectetur purus sit amet fermentum."@no ]
+                                        ] ;
+        dqv:hasQualityAnnotation        [ a                dqv:QualityAnnotation ;
+                                          dqv:inDimension  <http://iso.org/25012/2008/dataquality/Accuracy> ;
+                                          prov:hasBody     [ rdf:value  "Denne teksten sier noe om nøyaktigheten. Cras mattis consectetur purus sit."@no ]
+                                        ] ;
+        dqv:hasQualityAnnotation        [ a                dqv:QualityAnnotation ;
+                                          dqv:inDimension  <http://iso.org/25012/2008/dataquality/Availability> ;
+                                          prov:hasBody     [ rdf:value  "Denne teksten sier noe om tilgjengeligheten. Vestibulum id ligula porta felis euismod semper. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras mattis consectetur purus sit amet fermentum."@no ]
+                                        ] ;
+        dqv:hasQualityAnnotation        [ a                dqv:QualityAnnotation ;
+                                          dqv:inDimension  <http://iso.org/25012/2008/dataquality/Relevance> ;
+                                          prov:hasBody     [ rdf:value  "Denne teksten sier noe om relevansen. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras mattis consectetur purus sit amet fermentum. Cum sociis natoque penatibus et magnis dis parturient montes."@no ]
+                                        ] ;
+        foaf:page                       <http://uri1> .
+
+<https://data-david.github.io/Begrep/begrep/Enhet>
+        a                skos:Concept ;
+        dct:creator      <http://data.brreg.no/enhetsregisteret/enhet/987654321> ;
+        dct:source       "https://jira.brreg.no/browse/BEGREP-208" ;
+        skos:altLabel    "orgnr"@no , "orgzip"@en ;
+        skos:definition  "alt som er registrert med et organisasjonsnummer "@no ;
+        skos:inScheme    "befolking" , "samfunn" ;
+        skos:note        "Alle hovedenheter, underenheter og organisasjonsledd som er identifisert med et organisasjonsnummer."@no ;
+        skos:prefLabel   "enhet"@no .
