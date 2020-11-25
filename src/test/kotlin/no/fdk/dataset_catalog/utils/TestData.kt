@@ -2,8 +2,6 @@ package no.fdk.dataset_catalog.utils
 
 import no.fdk.dataset_catalog.model.*
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap
-import java.time.LocalDate
-import java.time.ZonedDateTime
 import java.util.*
 
 const val API_PORT = 8080
@@ -52,7 +50,7 @@ val DATASET_1 = Dataset(
     registrationStatus = REGISTRATION_STATUS.DRAFT,
 )
 
-val DATASET_2 = DATASET_BIG.copy(
+val DATASET_2 = TEST_DATASET_0.copy(
     id = DATASET_ID_2,
     catalogId = DB_CATALOG_ID_1
 )
@@ -63,7 +61,7 @@ val DB_DATASET_1 = Dataset(
     title = mapOf(Pair("nb", "test tittel"))
 )
 
-val DB_DATASET_2 = DATASET_BIG.copy(
+val DB_DATASET_2 = TEST_DATASET_0.copy(
     DB_DATASET_ID_2,
     DB_CATALOG_ID_1,
     title = mapOf(Pair("nb", "enda en")),

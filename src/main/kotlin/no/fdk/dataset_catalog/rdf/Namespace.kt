@@ -103,6 +103,9 @@ class PROV {
         const val uri = "http://www.w3.org/ns/prov#"
         val Attribution = model.createResource("${uri}Attribution")
 
+        // TODO: PROV vocabulary does not have "hasBody" attribute
+        @Deprecated("")
+        val hasBody = model.createProperty("${uri}hasBody")
         val agent = model.createProperty("${uri}agent")
         val qualifiedAttribution = model.createProperty("${uri}qualifiedAttribution")
 

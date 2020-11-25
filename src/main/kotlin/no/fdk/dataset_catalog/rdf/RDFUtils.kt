@@ -1,17 +1,25 @@
 package no.fdk.dataset_catalog.rdf
 
+import no.fdk.dataset_catalog.Application
+import no.fdk.dataset_catalog.controller.DatasetController
 import no.fdk.dataset_catalog.model.*
+import org.apache.jena.datatypes.xsd.XSDDatatype
 import org.apache.jena.rdf.model.*
 import org.apache.jena.sparql.vocabulary.FOAF
 import org.apache.jena.util.URIref
 import org.apache.jena.vocabulary.*
-import org.apache.jena.vocabulary.OA
+import org.slf4j.LoggerFactory
 import java.io.ByteArrayOutputStream
+import java.lang.Exception
+import java.net.URL
 import java.time.LocalDate
 import java.util.*
 
+private val logger = LoggerFactory.getLogger(Application::class.java)
+
 
 // -------- Helper functions --------
+
 
 fun Resource.safeAddLinkListProperty(property: Property, value: List<String>?): Resource {
     value?.forEach{ safeAddLinkedProperty(property, it) }
@@ -41,8 +49,9 @@ fun Resource.safeAddLangListLiteral(property: Property, langMapList: List<Map<St
 
 fun Resource.addPublisherName(publisher: Publisher): Resource {
     if (publisher.name != null && publisher.prefLabel == null){
-        safeAddLangLiteral(FOAF.name, publisher.name, "nb")
+        safeAddProperty(FOAF.name, publisher.name)
     } else {
+        if (publisher.prefLabel?.get("no") != null) safeAddLangLiteral(FOAF.name, publisher.prefLabel["no"], "no")
         if (publisher.prefLabel?.get("nb") != null) safeAddLangLiteral(FOAF.name, publisher.prefLabel["nb"], "nb")
         if (publisher.prefLabel?.get("nn") != null) safeAddLangLiteral(FOAF.name, publisher.prefLabel["nn"], "nn")
         if (publisher.prefLabel?.get("en") != null) safeAddLangLiteral(FOAF.name, publisher.prefLabel["en"], "en")
@@ -51,6 +60,7 @@ fun Resource.addPublisherName(publisher: Publisher): Resource {
 }
 
 fun Resource.safeAddPropertyByLang(property: Property, langMap: Map<String, String>?): Resource {
+    if (langMap?.get("no") != null) addProperty(property, langMap["no"], "no")
     if (langMap?.get("nb") != null) addProperty(property, langMap["nb"], "nb")
     if (langMap?.get("nn") != null) addProperty(property, langMap["nn"], "nn")
     if (langMap?.get("en") != null) addProperty(property, langMap["en"], "en")
@@ -58,6 +68,7 @@ fun Resource.safeAddPropertyByLang(property: Property, langMap: Map<String, Stri
 }
 
 fun Resource.safeAddLiteralByLang(property: Property, langMap: Map<String, String>?): Resource {
+    if (langMap?.get("no") != null) safeAddLangLiteral(property, langMap["no"], "no")
     if (langMap?.get("nb") != null) safeAddLangLiteral(property, langMap["nb"], "nb")
     if (langMap?.get("nn") != null) safeAddLangLiteral(property, langMap["nn"], "nn")
     if (langMap?.get("en") != null) safeAddLangLiteral(property, langMap["en"], "en")
@@ -67,7 +78,7 @@ fun Resource.safeAddLiteralByLang(property: Property, langMap: Map<String, Strin
 fun Resource.safeAddDatasetListLinkedProperty(property: Property, value: List<Dataset>?): Resource =
     if(value == null || value.isEmpty()) this
     else {
-        value.map { addProperty(property, model.createResource(it.originalUri ?: it.uri)) }
+        value.map { addProperty(property, model.safeCreateResource(it.originalUri ?: it.uri)) }
         this
     }
 
@@ -94,18 +105,30 @@ fun Resource.safeAddResourceProperty(property: Property, value: Resource?): Reso
     if(value == null) this
     else addProperty(property, value)
 
-fun Resource.safeAddDateLiteral(property: Property, value: LocalDate?): Resource =
-    if(value == null) this
+fun Resource.safeAddDateTypeLiteral(property: Property, date: LocalDate?): Resource =
+    if(date == null) this
     else {
-        val calendar: Calendar = Calendar.getInstance()
-        calendar.clear()
-        calendar.set(value.year, value.monthValue - 1, value.dayOfMonth)
-        safeAddLiteral(property, model.createTypedLiteral(calendar))
+        safeAddLiteral(property, model.createTypedLiteral(date, XSDDatatype.XSDdate))
     }
 
 fun Resource.safeAddLinkedProperty(property: Property, value: String?): Resource =
     if(value == null) this
     else addProperty(property, model.createResource(value))
+
+fun Resource.safeAddURLs(property: Property, value: List<String?>?): Resource {
+    value?.forEach {
+        try {
+            if (it != null){
+                URL(it)
+                addProperty(property, model.createResource(it))
+            }
+        } catch (e: Exception) {
+            logger.error("Invalid URL skipped in Resource.safeAddURLs")
+        }
+    }
+    return this
+}
+
 
 fun String.addContactStringPrefix(prefix: String): String =
     if (this.startsWith(prefix)) {
@@ -119,14 +142,14 @@ fun String.addContactStringPrefix(prefix: String): String =
 fun Resource.addContactPoints(contactPoints: Collection<Contact>?): Resource {
     contactPoints?.forEach {
         addProperty(DCAT.contactPoint,
-            model.createResource(it.uri)
+            model.safeCreateResource(it.uri)
                 .addProperty(RDF.type, VCARD4.Organization)
                 .safeAddStringLiteral(VCARD4.fn, it.fullname)
-                .safeAddProperty(VCARD4.hasURL, it.hasURL)
+                .safeAddURLs(VCARD4.hasURL, listOf(it.hasURL))
                 .safeAddStringLiteral(VCARD4.organization_name, it.organizationName)
                 .safeAddStringLiteral(VCARD4.organization_unit, it.organizationUnit)
                 .safeAddLinkedProperty(VCARD4.hasEmail, it.email?.addContactStringPrefix("mailto:"))
-                .safeAddLinkedProperty(VCARD4.hasTelephone, it.hasTelephone?.addContactStringPrefix("tel"))
+                .safeAddLinkedProperty(VCARD4.hasTelephone, it.hasTelephone?.addContactStringPrefix("tel:"))
         )
     }
     return this
@@ -135,10 +158,10 @@ fun Resource.addContactPoints(contactPoints: Collection<Contact>?): Resource {
 fun Resource.addSkosConcepts(property: Property, skosConcept: Collection<SkosConcept>?, resource: Resource): Resource {
     skosConcept?.forEach {
         addProperty(property,
-            model.createResource(it.uri)
+            model.safeCreateResource()
                 .addProperty(RDF.type, resource)
+                .safeAddLinkedProperty(RDF.type, it.extraType)
                 .addProperty(RDF.type, SKOS.Concept)
-                .safeAddProperty(RDF.type, it.extraType)
                 .safeAddProperty(DCTerms.source, it.uri)
                 .safeAddLiteralByLang(SKOS.prefLabel, it.prefLabel)
         )
@@ -146,22 +169,22 @@ fun Resource.addSkosConcepts(property: Property, skosConcept: Collection<SkosCon
     return this
 }
 
-fun Resource.addDistribution(property: Property,distributions: Collection<Distribution>?): Resource {
+fun Resource.addDistribution(property: Property, distributions: Collection<Distribution>?, baseURI: String): Resource {
     distributions?.forEach {
         if (it.hasNonNullProperty()) {
             addProperty(property,
-                model.createResource(it.uri)
-                    .addProperty(RDF.type, DCAT.distribution)
+                model.safeCreateResource(it.uri)
+                    .addProperty(RDF.type, DCAT.Distribution)
                     .safeAddStringLiteral(DCTerms.identifier, it.id)
                     .safeAddLiteralByLang(DCTerms.title, it.title)
                     .safeAddLiteralByLang(DCTerms.description, it.description)
-                    .safeAddStringListProperty(DCAT.accessURL, it.accessURL)
-                    .safeAddStringListProperty(DCAT.downloadURL, it.downloadURL)
+                    .safeAddURLs(DCAT.accessURL, it.accessURL)
+                    .safeAddURLs(DCAT.downloadURL, it.downloadURL)
                     .addSkosConcepts(DCTerms.license, listOfNotNull(it.license), DCTerms.LicenseDocument)
                     .addSkosConcepts(DCTerms.conformsTo, it.conformsTo, DCTerms.Standard)
                     .addSkosConcepts(FOAF.page, it.page, FOAF.Document)
                     .safeAddStringListLiteral(DCTerms.format, it.format)
-                    .addDataDistributionServices(it.accessService)
+                    .addDataDistributionServices(it.accessService, baseURI)
             )
         }
     }
@@ -181,10 +204,10 @@ private fun Distribution.hasNonNullProperty(): Boolean =
 // TODO: add dcat:endpointURLs and make sure front-end sends necessary data (https://doc.difi.no/review/dcat-ap-no/#_obligatoriske_egenskaper_for_datatjeneste)
 // TODO: add a list of dct:MediaTypes (https://doc.difi.no/review/dcat-ap-no/#distribusjon-medietype)
 
-fun Resource.addDataDistributionServices(dataDistributionServices: Collection<DataDistributionService>?): Resource {
+fun Resource.addDataDistributionServices(dataDistributionServices: Collection<DataDistributionService>?, baseURI: String): Resource {
     dataDistributionServices?.forEach {
-        addProperty(DCAT.accessService,
-            model.createResource(it.uri)
+        addProperty(DCATapi.accessService,
+            model.safeCreateResource(it.uri ?: "$baseURI/accessService/${UUID.fromString(it.id)}")
                 .addProperty(RDF.type, DCATapi.DataDistributionService)
                 .safeAddStringLiteral(DCTerms.identifier, it.id)
                 .safeAddLiteralByLang(DCTerms.title, it.title)
@@ -200,10 +223,10 @@ fun Resource.addTemporal(temporal: List<PeriodOfTime>?): Resource {
     temporal?.forEach {
         if (it.startDate != null || it.endDate != null) {
             addProperty(DCTerms.temporal,
-                model.createResource()
+                model.safeCreateResource()
                     .addProperty(RDF.type, DCTerms.PeriodOfTime)
-                    .safeAddDateLiteral(Schema.startDate, it.startDate)
-                    .safeAddDateLiteral(Schema.endDate, it.endDate))
+                    .safeAddDateTypeLiteral(Schema.startDate, it.startDate)
+                    .safeAddDateTypeLiteral(Schema.endDate, it.endDate))
         }
     }
     return this
@@ -213,7 +236,7 @@ fun Resource.addTemporal(temporal: List<PeriodOfTime>?): Resource {
 fun Resource.addQualityAnnotation(qualityAnnotation: QualityAnnotation?): Resource {
     qualityAnnotation?.let {
         addProperty(DQV.hasQualityAnnotation,
-            model.createResource()
+            model.safeCreateResource()
                 .addProperty(RDF.type, DQV.QualityAnnotation)
                 .addQualityAnnotationDimension(DQV.inDimension, it.inDimension)
                 .addQualityAnnotationBody(it.hasBody))
@@ -224,15 +247,15 @@ fun Resource.addQualityAnnotation(qualityAnnotation: QualityAnnotation?): Resour
 fun Resource.addQualityAnnotationDimension(property: Property, dimension: String?): Resource {
     DQV.resolveDimensionResource(dimension)
         ?.let {
-            safeAddProperty(property, dimension)
+            safeAddLinkedProperty(property, dimension)
         }
     return this
 }
 
 fun Resource.addQualityAnnotationBody(body: Map<String, String>?): Resource {
     body?.let {
-        addProperty(OA.hasBody,
-            model.createResource()
+        addProperty(PROV.hasBody,
+            model.safeCreateResource()
                 .safeAddLiteralByLang(RDF.value, body))
     }
     return this
@@ -264,13 +287,13 @@ fun Resource.addReferences(references: Collection<Reference>?): Resource {
 
             if (it.source?.prefLabel.isNullOrEmpty()) {
                 safeAddResourceProperty(referenceProperty,
-                    model.createResource(it.source?.uri))
+                    model.safeCreateResource(it.source?.uri))
             } else {
                 addProperty(referenceProperty,
-                    model.createResource()
-                        .addProperty(RDF.type, DCAT.dataset)
+                    model.safeCreateResource()
+                        .addProperty(RDF.type, DCAT.Dataset)
                         .safeAddLiteralByLang(SKOS.prefLabel, it.source?.prefLabel)
-                        .safeAddResourceProperty(DCTerms.source, model.createResource(it.source?.uri)))
+                        .safeAddResourceProperty(DCTerms.source, model.safeCreateResource(it.source?.uri)))
             }
         }
     }
@@ -286,9 +309,9 @@ private fun Reference.isValidReference(): Boolean =
 fun Resource.addRelations(relations: Collection<SkosConcept>?): Resource {
     relations?.forEach {
         addProperty(DCTerms.relation,
-        model.createResource(it.uri)
-            .addProperty(RDF.type, RDFS.Resource)
-            .safeAddLiteralByLang(RDFS.label, it.prefLabel)
+            model.safeCreateResource(it.uri)
+                .addProperty(RDF.type, RDFS.Resource)
+                .safeAddLiteralByLang(RDFS.label, it.prefLabel)
         )
     }
     return this
@@ -297,15 +320,15 @@ fun Resource.addRelations(relations: Collection<SkosConcept>?): Resource {
 fun Resource.addQualifiedAttributions(qualifiedAttributions: Collection<String>?): Resource {
     qualifiedAttributions?.forEach {
         addProperty(PROV.qualifiedAttribution,
-            model.createResource()
+            model.safeCreateResource()
                 .addProperty(RDF.type, PROV.Attribution)
-                .safeAddResourceProperty(PROV.agent, ResourceFactory.createResource(URIref.encode("https://data.brreg.no/enhetsregisteret/api/enheter/$it"))))
                 .safeAddResourceProperty(DCAT.hadRole, ResourceFactory.createResource(URIref.encode("http://registry.it.csiro.au/def/isotc211/CI_RoleCode/contributor")))
+                .safeAddResourceProperty(PROV.agent, ResourceFactory.createResource(URIref.encode("https://data.brreg.no/enhetsregisteret/api/enheter/$it"))))
     }
     return this
 }
 
-private fun String.getIfNotNullOrEmpty(): String? =
+private fun String?.getIfNotNullOrEmpty(): String? =
     if (this.isNullOrEmpty())
         null
     else
@@ -314,7 +337,7 @@ private fun String.getIfNotNullOrEmpty(): String? =
 fun Resource.addPublisher(publisher: Publisher?): Resource {
     publisher?.let {
         addProperty(DCTerms.publisher,
-            model.createResource(it.uri?.getIfNotNullOrEmpty() ?: it.id?.getIfNotNullOrEmpty())
+            model.safeCreateResource(it.uri.getIfNotNullOrEmpty() ?: it.id.getIfNotNullOrEmpty())
                 .addProperty(RDF.type, FOAF.Agent)
                 .addPublisherName(it)
                 .safeAddLiteralByLang(SKOS.prefLabel, it.prefLabel)
@@ -323,27 +346,34 @@ fun Resource.addPublisher(publisher: Publisher?): Resource {
     return this
 }
 
+
+fun Resource.safeAddSubjectCreatorId(property: Property, uri: String?): Resource =
+    if (uri !=null) {
+        this.safeAddLinkedProperty(property, uri)
+    } else this
+
+
 fun Resource.addSubjects(subjects: Collection<Subject>?): Resource {
     subjects?.forEach {
         addProperty(DCTerms.subject,
-            model.createResource(it.uri)
+            model.safeCreateResource(it.uri)
                 .addProperty(RDF.type, SKOS.Concept)
-                .safeAddStringLiteral(DCTerms.identifier, it.identifier)
+                .safeAddSubjectCreatorId(DCTerms.creator, it.creator?.id)
+                .safeAddProperty(DCTerms.source, it.source)
                 .safeAddLangListLiteral(SKOS.altLabel, it.altLabel)
-                .safeAddPropertyByLang(SKOS.prefLabel, it.prefLabel)
-                .safeAddLiteralByLang(SKOS.definition, it.definition)
-                .safeAddPropertyByLang(SKOS.note, it.note)
-                .safeAddStringLiteral(DCTerms.source, it.source)
                 .safeAddStringListLiteral(SKOS.inScheme, it.inScheme)
-                .addPublisher(it.creator))
+                .safeAddPropertyByLang(SKOS.prefLabel, it.prefLabel)
+                .safeAddPropertyByLang(SKOS.note, it.note)
+                .safeAddLiteralByLang(SKOS.definition, it.definition)
+        )
     }
     return this
 }
 
-fun Resource.addLanguages(language:  Collection<SkosCode>?): Resource {
+fun Resource.addLanguages(language: Collection<SkosCode>?): Resource {
     language?.forEach {
         addProperty(DCTerms.language,
-            model.createResource(it.uri)
+            model.safeCreateResource(it.uri)
                 .addProperty(RDF.type, DCTerms.LinguisticSystem)
                 .safeAddLiteralByLang(SKOS.prefLabel, it.prefLabel)
                 .safeAddStringLiteral(AT.authorityCode, it.code))
@@ -360,6 +390,11 @@ fun Model.createRDFResponse(): String =
         out.flush()
         out.toString("UTF-8")
     }
+
+fun Model.safeCreateResource(uri: String? = null): Resource =
+    if (uri != null && (uri.startsWith("http://") || uri.startsWith("https://"))) {
+        createResource(uri)
+    } else createResource()
 
 
 // -------- Utils --------
