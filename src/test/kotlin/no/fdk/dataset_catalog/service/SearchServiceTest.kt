@@ -33,13 +33,12 @@ class SearchServiceTest {
             val descriptionHits = setOf(Dataset(description = mapOf(Pair("nb", "test description"))))
             val catalogId = "1"
             val query = "test"
-            val queryString = "\\b${query}"
 
             val request = SearchRequest(SEARCH_TYPE.DATASET_BY_QUERY, listOf(catalogId), query)
 
             whenever(endpointPermissions.hasOrgReadPermission(any(), any())).thenReturn(true)
-            whenever(datasetRepository.findByTitleContaining(listOf(catalogId), queryString)).thenReturn(titleHits)
-            whenever(datasetRepository.findByDescriptionContaining(listOf(catalogId), queryString)).thenReturn(descriptionHits)
+            whenever(datasetRepository.findByTitleContaining(listOf(catalogId), query)).thenReturn(titleHits)
+            whenever(datasetRepository.findByDescriptionContaining(listOf(catalogId), query)).thenReturn(descriptionHits)
 
 
             assertNotEquals(SearchResult(), searchService.datasetByQuery(auth, request))
@@ -51,13 +50,12 @@ class SearchServiceTest {
             val descriptionHits = emptySet<Dataset>()
             val catalogId = "1"
             val query = "test"
-            val queryString = "\\b${query}"
 
             val request = SearchRequest(SEARCH_TYPE.DATASET_BY_QUERY, listOf(catalogId), query)
 
             whenever(endpointPermissions.hasOrgReadPermission(any(), any())).thenReturn(true)
-            whenever(datasetRepository.findByTitleContaining(listOf(catalogId), queryString)).thenReturn(titleHits)
-            whenever(datasetRepository.findByDescriptionContaining(listOf(catalogId), queryString)).thenReturn(descriptionHits)
+            whenever(datasetRepository.findByTitleContaining(listOf(catalogId), query)).thenReturn(titleHits)
+            whenever(datasetRepository.findByDescriptionContaining(listOf(catalogId), query)).thenReturn(descriptionHits)
 
             assertEquals(SearchResult(), searchService.datasetByQuery(auth, request))
         }
@@ -70,13 +68,12 @@ class SearchServiceTest {
             val descriptionHits = setOf(dsDescription)
             val catalogId = "1"
             val query = "test"
-            val queryString = "\\b${query}"
 
             val request = SearchRequest(SEARCH_TYPE.DATASET_BY_QUERY, listOf(catalogId), query)
 
             whenever(endpointPermissions.hasOrgReadPermission(any(), any())).thenReturn(true)
-            whenever(datasetRepository.findByTitleContaining(listOf(catalogId), queryString)).thenReturn(titleHits)
-            whenever(datasetRepository.findByDescriptionContaining(listOf(catalogId), queryString)).thenReturn(descriptionHits)
+            whenever(datasetRepository.findByTitleContaining(listOf(catalogId), query)).thenReturn(titleHits)
+            whenever(datasetRepository.findByDescriptionContaining(listOf(catalogId), query)).thenReturn(descriptionHits)
 
             val result = searchService.datasetByQuery(auth, request)
 
@@ -94,13 +91,12 @@ class SearchServiceTest {
             val descriptionHits = emptySet<Dataset>()
             val catalogId = "1"
             val query = "test"
-            val queryString = "\\b${query}"
 
             val request = SearchRequest(SEARCH_TYPE.DATASET_BY_QUERY, listOf(catalogId), query)
 
             whenever(endpointPermissions.hasOrgReadPermission(any(), any())).thenReturn(true)
-            whenever(datasetRepository.findByTitleContaining(listOf(catalogId), queryString)).thenReturn(titleHits)
-            whenever(datasetRepository.findByDescriptionContaining(listOf(catalogId), queryString)).thenReturn(descriptionHits)
+            whenever(datasetRepository.findByTitleContaining(listOf(catalogId), query)).thenReturn(titleHits)
+            whenever(datasetRepository.findByDescriptionContaining(listOf(catalogId), query)).thenReturn(descriptionHits)
             val result = searchService.datasetByQuery(auth, request)
 
             assertEquals(dsTitle[3], result.datasets[0])
@@ -115,13 +111,12 @@ class SearchServiceTest {
             val descriptionHits = emptySet<Dataset>()
             val catalogId = "1"
             val query = "test"
-            val queryString = "\\b${query}"
 
             val request = SearchRequest(SEARCH_TYPE.DATASET_BY_QUERY, listOf(catalogId), query)
 
             whenever(endpointPermissions.hasOrgReadPermission(any(), any())).thenReturn(true)
-            whenever(datasetRepository.findByTitleContaining(listOf(catalogId), queryString)).thenReturn(titleHits)
-            whenever(datasetRepository.findByDescriptionContaining(listOf(catalogId), queryString)).thenReturn(descriptionHits)
+            whenever(datasetRepository.findByTitleContaining(listOf(catalogId), query)).thenReturn(titleHits)
+            whenever(datasetRepository.findByDescriptionContaining(listOf(catalogId), query)).thenReturn(descriptionHits)
             val result = searchService.datasetByQuery(auth, request)
 
             assertEquals(dsTitle, result.datasets)
@@ -136,13 +131,12 @@ class SearchServiceTest {
             val descriptionHits = dsDescription.toSet()
             val catalogId = "1"
             val query = "test"
-            val queryString = "\\b${query}"
 
             val request = SearchRequest(SEARCH_TYPE.DATASET_BY_QUERY, listOf(catalogId), query)
 
             whenever(endpointPermissions.hasOrgReadPermission(any(), any())).thenReturn(true)
-            whenever(datasetRepository.findByTitleContaining(listOf(catalogId), queryString)).thenReturn(titleHits)
-            whenever(datasetRepository.findByDescriptionContaining(listOf(catalogId), queryString)).thenReturn(descriptionHits)
+            whenever(datasetRepository.findByTitleContaining(listOf(catalogId), query)).thenReturn(titleHits)
+            whenever(datasetRepository.findByDescriptionContaining(listOf(catalogId), query)).thenReturn(descriptionHits)
             val result = searchService.datasetByQuery(auth, request)
 
             assertEquals(dsDescription, result.datasets)
