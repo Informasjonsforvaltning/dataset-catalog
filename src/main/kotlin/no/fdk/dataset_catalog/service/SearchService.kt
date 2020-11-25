@@ -28,7 +28,7 @@ class SearchService (
                     datasets = searchRequest.catalogIDs.map { datasetService.getAll(it) }.flatten()
                 )
             } else {
-                val queryString = "\\b${searchRequest.query.toLowerCase()}"
+                val queryString = searchRequest.query.toLowerCase()
                 val titleHits = datasetRepository.findByTitleContaining(searchRequest.catalogIDs, queryString)
                 val descriptionHits = datasetRepository.findByDescriptionContaining(searchRequest.catalogIDs, queryString)
                 SearchResult(

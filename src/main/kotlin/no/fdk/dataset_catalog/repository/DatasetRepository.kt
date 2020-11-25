@@ -9,13 +9,13 @@ import org.springframework.stereotype.Repository
 const val matchTitle =
     "{" +
         "'catalogId' : {\$in: ?0}," +
-        "\$or : [{'title.nb' : { \$regex: ?1 }}, {'title.nn' : { \$regex: ?1 }}, {'title.en' : { \$regex: ?1 }}]" +
+        "\$or : [{'title.nb' : { \$regex: /\\b?1/, \$options: 'i' }}, {'title.nn' : { \$regex: /\\b?1/, \$options: 'i' }}, {'title.en' : { \$regex: /\\b?1/, \$options: 'i' }}]" +
     "}"
 
 const val matchDescription =
     "{" +
         "'catalogId' : {\$in: ?0}," +
-        "\$or : [{'description.nb' : { \$regex: ?1 }}, {'description.nn' : { \$regex: ?1 }}, {'description.en' : { \$regex: ?1 }}]" +
+        "\$or : [{'description.nb' : { \$regex: /\\b?1/, \$options: 'i' }}, {'description.nn' : { \$regex: /\\b?1/ , \$options: 'i'}}, {'description.en' : { \$regex: /\\b?1/, \$options: 'i' }}]" +
     "}"
 @Repository
 interface DatasetRepository : MongoRepository<Dataset, String?> {
