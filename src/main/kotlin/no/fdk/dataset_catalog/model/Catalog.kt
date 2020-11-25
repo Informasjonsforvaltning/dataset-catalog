@@ -1,5 +1,6 @@
 package no.fdk.dataset_catalog.model
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
@@ -13,16 +14,17 @@ data class CatalogDTO(
 )
 
 @Document( collection = "catalogs")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class Catalog(
     @Id
     val id: String? = null,
     val uri: String? = null,
 
 //    dct:title
-    val title: Map<String, String>? = null,
+    val title: Map<String, String>? = emptyMap(),
 
 //    dct:description
-    val description: Map<String, String>? = null,
+    val description: Map<String, String>? = emptyMap(),
 
 //    dct:publisher
     val publisher: Publisher? = null,
