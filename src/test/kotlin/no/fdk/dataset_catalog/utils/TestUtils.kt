@@ -19,7 +19,7 @@ private fun isOK(response: Int?): Boolean =
 
 
 
-fun apiAuthorizedRequest(path: String, body: String?, token: String?, method: String, accept: MediaType = MediaType.APPLICATION_JSON): Map<String, Any> {
+fun apiAuthorizedRequest(path: String, body: String? = null, token: String? = null, method: String, accept: MediaType = MediaType.APPLICATION_JSON): Map<String, Any> {
     val request = RestTemplate()
     request.requestFactory = HttpComponentsClientHttpRequestFactory()
     val url = "http://localhost:$API_TEST_PORT$path"
