@@ -206,8 +206,13 @@ private fun Distribution.hasNonNullProperty(): Boolean =
 
 fun Resource.addDataDistributionServices(dataDistributionServices: Collection<DataDistributionService>?, baseURI: String): Resource {
     dataDistributionServices?.forEach {
+        val uri = when {
+            it.uri.notNullOrEmpty() -> it.uri
+            it.id.notNullOrEmpty() -> "$baseURI/accessService/${UUID.fromString(it.id)}"
+            else -> null
+        }
         addProperty(DCATapi.accessService,
-            model.safeCreateResource(it.uri ?: "$baseURI/accessService/${UUID.fromString(it.id)}")
+            model.safeCreateResource(uri)
                 .addProperty(RDF.type, DCATapi.DataDistributionService)
                 .safeAddStringLiteral(DCTerms.identifier, it.id)
                 .safeAddLiteralByLang(DCTerms.title, it.title)
