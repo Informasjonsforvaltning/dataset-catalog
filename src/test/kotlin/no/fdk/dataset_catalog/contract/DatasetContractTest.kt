@@ -74,7 +74,7 @@ class DatasetContractTest: ApiTestContext() {
                 DATASET_2.copy(
                     lastModified = bodyGet.lastModified,
                     concepts = bodyGet.concepts,
-                    subjects = bodyGet.subjects,
+                    subject = bodyGet.subject,
                     uri = bodyGet.uri)
                 , bodyGet)
 
@@ -177,7 +177,7 @@ class DatasetContractTest: ApiTestContext() {
                 updated.copy(
                     lastModified = bodyPostUpdate.lastModified,
                     concepts = bodyPostUpdate.concepts,
-                    subjects = bodyPostUpdate.subjects,)
+                    subject = bodyPostUpdate.subject,)
                 , bodyPostUpdate)
         }
     }
