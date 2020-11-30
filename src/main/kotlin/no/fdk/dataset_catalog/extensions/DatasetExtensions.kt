@@ -6,7 +6,7 @@ import java.time.LocalDateTime
 fun List<Dataset>.toDTO() : DatasetDTO = DatasetDTO(mapOf(Pair("datasets", this)))
 
 fun Dataset.updateSubjects(): Dataset =
-    copy(subjects = concepts?.map {
+    copy(subject = concepts?.map {
         Subject(
             id=it.id,
             uri = it.uri,
@@ -22,7 +22,7 @@ fun Dataset.update(newValues: Dataset): Dataset =
         lastModified = LocalDateTime.now(),
         registrationStatus = newValues.registrationStatus ?: registrationStatus,
         concepts = newValues.concepts ?: concepts,
-        subjects = newValues.subjects ?: subjects,
+        subject = newValues.subject ?: subject,
         uri = newValues.uri ?: uri,
         originalUri = newValues.originalUri ?: originalUri,
         source = newValues.source ?: source,
@@ -58,7 +58,6 @@ fun Dataset.update(newValues: Dataset): Dataset =
         identifier = newValues.identifier ?: identifier,
         page = newValues.page ?: page,
         accrualPeriodicity = newValues.accrualPeriodicity ?: accrualPeriodicity,
-        subject = newValues.subject ?: subject,
         admsIdentifier = newValues.admsIdentifier ?: admsIdentifier,
         conformsTo = newValues.conformsTo ?: conformsTo,
         informationModel = newValues.informationModel ?: informationModel,

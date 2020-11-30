@@ -118,11 +118,11 @@ class DatasetServiceTest {
 
 
     @Nested
-    internal inner class UpdateSubjects {
+    internal inner class UpdateSubject {
         @Test
-        fun `updates subjects`() {
+        fun `updates subject`() {
             val ds = Dataset("dsId", "catId", concepts = listOf(Concept("1", "uri")))
-            val expected = ds.copy(subjects = listOf(Subject(id = "1", uri = "uri")))
+            val expected = ds.copy(subject = listOf(Subject(id = "1", uri = "uri")))
             val actual = ds.updateSubjects()
             assertEquals(expected, actual)
         }

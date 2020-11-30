@@ -36,7 +36,8 @@ data class Dataset(
     val concepts: Collection<Concept>? = null,
 
 //    dct:subject
-    val subjects: Collection<Subject>? = null,
+//Norwegian: begrep
+    val subject: List<Subject>? = null,
 
     val uri: String? = null,
 
@@ -163,10 +164,6 @@ data class Dataset(
     //Norwegian: frekvens
     val accrualPeriodicity: SkosCode? = null,
 
-    //dct:subject
-    //Norwegian: begrep
-    val subject: List<Subject>? = null,
-
     //adms:identifier
     //Norwegian: annen identifikator
     val admsIdentifier: List<String>? = null,
@@ -199,6 +196,7 @@ enum class REGISTRATION_STATUS {
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class Concept (
 //    a Skos:Concept
     val id: String? = null,
@@ -226,11 +224,13 @@ data class Concept (
     val example: Map<String, String>? = null,
 )
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class ContactPoint(
     val email: String? = null,
     val telephone: String? = null,
 )
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class Definition(
     val text: Map<String, String>? = null,
     val remark: Map<String, String>? = null,
@@ -242,16 +242,19 @@ data class Definition(
     val lastUpdated: Long? = null,
 )
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class Source(
     val uri: String? = null,
     val prefLabel: Map<String, String>? = null,
 )
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class TextAndURI(
     val text: Map<String, String>? = null,
     val uri: String? = null,
 )
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class Contact (
     val id: String? = null,
     val uri: String? = null,
@@ -263,6 +266,7 @@ data class Contact (
     val hasTelephone: String? = null,
 )
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class Publisher (
     val uri: String? = null,
     val id: String? = null,
@@ -271,12 +275,14 @@ data class Publisher (
     val prefLabel: Map<String, String>? = null,
 )
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class SkosCode (
     val uri: String? = null,
     val code: String? = null,
     val prefLabel: Map<String, String>? = null,
 )
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class DataTheme (
     val id: String? = null,
     val uri: String? = null,
@@ -288,6 +294,7 @@ data class DataTheme (
     val numberOfHits: Int? = null,
 )
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class Distribution (
     val id: String? = null,
     val uri: String? = null,
@@ -303,6 +310,7 @@ data class Distribution (
     val accessService: List<DataDistributionService>? = null,
 )
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class PeriodOfTime (
     val id: String? = null,
     val name: String? = null,
@@ -314,23 +322,27 @@ data class PeriodOfTime (
     val endDate: LocalDate? = null,
 )
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class SkosConcept (
     val uri: String? = null,
     val prefLabel: Map<String, String> = mutableMapOf(),
     val extraType: String? = null,
 )
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class QualityAnnotation (
     val inDimension: String? = null,
     val motivatedBy: String? = null,
     val hasBody: Map<String, String>? = null
 )
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class Reference (
     val referenceType: SkosCode? = null,
     val source: SkosConcept? = null // link to Dataset
 )
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class ConceptSchema (
     val id: String? = null,
     val title: Map<String, String>? = null,
@@ -338,6 +350,7 @@ data class ConceptSchema (
     val versionnumber: String? = null,
 )
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class DataDistributionService (
     val id: String? = null,
     val uri: String? = null,
