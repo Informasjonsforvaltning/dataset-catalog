@@ -118,12 +118,13 @@ fun Resource.safeAddLinkedProperty(property: Property, value: String?): Resource
 fun Resource.safeAddURLs(property: Property, value: List<String?>?): Resource {
     value?.forEach {
         try {
-            if (it != null){
-                URL(it)
-                addProperty(property, model.createResource(it))
+            if (it != null && it.isNotEmpty()){
+                val url = it.replace(" ", "%20")
+                URL(url)
+                addProperty(property, model.createResource(url))
             }
         } catch (e: Exception) {
-            logger.error("Invalid URL skipped in Resource.safeAddURLs")
+            logger.error("Invalid URL skipped in Resource.safeAddURLs: $it")
         }
     }
     return this
