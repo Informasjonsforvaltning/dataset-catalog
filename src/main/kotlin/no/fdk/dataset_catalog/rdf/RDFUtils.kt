@@ -1,7 +1,6 @@
 package no.fdk.dataset_catalog.rdf
 
 import no.fdk.dataset_catalog.Application
-import no.fdk.dataset_catalog.controller.DatasetController
 import no.fdk.dataset_catalog.model.*
 import org.apache.jena.datatypes.xsd.XSDDatatype
 import org.apache.jena.rdf.model.*
@@ -13,7 +12,6 @@ import java.io.ByteArrayOutputStream
 import java.lang.Exception
 import java.net.URL
 import java.time.LocalDate
-import java.util.*
 
 private val logger = LoggerFactory.getLogger(Application::class.java)
 
@@ -209,7 +207,7 @@ fun Resource.addDataDistributionServices(dataDistributionServices: Collection<Da
     dataDistributionServices?.forEach {
         val uri = when {
             it.uri.notNullOrEmpty() -> it.uri
-            it.id.notNullOrEmpty() -> "$baseURI/accessService/${UUID.fromString(it.id)}"
+            it.id.notNullOrEmpty() -> "$baseURI/accessService/${it.id}"
             else -> null
         }
         addProperty(DCATapi.accessService,
