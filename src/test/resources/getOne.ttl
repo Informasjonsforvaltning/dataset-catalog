@@ -1,0 +1,28 @@
+@prefix schema: <http://schema.org/> .
+@prefix dcatapi: <http://dcat.no/dcatapi/> .
+@prefix adms:  <http://www.w3.org/ns/adms#> .
+@prefix iso:   <http://www.w3.org/ns/dqvNS#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix dqv:   <http://www.w3.org/ns/dqvNS#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix dcatno: <http://difi.no/dcatno#> .
+@prefix dcat:  <http://www.w3.org/ns/dcat#> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+
+<http://db2>  a          dcat:Dataset ;
+        dct:description  "test words"@en ;
+        dct:title        "enda en"@nb .
+
+<http://db1>  a    dcat:Dataset ;
+        dct:title  "test tittel"@nb .
+
+<http://db3>  a          dcat:Dataset ;
+        dct:description  "the description"@en .
+
+<http://123456789>  a  dcat:Catalog ;
+        dcat:dataset  <http://db3> , <http://db2> , <http://db1> .
