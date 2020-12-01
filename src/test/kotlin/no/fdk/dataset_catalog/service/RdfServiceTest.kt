@@ -3,21 +3,17 @@ package no.fdk.dataset_catalog.service
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import no.fdk.dataset_catalog.configuration.ApplicationProperties
-import no.fdk.dataset_catalog.controller.CatalogController
 import no.fdk.dataset_catalog.model.Catalog
 import no.fdk.dataset_catalog.model.Dataset
 import no.fdk.dataset_catalog.model.SkosConcept
-import no.fdk.dataset_catalog.rdf.createRDFResponse
 import no.fdk.dataset_catalog.utils.TEST_CATALOG_1
 import no.fdk.dataset_catalog.utils.TEST_DATASET_1
 import no.fdk.dataset_catalog.utils.TestResponseReader
-import org.apache.jena.rdf.model.Model
-import org.apache.jena.rdf.model.ModelFactory
+import no.fdk.dataset_catalog.utils.checkIfIsomorphicAndPrintDiff
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
-import java.io.StringReader
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
@@ -30,29 +26,6 @@ class RdfServiceTest {
     private val applicationProperties: ApplicationProperties = mock()
     private val RDFService = RDFService(catalogService, datasetService, applicationProperties)
     private val responseReader = TestResponseReader()
-
-    fun checkIfIsomorphicAndPrintDiff(actual: Model, expected: Model, name: String): Boolean {
-        // Its necessary to parse the created models from strings to have the same base, and ensure blank node validity
-        val parsedActual = ModelFactory.createDefaultModel().read(StringReader(actual.createRDFResponse()), null, "TURTLE")
-        val parsedExpected = ModelFactory.createDefaultModel().read(StringReader(expected.createRDFResponse()), null, "TURTLE")
-
-        val isIsomorphic = parsedActual.isIsomorphicWith(parsedExpected)
-
-        if (!isIsomorphic) {
-            val actualDiff = parsedActual.difference(parsedExpected).createRDFResponse()
-            val expectedDiff = parsedExpected.difference(parsedActual).createRDFResponse()
-
-            if (actualDiff.isNotEmpty()) {
-                logger.error("non expected nodes in $name:")
-                logger.error(actualDiff)
-            }
-            if (expectedDiff.isNotEmpty()) {
-                logger.error("missing nodes in $name:")
-                logger.error(expectedDiff)
-            }
-        }
-        return isIsomorphic
-    }
 
     @Nested
     internal inner class Serialize {
@@ -91,7 +64,7 @@ class RdfServiceTest {
             val expected = responseReader.parseFile("catalog_0.ttl", "TURTLE")
             val responseModel = RDFService.getById("http://catalog/1")
 
-            assertTrue(checkIfIsomorphicAndPrintDiff(responseModel!!, expected, "Serializing dataset relations"))
+            assertTrue(checkIfIsomorphicAndPrintDiff(responseModel!!, expected, "Serializing dataset relations", logger))
 
         }
 
@@ -106,7 +79,7 @@ class RdfServiceTest {
             val expected = responseReader.parseFile("catalog_1.ttl", "TURTLE")
             val responseModel = RDFService.getById("http://catalog/1")
 
-            assertTrue(checkIfIsomorphicAndPrintDiff(responseModel!!, expected, "Serializing qualified attributions"))
+            assertTrue(checkIfIsomorphicAndPrintDiff(responseModel!!, expected, "Serializing qualified attributions", logger))
         }
 
         @Test
@@ -120,7 +93,7 @@ class RdfServiceTest {
             val expected = responseReader.parseFile("catalog_2.ttl", "TURTLE")
             val responseModel = RDFService.getById(catalog.id!!)
 
-            assertTrue(checkIfIsomorphicAndPrintDiff(responseModel!!, expected, "Serializing complete catalog"))
+            assertTrue(checkIfIsomorphicAndPrintDiff(responseModel!!, expected, "Serializing complete catalog", logger))
         }
     }
 }

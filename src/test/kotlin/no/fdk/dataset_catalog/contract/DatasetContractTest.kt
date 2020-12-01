@@ -56,8 +56,6 @@ class DatasetContractTest: ApiTestContext() {
 
             val bodyGet: Dataset = mapper.readValue(rspGet["body"] as String)
             assertEquals(DATASET_1.copy(lastModified = bodyGet.lastModified, uri = bodyGet.uri, publisher = bodyGet.publisher), bodyGet)
-
-            apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/$DATASET_ID_1", null, JwtToken(Access.ORG_WRITE).toString(), "DELETE")
         }
 
         @Test
@@ -77,8 +75,6 @@ class DatasetContractTest: ApiTestContext() {
                     subject = bodyGet.subject,
                     uri = bodyGet.uri)
                 , bodyGet)
-
-            apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/$DATASET_ID_2", null, JwtToken(Access.ORG_WRITE).toString(), "DELETE")
         }
 
     }
@@ -111,10 +107,10 @@ class DatasetContractTest: ApiTestContext() {
 
         @Test
         fun `Get All datasets returns all datasets in catalog`() {
-            val rspRead = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets", null, JwtToken(Access.ORG_READ).toString(), "GET")
+            val rspRead = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_2/datasets", null, JwtToken(Access.ROOT).toString(), "GET")
             val bodyRead: DatasetDTO = mapper.readValue(rspRead["body"] as String)
 
-            assertEquals(listOf(DB_DATASET_ID_1, DB_DATASET_ID_2, DB_DATASET_ID_3), bodyRead._embedded?.get("datasets")?.map { it.id })
+            assertEquals(listOf(DB_DATASET_ID_4, DB_DATASET_ID_5, DB_DATASET_ID_6), bodyRead._embedded?.get("datasets")?.map { it.id })
         }
 
     }
@@ -211,9 +207,6 @@ class DatasetContractTest: ApiTestContext() {
             val rspGet = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", null, JwtToken(Access.ORG_WRITE).toString(), "GET")
 
             assertEquals(HttpStatus.NOT_FOUND.value(), rspGet["status"])
-
-            apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/", mapper.writeValueAsString(DB_DATASET_1), JwtToken(Access.ORG_WRITE).toString(), "POST")
         }
     }
-
 }
