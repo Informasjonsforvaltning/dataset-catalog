@@ -4,20 +4,23 @@ import com.mongodb.ConnectionString
 import com.mongodb.MongoClientSettings
 import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoClients
+import no.fdk.dataset_catalog.rdf.createRDFResponse
 import no.fdk.dataset_catalog.utils.ApiTestContext.Companion.mongoContainer
+import org.apache.jena.rdf.model.Model
+import org.apache.jena.rdf.model.ModelFactory
 import org.bson.codecs.configuration.CodecRegistries
 import org.bson.codecs.pojo.PojoCodecProvider
+import org.slf4j.Logger
 import org.springframework.http.*
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
+import java.io.StringReader
 
 
 private fun isOK(response: Int?): Boolean =
     if(response == null) false
     else HttpStatus.resolve(response)?.is2xxSuccessful == true
-
-
 
 fun apiAuthorizedRequest(path: String, body: String? = null, token: String? = null, method: String, accept: MediaType = MediaType.APPLICATION_JSON): Map<String, Any> {
     val request = RestTemplate()
@@ -45,7 +48,7 @@ fun apiAuthorizedRequest(path: String, body: String? = null, token: String? = nu
             "status" to response.statusCode.value()
         )
 
-    } catch(e: HttpClientErrorException) {
+    } catch (e: HttpClientErrorException) {
         mapOf(
             "status" to e.rawStatusCode,
             "header" to " ",
@@ -61,9 +64,7 @@ fun apiAuthorizedRequest(path: String, body: String? = null, token: String? = nu
 
 }
 
-
-
-fun populateDB() {
+fun resetDB() {
     val connectionString = ConnectionString("mongodb://${MONGO_USER}:${MONGO_PASSWORD}@localhost:${mongoContainer.getMappedPort(MONGO_PORT)}/$MONGO_DB_NAME?authSource=admin&authMechanism=SCRAM-SHA-1")
     val pojoCodecRegistry = CodecRegistries.fromRegistries(MongoClientSettings.getDefaultCodecRegistry(), CodecRegistries.fromProviders(PojoCodecProvider.builder().automatic(true).build()))
 
@@ -71,11 +72,36 @@ fun populateDB() {
     val mongoDatabase = client.getDatabase(MONGO_DB_NAME).withCodecRegistry(pojoCodecRegistry)
 
     val catalogCollection = mongoDatabase.getCollection("catalogs")
+    catalogCollection.deleteMany(org.bson.Document())
     catalogCollection.insertMany(catalogDbPopulation())
 
     val datasetCollection = mongoDatabase.getCollection("datasets")
+    datasetCollection.deleteMany(org.bson.Document())
     datasetCollection.insertMany(datasetDbPopulation())
 
 
     client.close()
+}
+
+fun checkIfIsomorphicAndPrintDiff(actual: Model, expected: Model, name: String, logger: Logger): Boolean {
+    // Its necessary to parse the created models from strings to have the same base, and ensure blank node validity
+    val parsedActual = ModelFactory.createDefaultModel().read(StringReader(actual.createRDFResponse()), null, "TURTLE")
+    val parsedExpected = ModelFactory.createDefaultModel().read(StringReader(expected.createRDFResponse()), null, "TURTLE")
+
+    val isIsomorphic = parsedActual.isIsomorphicWith(parsedExpected)
+
+    if (!isIsomorphic) {
+        val actualDiff = parsedActual.difference(parsedExpected).createRDFResponse()
+        val expectedDiff = parsedExpected.difference(parsedActual).createRDFResponse()
+
+        if (actualDiff.isNotEmpty()) {
+            logger.error("non expected nodes in $name:")
+            logger.error(actualDiff)
+        }
+        if (expectedDiff.isNotEmpty()) {
+            logger.error("missing nodes in $name:")
+            logger.error(expectedDiff)
+        }
+    }
+    return isIsomorphic
 }

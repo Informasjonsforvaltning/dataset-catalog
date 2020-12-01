@@ -8,10 +8,7 @@ import no.fdk.dataset_catalog.model.SearchResult
 import no.fdk.dataset_catalog.utils.*
 import no.fdk.dataset_catalog.utils.jwk.Access
 import no.fdk.dataset_catalog.utils.jwk.JwtToken
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Tag
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.*
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.ContextConfiguration
@@ -52,6 +49,8 @@ class SearchContractTest {
 
         @Test
         fun `Search returns relevant results`() {
+            resetDB()
+
             val q1 = mapper.writeValueAsString(SearchRequest(SEARCH_TYPE.DATASET_BY_QUERY, listOf(DB_CATALOG_ID_1), "test"))
             val q2 = mapper.writeValueAsString(SearchRequest(SEARCH_TYPE.DATASET_BY_QUERY, listOf(DB_CATALOG_ID_1), "description"))
 

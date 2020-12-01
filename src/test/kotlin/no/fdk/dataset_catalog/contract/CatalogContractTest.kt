@@ -55,8 +55,6 @@ class CatalogContractTest: ApiTestContext() {
 
             val bodyGet: Catalog = mapper.readValue(rspGet["body"] as String)
             assertEquals(CATALOG_1.copy(publisher = bodyGet.publisher, uri = bodyGet.uri), bodyGet)
-
-            apiAuthorizedRequest("/catalogs/$CATALOG_ID_1", null, JwtToken(Access.ORG_WRITE).toString(), "DELETE")
         }
     }
 
@@ -88,6 +86,7 @@ class CatalogContractTest: ApiTestContext() {
 
         @Test
         fun `Get All catalogs returns all permitted catalogs`() {
+            resetDB()
             val rspRead = apiAuthorizedRequest("/catalogs/", null, JwtToken(Access.ORG_READ).toString(), "GET")
             val bodyRead: CatalogDTO = mapper.readValue(rspRead["body"] as String)
 
@@ -165,9 +164,6 @@ class CatalogContractTest: ApiTestContext() {
             val rspGet = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_4", null, JwtToken(Access.ORG_WRITE).toString(), "GET")
 
             assertEquals(HttpStatus.NOT_FOUND.value(), rspGet["status"])
-
-            apiAuthorizedRequest("/catalogs/", mapper.writeValueAsString(DB_CATALOG_ID_4), JwtToken(Access.ORG_WRITE).toString(), "POST")
-
         }
 
     }
