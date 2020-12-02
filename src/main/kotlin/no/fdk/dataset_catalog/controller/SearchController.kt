@@ -15,7 +15,7 @@ private val logger = LoggerFactory.getLogger(SearchController::class.java)
 
 @RestController
 @CrossOrigin
-@RequestMapping(value = ["/search"])
+@RequestMapping(value = ["/v2/search"])
 class SearchController (
     private val searchService: SearchService) {
 

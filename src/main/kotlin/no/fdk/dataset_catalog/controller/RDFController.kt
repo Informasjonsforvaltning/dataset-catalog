@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest
 @RestController
 @CrossOrigin
 @RequestMapping(
-    value = ["/catalogs"],
+    value = ["/v2/catalogs"],
     produces = ["text/turtle",
         "application/rdf+json",
         "application/ld+json",

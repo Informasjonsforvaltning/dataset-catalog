@@ -17,7 +17,7 @@ private val logger = LoggerFactory.getLogger(DatasetController::class.java)
 
 @RestController
 @CrossOrigin
-@RequestMapping(value = ["/catalogs/{catalogId}/datasets"])
+@RequestMapping(value = ["/v2/catalogs/{catalogId}/datasets"])
 class DatasetController(
     private val datasetService: DatasetService,
     private val endpointPermissions: EndpointPermissions) {

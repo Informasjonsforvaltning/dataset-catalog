@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.test.context.ContextConfiguration
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -18,9 +19,9 @@ import kotlin.test.assertTrue
 class PingTest: ApiTestContext() {
     @Test
     fun serviceUp() {
-        val response = apiAuthorizedRequest("/ping", null, null, "GET", MediaType.TEXT_PLAIN)
+        val response = apiAuthorizedRequest("/v2/ping", null, null, "GET", MediaType.TEXT_PLAIN)
 
-        assertTrue { HttpStatus.OK.value() == response["status"] }
+        assertEquals(HttpStatus.OK.value(), response["status"])
     }
 
 

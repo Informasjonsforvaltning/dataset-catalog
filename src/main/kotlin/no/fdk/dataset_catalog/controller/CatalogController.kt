@@ -17,7 +17,7 @@ private val logger = LoggerFactory.getLogger(CatalogController::class.java)
 
 @RestController
 @CrossOrigin
-@RequestMapping(value = ["/catalogs"])
+@RequestMapping(value = ["/v2/catalogs"])
 class CatalogController(
     private val catalogService: CatalogService,
     private val endpointPermissions: EndpointPermissions) {

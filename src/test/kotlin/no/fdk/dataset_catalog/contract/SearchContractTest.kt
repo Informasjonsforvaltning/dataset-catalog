@@ -29,8 +29,8 @@ class SearchContractTest {
         @Test
         fun `Unable to search when not logged in as a user with org access`() {
             val request = mapper.writeValueAsString(SearchRequest(SEARCH_TYPE.DATASET_BY_QUERY, listOf(DB_CATALOG_ID_2)))
-            val notLoggedIn = apiAuthorizedRequest("/search", request, null, "POST")
-            val wrongOrg = apiAuthorizedRequest("/search", request, JwtToken(Access.ORG_WRITE).toString(), "POST")
+            val notLoggedIn = apiAuthorizedRequest("/v2/search", request, null, "POST")
+            val wrongOrg = apiAuthorizedRequest("/v2/search", request, JwtToken(Access.ORG_WRITE).toString(), "POST")
 
             assertEquals(HttpStatus.UNAUTHORIZED.value(), notLoggedIn["status"])
             assertEquals(HttpStatus.FORBIDDEN.value(), wrongOrg["status"])
@@ -40,8 +40,8 @@ class SearchContractTest {
         fun `Both read and write can search`() {
             val request = mapper.writeValueAsString(SearchRequest(SEARCH_TYPE.DATASET_BY_QUERY, listOf(DB_CATALOG_ID_1)))
 
-            val rspRead = apiAuthorizedRequest("/search", request, JwtToken(Access.ORG_READ).toString(), "POST")
-            val rspWrite = apiAuthorizedRequest("/search", request, JwtToken(Access.ORG_WRITE).toString(), "POST")
+            val rspRead = apiAuthorizedRequest("/v2/search", request, JwtToken(Access.ORG_READ).toString(), "POST")
+            val rspWrite = apiAuthorizedRequest("/v2/search", request, JwtToken(Access.ORG_WRITE).toString(), "POST")
 
             assertEquals(HttpStatus.OK.value(), rspRead["status"])
             assertEquals(HttpStatus.OK.value(), rspWrite["status"])
@@ -54,8 +54,8 @@ class SearchContractTest {
             val q1 = mapper.writeValueAsString(SearchRequest(SEARCH_TYPE.DATASET_BY_QUERY, listOf(DB_CATALOG_ID_1), "test"))
             val q2 = mapper.writeValueAsString(SearchRequest(SEARCH_TYPE.DATASET_BY_QUERY, listOf(DB_CATALOG_ID_1), "description"))
 
-            val rspQ1 = apiAuthorizedRequest("/search", q1, JwtToken(Access.ORG_READ).toString(), "POST")
-            val rspQ2 = apiAuthorizedRequest("/search", q2, JwtToken(Access.ORG_READ).toString(), "POST")
+            val rspQ1 = apiAuthorizedRequest("/v2/search", q1, JwtToken(Access.ORG_READ).toString(), "POST")
+            val rspQ2 = apiAuthorizedRequest("/v2/search", q2, JwtToken(Access.ORG_READ).toString(), "POST")
 
             val bodyQ1: SearchResult = mapper.readValue(rspQ1["body"] as String)
             val bodyQ2: SearchResult = mapper.readValue(rspQ2["body"] as String)

@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.RestController
 @CrossOrigin
 class ApplicationStatusController(private val datasetService: DatasetService) {
 
-    @GetMapping("/ping")
+    @GetMapping("/v2/ping")
     fun ping(): ResponseEntity<Unit> =
         ResponseEntity.ok().build()
 
-    @GetMapping("/ready")
+    @GetMapping("/v2/ready")
     fun ready(): ResponseEntity<Unit> =
         try {
             datasetService.count()

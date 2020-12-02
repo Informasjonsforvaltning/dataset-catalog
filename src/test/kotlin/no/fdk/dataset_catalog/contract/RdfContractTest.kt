@@ -29,8 +29,8 @@ class RdfContractTest: ApiTestContext() {
         fun `Gets Catalog`() {
             resetDB()
 
-            val getAll = apiAuthorizedRequest("/catalogs/", method="GET", accept=MediaType("text","turtle"))
-            val getOne = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1", method="GET", accept=MediaType("text","turtle"))
+            val getAll = apiAuthorizedRequest("/v2/catalogs/", method="GET", accept=MediaType("text","turtle"))
+            val getOne = apiAuthorizedRequest("/v2/catalogs/$DB_CATALOG_ID_1", method="GET", accept=MediaType("text","turtle"))
 
             assertEquals(HttpStatus.OK.value(), getAll["status"])
             assertEquals(HttpStatus.OK.value(), getOne["status"])
