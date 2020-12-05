@@ -1,19 +1,16 @@
 package no.fdk.dataset_catalog.rdf
 
-import no.fdk.dataset_catalog.Application
 import no.fdk.dataset_catalog.model.*
 import org.apache.jena.datatypes.xsd.XSDDatatype
 import org.apache.jena.rdf.model.*
 import org.apache.jena.sparql.vocabulary.FOAF
 import org.apache.jena.util.URIref
 import org.apache.jena.vocabulary.*
-import org.slf4j.LoggerFactory
 import java.io.ByteArrayOutputStream
 import java.lang.Exception
+import java.net.URI
 import java.net.URL
-import java.time.LocalDate
-
-private val logger = LoggerFactory.getLogger(Application::class.java)
+import java.time.LocalDateTime
 
 
 // -------- Helper functions --------
@@ -73,56 +70,47 @@ fun Resource.safeAddLiteralByLang(property: Property, langMap: Map<String, Strin
     return this
 }
 
-fun Resource.safeAddDatasetListLinkedProperty(property: Property, value: List<Dataset>?): Resource =
-    if(value == null || value.isEmpty()) this
-    else {
-        value.map { addProperty(property, model.safeCreateResource(it.originalUri ?: it.uri)) }
-        this
-    }
-
 fun Resource.safeAddStringLiteral(property: Property, value: String?): Resource =
-    if(value == null) this
+    if (value.isNullOrEmpty()) this
     else addLiteral(property, value)
 
 fun Resource.safeAddLiteral(property: Property, value: Literal?): Resource =
-    if(value == null) this
+    if (value == null) this
     else addLiteral(property, value)
 
 fun Resource.safeAddLangLiteral(property: Property, value: String?, lang: String): Resource =
-    if(value == null) this
+    if (value.isNullOrEmpty()) this
     else {
         val literal = model.createLiteral(value, lang)
         addLiteral(property, literal)
     }
 
 fun Resource.safeAddProperty(property: Property, value: String?): Resource =
-    if(value == null) this
+    if (value.isNullOrEmpty()) this
+    else addProperty(property, value)
+
+fun Resource.safeAddProperty(property: Property, value: Resource?): Resource =
+    if (value == null) this
     else addProperty(property, value)
 
 fun Resource.safeAddResourceProperty(property: Property, value: Resource?): Resource =
-    if(value == null) this
+    if (value == null) this
     else addProperty(property, value)
 
-fun Resource.safeAddDateTypeLiteral(property: Property, date: LocalDate?): Resource =
-    if(date == null) this
+fun Resource.safeAddDateTimeLiteral(property: Property, dateTime: LocalDateTime?): Resource =
+    if(dateTime == null) this
     else {
-        safeAddLiteral(property, model.createTypedLiteral(date, XSDDatatype.XSDdate))
+        safeAddLiteral(property, model.createTypedLiteral("$dateTime:00",XSDDatatype.XSDdateTime))
     }
 
 fun Resource.safeAddLinkedProperty(property: Property, value: String?): Resource =
-    if(value == null) this
+    if (value.isNullOrEmpty()) this
     else addProperty(property, model.createResource(value))
 
 fun Resource.safeAddURLs(property: Property, value: List<String?>?): Resource {
     value?.forEach {
-        try {
-            if (it != null && it.isNotEmpty()){
-                val url = it.replace(" ", "%20")
-                URL(url)
-                addProperty(property, model.createResource(url))
-            }
-        } catch (e: Exception) {
-            logger.error("Invalid URL skipped in Resource.safeAddURLs: $it")
+        if (it.isValidURL()) {
+            safeAddProperty(property, model.safeCreateLinkedResource(it))
         }
     }
     return this
@@ -156,14 +144,16 @@ fun Resource.addContactPoints(contactPoints: Collection<Contact>?): Resource {
 
 fun Resource.addSkosConcepts(property: Property, skosConcept: Collection<SkosConcept>?, resource: Resource): Resource {
     skosConcept?.forEach {
-        addProperty(property,
-            model.safeCreateResource()
-                .addProperty(RDF.type, resource)
-                .safeAddLinkedProperty(RDF.type, it.extraType)
-                .addProperty(RDF.type, SKOS.Concept)
-                .safeAddProperty(DCTerms.source, it.uri)
-                .safeAddLiteralByLang(SKOS.prefLabel, it.prefLabel)
-        )
+        if (!it.uri.isNullOrEmpty()) {
+            addProperty(property,
+                model.safeCreateResource()
+                    .addProperty(RDF.type, resource)
+                    .safeAddLinkedProperty(RDF.type, it.extraType)
+                    .addProperty(RDF.type, SKOS.Concept)
+                    .safeAddProperty(DCTerms.source, it.uri)
+                    .safeAddLiteralByLang(SKOS.prefLabel, it.prefLabel)
+            )
+        }
     }
     return this
 }
@@ -206,8 +196,8 @@ private fun Distribution.hasNonNullProperty(): Boolean =
 fun Resource.addDataDistributionServices(dataDistributionServices: Collection<DataDistributionService>?, baseURI: String): Resource {
     dataDistributionServices?.forEach {
         val uri = when {
-            it.uri.notNullOrEmpty() -> it.uri
-            it.id.notNullOrEmpty() -> "$baseURI/accessService/${it.id}"
+            !it.uri.isNullOrEmpty() -> it.uri
+            !it.id.isNullOrEmpty() -> "$baseURI/accessService/${it.id}"
             else -> null
         }
         addProperty(DCATapi.accessService,
@@ -229,8 +219,8 @@ fun Resource.addTemporal(temporal: List<PeriodOfTime>?): Resource {
             addProperty(DCTerms.temporal,
                 model.safeCreateResource()
                     .addProperty(RDF.type, DCTerms.PeriodOfTime)
-                    .safeAddDateTypeLiteral(Schema.startDate, it.startDate)
-                    .safeAddDateTypeLiteral(Schema.endDate, it.endDate))
+                    .safeAddDateTimeLiteral(Schema.startDate, it.startDate)
+                    .safeAddDateTimeLiteral(Schema.endDate, it.endDate))
         }
     }
     return this
@@ -265,11 +255,8 @@ fun Resource.addQualityAnnotationBody(body: Map<String, String>?): Resource {
     return this
 }
 
-fun String?.notNullOrEmpty() = this != null && this != ""
-
-
 private fun getReferencePropertyURI(code: String?, uri: String?): String {
-    return if (code != null && code != "") {
+    return if (!code.isNullOrEmpty()) {
         val newCode = code.replaceFirst("dct:", "")
         if (newCode.startsWith(DCTerms.NS)) {
             newCode
@@ -307,8 +294,8 @@ fun Resource.addReferences(references: Collection<Reference>?): Resource {
 private fun Reference.isValidReference(): Boolean =
     referenceType != null &&
     source != null &&
-    (referenceType.uri.notNullOrEmpty() || referenceType.code.notNullOrEmpty()) &&
-    source.uri.notNullOrEmpty()
+    (!referenceType.uri.isNullOrEmpty() || !referenceType.code.isNullOrEmpty()) &&
+    !source.uri.isNullOrEmpty()
 
 fun Resource.addRelations(relations: Collection<SkosConcept>?): Resource {
     relations?.forEach {
@@ -362,6 +349,7 @@ fun Resource.addSubjects(subjects: Collection<Subject>?): Resource {
         addProperty(DCTerms.subject,
             model.safeCreateResource(it.uri)
                 .addProperty(RDF.type, SKOS.Concept)
+                .safeAddProperty(DCTerms.identifier, it.identifier)
                 .safeAddSubjectCreatorId(DCTerms.creator, it.creator?.id)
                 .safeAddProperty(DCTerms.source, it.source)
                 .safeAddLangListLiteral(SKOS.altLabel, it.altLabel)
@@ -395,11 +383,18 @@ fun Model.createRDFResponse(): String =
         out.toString("UTF-8")
     }
 
-fun Model.safeCreateResource(uri: String? = null): Resource =
-    if (uri != null && (uri.startsWith("http://") || uri.startsWith("https://"))) {
-        createResource(uri)
+fun Model.safeCreateResource(value: String? = null): Resource =
+    if (value != null && URI(value).let {
+            !it.scheme.isNullOrEmpty() &&
+                !it.host.isNullOrEmpty() &&
+                it.path != null }) {
+        createResource(value)
     } else createResource()
 
+fun Model.safeCreateLinkedResource(value: String? = null) : Resource? =
+    if (!value.isNullOrEmpty()) {
+        createResource(value)
+    } else null
 
 // -------- Utils --------
 
@@ -413,3 +408,11 @@ enum class JenaType(val value: String){
     TURTLE("TURTLE"),
     NOT_ACCEPTABLE("")
 }
+
+fun String?.isValidURL(): Boolean =
+    try {
+        URL(this)
+        true
+    } catch (e: Exception) {
+        false
+    }

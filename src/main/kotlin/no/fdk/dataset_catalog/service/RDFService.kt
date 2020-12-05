@@ -3,7 +3,6 @@ package no.fdk.dataset_catalog.service
 import no.fdk.dataset_catalog.configuration.ApplicationProperties
 import no.fdk.dataset_catalog.model.Catalog
 import no.fdk.dataset_catalog.rdf.*
-import org.apache.jena.datatypes.xsd.XSDDatatype
 import org.apache.jena.rdf.model.Model
 import org.apache.jena.rdf.model.ModelFactory
 import org.apache.jena.sparql.vocabulary.FOAF
@@ -35,33 +34,26 @@ class RDFService(private val catalogService: CatalogService,
         model.setNsPrefix("vcard", VCARD4.NS)
         model.setNsPrefix("dcatapi", DCATapi.uri)
         model.setNsPrefix("xsd", XSD.NS)
-        model.setNsPrefix("iso", DQV.uri)
+        model.setNsPrefix("iso", DQV.ISO)
         model.setNsPrefix("dqv", DQV.uri)
         model.setNsPrefix("rdf", RDF.uri)
         model.setNsPrefix("skos", SKOS.uri)
         model.setNsPrefix("schema", "http://schema.org/")
 
+        forEach {
+            val baseUri = "${applicationProperties.conceptCatalogueHost}/${it.id}/datasets/"
 
-
-        forEach{
             model.createResource(it.uri)
                 .addProperty(RDF.type, DCAT.Catalog)
                 .safeAddPropertyByLang(DCTerms.title, it.title)
                 .safeAddPropertyByLang(DCTerms.description, it.description)
-                .safeAddLinkedProperty(DCTerms.publisher, it.publisher?.uri)
-                .safeAddDateTypeLiteral(DCTerms.issued, it.issued)
-                .safeAddDateTypeLiteral(DCTerms.modified, it.modified)
+                .safeAddDateTimeLiteral(DCTerms.issued, it.issued)
+                .safeAddDateTimeLiteral(DCTerms.modified, it.modified)
                 .safeAddProperty(DCTerms.language, it.language)
-                .safeAddDatasetListLinkedProperty(DCAT.dataset, it.dataset)
                 .addPublisher(it.publisher)
-
-
-
-            val catalogDatasets = it.id?.let { catId -> datasetService.getAll(catId) }
-            catalogDatasets?.forEach {
-                dataset ->  model.createDatasetResource(
-                dataset,
-                "${applicationProperties.conceptCatalogueHost}/${it.id}/datasets/${dataset.id}") }
+                .addDatasets(
+                    it.id?.let { catId -> datasetService.getAll(catId) },
+                    baseUri)
         }
 
         return model

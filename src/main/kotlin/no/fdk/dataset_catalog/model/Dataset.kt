@@ -5,13 +5,10 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class DatasetDTO(
@@ -73,15 +70,15 @@ data class Dataset(
 
     //dct:issued
     //Norwegian: Utgivelsesdato
-    @JsonDeserialize(using = LocalDateDeserializer::class)
-    @JsonSerialize(using = LocalDateSerializer::class)
-    val issued: LocalDate? = null,
+    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
+    @JsonSerialize(using = LocalDateTimeSerializer::class)
+    val issued: LocalDateTime? = null,
 
     //dct:modified
     //Norwegian: Modifiseringsdato
-    @JsonDeserialize(using = LocalDateDeserializer::class)
-    @JsonSerialize(using = LocalDateSerializer::class)
-    val modified: LocalDate? = null,
+    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
+    @JsonSerialize(using = LocalDateTimeSerializer::class)
+    val modified: LocalDateTime? = null,
 
     //dct:language
     //Norwegian: Språk
@@ -314,12 +311,12 @@ data class Distribution (
 data class PeriodOfTime (
     val id: String? = null,
     val name: String? = null,
-    @JsonDeserialize(using = LocalDateDeserializer::class)
-    @JsonSerialize(using = LocalDateSerializer::class)
-    val startDate: LocalDate? = null,
-    @JsonDeserialize(using = LocalDateDeserializer::class)
-    @JsonSerialize(using = LocalDateSerializer::class)
-    val endDate: LocalDate? = null,
+    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
+    @JsonSerialize(using = LocalDateTimeSerializer::class)
+    val startDate: LocalDateTime? = null,
+    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
+    @JsonSerialize(using = LocalDateTimeSerializer::class)
+    val endDate: LocalDateTime? = null,
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
