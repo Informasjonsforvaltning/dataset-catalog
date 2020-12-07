@@ -1,6 +1,6 @@
 spring:
   data.mongodb.uri: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongodb:27017/datasetCatalog?authSource=admin&authMechanism=SCRAM-SHA-1
-  security.oauth2.resourceserver.jwt.jwk-set-uri: ${JWK_KEY_SET_URI:https://sso.staging.fellesdatakatalog.digdir.no/auth/realms/fdk/protocol/openid-connect/certs}
+  security.oauth2.resourceserver.jwt.jwk-set-uri: ${SSO_HOST:https://sso.staging.fellesdatakatalog.digdir.no}/auth/realms/fdk/protocol/openid-connect/certs
 server.port: 8080
 logging:
   level.root: WARN
