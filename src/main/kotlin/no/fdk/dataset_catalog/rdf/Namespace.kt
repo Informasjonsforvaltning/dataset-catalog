@@ -68,7 +68,7 @@ class DQV {
     companion object {
         private val model = ModelFactory.createDefaultModel()
 
-        const val uri = "http://www.w3.org/ns/dqvNS#"
+        const val uri = "http://www.w3.org/ns/dqv#"
         const val ISO = "http://iso.org/25012/2008/dataquality/"
 
 

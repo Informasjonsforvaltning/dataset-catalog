@@ -5,7 +5,9 @@ import com.nhaarman.mockitokotlin2.whenever
 import no.fdk.dataset_catalog.configuration.ApplicationProperties
 import no.fdk.dataset_catalog.model.Catalog
 import no.fdk.dataset_catalog.model.Dataset
+import no.fdk.dataset_catalog.model.REGISTRATION_STATUS
 import no.fdk.dataset_catalog.model.SkosConcept
+import no.fdk.dataset_catalog.rdf.createRDFResponse
 import no.fdk.dataset_catalog.utils.TEST_CATALOG_1
 import no.fdk.dataset_catalog.utils.TEST_DATASET_1
 import no.fdk.dataset_catalog.utils.TestResponseReader
@@ -40,6 +42,7 @@ class RdfServiceTest {
         @Test
         fun `Serializes dataset relations`() {
             val dataset = Dataset(
+                registrationStatus = REGISTRATION_STATUS.PUBLISH,
                 id = "http://catalog/1/dataset/1",
                 uri = "http://catalog/1/dataset/1",
                 relations = listOf(
@@ -70,7 +73,7 @@ class RdfServiceTest {
 
         @Test
         fun `Serializes dataset qualified attributions`() {
-            val dataset = Dataset(id = "http://catalog/1/dataset/1", uri = "http://catalog/1/dataset/1", qualifiedAttributions = setOf("123456789", "987654321"))
+            val dataset = Dataset(registrationStatus = REGISTRATION_STATUS.PUBLISH, id = "http://catalog/1/dataset/1", uri = "http://catalog/1/dataset/1", qualifiedAttributions = setOf("123456789", "987654321"))
             val catalog = Catalog(id = "http://catalog/1", uri = "http://catalog/1", dataset = listOf(dataset))
 
             whenever(catalogService.getByID("http://catalog/1")).thenReturn(catalog)
@@ -91,9 +94,11 @@ class RdfServiceTest {
             whenever(datasetService.getAll(catalog.id!!)).thenReturn(listOf(dataset))
 
             val expected = responseReader.parseFile("catalog_2.ttl", "TURTLE")
-            val responseModel = RDFService.getById(catalog.id!!)
+            val responseModel = RDFService.getById(catalog.id!!)!!
 
-            assertTrue(checkIfIsomorphicAndPrintDiff(responseModel!!, expected, "Serializing complete catalog", logger))
+            println(expected.createRDFResponse())
+            println(responseModel.createRDFResponse())
+            assertTrue(checkIfIsomorphicAndPrintDiff(responseModel, expected, "Serializing complete catalog", logger))
         }
     }
 }

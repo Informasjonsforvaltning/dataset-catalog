@@ -46,20 +46,22 @@ val DATASET_1 = Dataset(
     DATASET_ID_1,
     DB_CATALOG_ID_1,
     uri = "http://$DATASET_ID_1",
-    registrationStatus = REGISTRATION_STATUS.DRAFT,
+    registrationStatus = REGISTRATION_STATUS.PUBLISH,
 )
 
 val DATASET_2 = TEST_DATASET_0.copy(
     id = DATASET_ID_2,
     catalogId = DB_CATALOG_ID_1,
     uri = "http://$DATASET_ID_2",
+    registrationStatus = REGISTRATION_STATUS.PUBLISH,
 )
 
 val DB_DATASET_1 = Dataset(
     DB_DATASET_ID_1,
     DB_CATALOG_ID_1,
     uri = "http://$DB_DATASET_ID_1",
-    title = mapOf(Pair("nb", "test tittel"))
+    title = mapOf(Pair("nb", "test tittel")),
+    registrationStatus = REGISTRATION_STATUS.PUBLISH,
 )
 
 val DB_DATASET_2 = TEST_DATASET_0.copy(
@@ -67,32 +69,37 @@ val DB_DATASET_2 = TEST_DATASET_0.copy(
     DB_CATALOG_ID_1,
     uri = "http://$DB_DATASET_ID_2",
     title = mapOf(Pair("nb", "enda en")),
-    description = mapOf(Pair("en", "test words"))
+    description = mapOf(Pair("en", "test words")),
+    registrationStatus = REGISTRATION_STATUS.PUBLISH,
 )
 
 val DB_DATASET_3 = Dataset(
     DB_DATASET_ID_3,
     DB_CATALOG_ID_1,
     uri = "http://$DB_DATASET_ID_3",
-    description = mapOf(Pair("en", "the description"))
+    description = mapOf(Pair("en", "the description")),
+    registrationStatus = REGISTRATION_STATUS.PUBLISH,
 )
 
 val DB_DATASET_4 = Dataset(
     DB_DATASET_ID_4,
     DB_CATALOG_ID_2,
     uri = "http://$DB_DATASET_ID_4",
+    registrationStatus = REGISTRATION_STATUS.PUBLISH,
 )
 
 val DB_DATASET_5 = Dataset(
     DB_DATASET_ID_5,
     DB_CATALOG_ID_2,
     uri = "http://$DB_DATASET_ID_5",
+    registrationStatus = REGISTRATION_STATUS.PUBLISH,
 )
 
 val DB_DATASET_6 = Dataset(
     DB_DATASET_ID_6,
     DB_CATALOG_ID_2,
     uri = "http://$DB_DATASET_ID_6",
+    registrationStatus = REGISTRATION_STATUS.PUBLISH,
 )
 
 val CATALOG_1 = Catalog(
@@ -146,7 +153,7 @@ private fun Dataset.mapDBO(): org.bson.Document =
         .append("catalogId", catalogId)
         .append("title", title)
         .append("description", description)
-
+        .append("registrationStatus", registrationStatus.toString())
 
 private fun Catalog.mapDBO(): org.bson.Document =
     org.bson.Document()
