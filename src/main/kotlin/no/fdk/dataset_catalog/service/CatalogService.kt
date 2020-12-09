@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service
 @Service
 class CatalogService(private val catalogRepository: CatalogRepository,
                      private val organizationService: OrganizationService,
+                     private val publishingService: PublishingService,
                      private val applicationProperties: ApplicationProperties) {
 
     fun getAll(): List<Catalog> = catalogRepository.findAll()
@@ -70,5 +71,16 @@ class CatalogService(private val catalogRepository: CatalogRepository,
 
     fun getByIDs(permittedOrgs: Set<String>): List<Catalog> = catalogRepository.findAllById(permittedOrgs).toList()
 
-
+    fun addDataSource(catalog: Catalog) {
+        val success = publishingService.sendNewDataSourceMessage(
+            catalog.id,
+            applicationProperties.catalogUriHost + catalog.id,
+            catalog.description?.getOrDefault("no", "")
+        )
+        if (success) {
+            catalogRepository.save(
+                catalog.copy(hasPublishedDataSource = true)
+            )
+        }
+    }
 }

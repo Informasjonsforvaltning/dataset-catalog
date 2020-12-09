@@ -23,6 +23,7 @@ fun Catalog.update(newValues: Catalog): Catalog =
         modified = newValues.modified ?: modified,
         language = newValues.language ?: language,
         dataset = newValues.dataset ?: dataset,
+        hasPublishedDataSource = newValues.hasPublishedDataSource ?: hasPublishedDataSource,
     )
 
 private fun getCatalogURI(catalogUriHost: String, id: String): String = "$catalogUriHost/catalogs/$id"

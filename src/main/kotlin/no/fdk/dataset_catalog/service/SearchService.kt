@@ -21,13 +21,16 @@ class SearchService (
 
     fun datasetByQuery(jwt: Jwt, searchRequest: SearchRequest): SearchResult =
         if (searchRequest.catalogIDs.all { endpointPermissions.hasOrgReadPermission(jwt, it) }) {
-             logger.info("Searching for datasets with title or description containing [${searchRequest.query}]")
 
-            if (searchRequest.query == "") {
+            if (searchRequest.query.isEmpty()) {
+                logger.info("Fetching datasets for catalog with ID(s) ${searchRequest.catalogIDs}")
+
                 SearchResult(
                     datasets = searchRequest.catalogIDs.map { datasetService.getAll(it) }.flatten()
                 )
             } else {
+                logger.info("Searching for datasets with title or description containing [${searchRequest.query}]")
+
                 val queryString = searchRequest.query.toLowerCase()
                 val titleHits = datasetRepository.findByTitleContaining(searchRequest.catalogIDs, queryString)
                 val descriptionHits = datasetRepository.findByDescriptionContaining(searchRequest.catalogIDs, queryString)

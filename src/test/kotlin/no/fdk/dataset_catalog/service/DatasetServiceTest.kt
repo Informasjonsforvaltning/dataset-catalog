@@ -17,7 +17,8 @@ class DatasetServiceTest {
     private val catalogService: CatalogService = mock()
     private val conceptService: ConceptService = mock()
     private val organizationService: OrganizationService = mock()
-    private val datasetService = DatasetService(datasetRepository, catalogService, organizationService, conceptService)
+    private val publishingService: PublishingService = mock()
+    private val datasetService = DatasetService(datasetRepository, catalogService, organizationService, conceptService, publishingService)
 
     @Nested
     internal inner class Create {
@@ -30,7 +31,7 @@ class DatasetServiceTest {
             whenever(datasetRepository.save(any())).thenReturn(ds)
             whenever(catalogService.getByID("catId")).thenReturn(Catalog("catId"))
             val actual = datasetService.create("catId", ds)
-            assertEquals(ds.copy(lastModified = actual.lastModified), actual)
+            assertEquals(ds.copy(lastModified = actual?.lastModified, uri = actual?.uri), actual)
         }
     }
 
@@ -97,9 +98,10 @@ class DatasetServiceTest {
             val expected = Dataset("dsId", "catId", uri="test")
             whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
             whenever(datasetRepository.save(any())).thenReturn(expected)
+            whenever(catalogService.getByID("catId")).thenReturn(Catalog())
             val actual = datasetService.updateDataset("catId","dsId", expected)
 
-            assertEquals(expected, actual)
+            assertEquals(expected.copy( lastModified = actual?.lastModified), actual)
         }
     }
 
@@ -125,6 +127,82 @@ class DatasetServiceTest {
             val expected = ds.copy(subject = listOf(Subject(id = "1", uri = "uri")))
             val actual = ds.updateSubjects()
             assertEquals(expected, actual)
+        }
+    }
+
+    @Nested
+    internal inner class TriggerHarvest {
+        @Test
+        fun `triggers harvest on update to published dataset`() {
+            val cat = Catalog("catId", publisher = Publisher(id="pubId"), hasPublishedDataSource = true)
+            val ds = Dataset("dsId", "catId", registrationStatus = REGISTRATION_STATUS.PUBLISH)
+
+            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
+            whenever(datasetRepository.save(any())).thenReturn(ds)
+            whenever(catalogService.getByID("catId")).thenReturn(cat)
+
+            datasetService.updateDataset("catId","dsId", ds)
+
+            verify(publishingService, times(1)).triggerHarvest("dsId", "catId", "pubId")
+        }
+
+        @Test
+        fun `does not trigger harvest on update to draft dataset`() {
+            val cat = Catalog("catId", publisher = Publisher(id="pubId"), hasPublishedDataSource = true)
+            val ds = Dataset("dsId", "catId", registrationStatus = REGISTRATION_STATUS.DRAFT)
+
+            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
+            whenever(datasetRepository.save(any())).thenReturn(ds)
+            whenever(catalogService.getByID("catId")).thenReturn(cat)
+
+            datasetService.updateDataset("catId","dsId", ds)
+
+            verify(publishingService, times(0)).triggerHarvest("dsId", "catId", "pubId")
+        }
+
+        @Test
+        fun `adds datasource on first published dataset in catalog`() {
+            val cat = Catalog("catId", publisher = Publisher(id="pubId"), hasPublishedDataSource = false)
+            val ds = Dataset("dsId", "catId", registrationStatus = REGISTRATION_STATUS.DRAFT)
+
+            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
+            whenever(datasetRepository.save(any())).thenReturn(ds)
+            whenever(catalogService.getByID("catId")).thenReturn(cat)
+
+            datasetService.create("catId", ds)
+            datasetService.updateDataset("catId","dsId", ds.copy(registrationStatus = REGISTRATION_STATUS.PUBLISH))
+
+            verify(catalogService, times(1)).addDataSource(cat)
+        }
+
+        @Test
+        fun `does not add datasource on already added catalog`() {
+            val cat = Catalog("catId", publisher = Publisher(id="pubId"), hasPublishedDataSource = true)
+            val ds = Dataset("dsId", "catId", registrationStatus = REGISTRATION_STATUS.DRAFT)
+
+            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
+            whenever(datasetRepository.save(any())).thenReturn(ds)
+            whenever(catalogService.getByID("catId")).thenReturn(cat)
+
+            datasetService.create("catId", ds)
+            datasetService.updateDataset("catId","dsId", ds.copy(registrationStatus = REGISTRATION_STATUS.PUBLISH))
+
+            verify(catalogService, times(0)).addDataSource(cat)
+        }
+
+        @Test
+        fun `triggers harvest and adds datasource on first published dataset in catalog`() {
+            val cat = Catalog("catId", publisher = Publisher(id="pubId"), hasPublishedDataSource = false)
+            val ds = Dataset("dsId", "catId", registrationStatus = REGISTRATION_STATUS.PUBLISH)
+
+            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
+            whenever(datasetRepository.save(any())).thenReturn(ds)
+            whenever(catalogService.getByID("catId")).thenReturn(cat)
+
+            datasetService.updateDataset("catId","dsId", ds)
+
+            verify(publishingService, times(1)).triggerHarvest("dsId", "catId", "pubId")
+            verify(catalogService, times(1)).addDataSource(cat)
         }
     }
 

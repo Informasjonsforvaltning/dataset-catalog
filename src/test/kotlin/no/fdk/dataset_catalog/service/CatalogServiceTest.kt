@@ -22,8 +22,16 @@ import kotlin.test.assertNull
 class CatalogServiceTest {
     private val catalogRepository: CatalogRepository = mock()
     private val organizationService: OrganizationService = mock()
-    private val applicationProperties = ApplicationProperties("localhost:5000", "localhost:5000", "localhost:5000")
-    private val catalogService = CatalogService(catalogRepository, organizationService, applicationProperties)
+    private val publishingService: PublishingService = mock()
+    private val applicationProperties = ApplicationProperties(
+        "localhost:5000",
+        "localhost:5000",
+        "localhost:5000",
+        0L,
+    "catalogHarvestRoute",
+    "newDataSourceRoute",
+    "harvests")
+    private val catalogService = CatalogService(catalogRepository, organizationService, publishingService, applicationProperties)
 
     @Nested
     internal inner class Create{
