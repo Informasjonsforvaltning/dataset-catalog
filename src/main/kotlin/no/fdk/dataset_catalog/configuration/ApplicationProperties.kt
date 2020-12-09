@@ -9,4 +9,8 @@ data class ApplicationProperties(
     val conceptCatalogueHost: String,
     val organizationCatalogueHost: String,
     val catalogUriHost: String,
+    val harvestDelay: Long,
+    val catalogHarvestRoute: String,
+    val newDataSourceRoute: String,
+    val exchangeName: String,
 )

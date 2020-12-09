@@ -44,4 +44,7 @@ data class Catalog(
 
 //   dcat:Dataset
     val dataset: List<Dataset>? = null,
-)
+
+    val hasPublishedDataSource: Boolean? = false,
+
+    )

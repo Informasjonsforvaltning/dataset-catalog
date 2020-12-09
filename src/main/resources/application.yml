@@ -1,6 +1,13 @@
 spring:
   data.mongodb.uri: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongodb:27017/datasetCatalog?authSource=admin&authMechanism=SCRAM-SHA-1
   security.oauth2.resourceserver.jwt.jwk-set-uri: ${SSO_HOST:https://sso.staging.fellesdatakatalog.digdir.no}/auth/realms/fdk/protocol/openid-connect/certs
+  rabbitmq:
+    host: ${RABBIT_HOST}
+    port: 5672
+    username: ${RABBIT_USERNAME}
+    password: ${RABBIT_PASSWORD}
+    template:
+      exchange: harvests
 server.port: 8080
 logging:
   level.root: WARN
@@ -11,6 +18,10 @@ application:
   conceptCatalogueHost: ${FDK_BASE_HOST:https://staging.fellesdatakatalog.digdir.no}
   organizationCatalogueHost: ${ORGANIZATION_CATALOGUE_HOST:https://organization-catalogue.staging.fellesdatakatalog.digdir.no}
   catalogUriHost: ${FDK_REGISTRATION_BASE_URI:https://registrering.fellesdatakatalog.digdir.no}/catalogs
+  harvestDelay: 600000
+  catalogHarvestRoute: dataset.publisher.HarvestTrigger
+  newDataSourceRoute: dataset.publisher.NewDataSource
+  exchangeName: harvests
 security:
   fdkIssuer: ${SSO_HOST:https://sso.staging.fellesdatakatalog.digdir.no}/auth/realms/fdk
 
@@ -18,10 +29,19 @@ security:
 spring:
   profiles: develop
   data.mongodb.uri: mongodb://admin:admin@localhost:27017/datasetCatalog?authSource=admin&authMechanism=SCRAM-SHA-1
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: admin
+    password: admin
 application:
   conceptCatalogueHost: https://staging.fellesdatakatalog.digdir.no
   organizationCatalogueHost: https://organization-catalogue.staging.fellesdatakatalog.digdir.no
   catalogUriHost: https://registrering.staging.fellesdatakatalog.digdir.no/catalogs
+  harvestDelay: 10000
+  catalogHarvestRoute: dataset.publisher.HarvestTrigger
+  newDataSourceRoute: dataset.publisher.NewDataSource
+  exchangeName: harvests
 
 ---
 spring:
@@ -32,3 +52,7 @@ application:
   conceptCatalogueHost: http://localhost:5000
   organizationCatalogueHost: http://localhost:5000
   catalogUriHost: http://localhost:5000/catalogs
+  harvestDelay: 10000
+  catalogHarvestRoute: dataset.publisher.HarvestTrigger
+  newDataSourceRoute: dataset.publisher.NewDataSource
+  exchangeName: harvests
