@@ -2,8 +2,6 @@ package no.fdk.dataset_catalog.utils
 
 import no.fdk.dataset_catalog.model.*
 import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.ZonedDateTime
 import java.util.*
 
 val DEFINITION_EX = Definition(
@@ -23,7 +21,7 @@ val DEFINITION_EX = Definition(
         text = mapOf(Pair("nb", "Tekstinnhold 2")),
         uri = "http://test.uri"
     )),
-    lastUpdated = ZonedDateTime.now().toEpochSecond()
+    lastUpdated = LocalDate.now().toEpochDay()
 )
 
 val CONTACTPOINT_EX = ContactPoint(
@@ -137,8 +135,8 @@ val DISTRIBUTION_EX = Distribution(
 val PERIODOFTIME_EX = PeriodOfTime(
     id = "id",
     name = "Time period",
-    startDate = LocalDateTime.now(),
-    endDate = LocalDateTime.now().plusYears(1)
+    startDate = LocalDate.now(),
+    endDate = LocalDate.now().plusYears(1)
 )
 
 val QUALITYANNOTATION_EX = QualityAnnotation(
@@ -158,8 +156,8 @@ val CATALOG_EX = Catalog(
     title = mapOf(Pair("nb", "Katalognavn")),
     description = mapOf(Pair("nb", "Beskrivelse")),
     publisher = PUBLISHER_EX,
-    issued = LocalDateTime.now(),
-    modified = LocalDateTime.now(),
+    issued = LocalDate.now(),
+    modified = LocalDate.now(),
     language = "nb",
     dataset = listOf(Dataset("Id", "catalogId")),
 )
@@ -180,8 +178,8 @@ val TEST_DATASET_0 = Dataset(
     contactPoint = listOf(CONTACT_EX),
     keyword = listOf(mapOf(Pair("nb", "Nøkkelord"))),
     publisher = PUBLISHER_EX,
-    issued = LocalDateTime.now(),
-    modified = LocalDateTime.now(),
+    issued = LocalDate.now(),
+    modified = LocalDate.now(),
     language = listOf(SKOSCODE_EX),
     landingPage = listOf("www.hjemmeside.no"),
     theme = listOf(DATATHEME_EX),

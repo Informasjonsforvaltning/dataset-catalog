@@ -10,7 +10,7 @@ import java.io.ByteArrayOutputStream
 import java.lang.Exception
 import java.net.URI
 import java.net.URL
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 
 // -------- Helper functions --------
@@ -97,11 +97,10 @@ fun Resource.safeAddResourceProperty(property: Property, value: Resource?): Reso
     if (value == null) this
     else addProperty(property, value)
 
-fun Resource.safeAddDateTimeLiteral(property: Property, dateTime: LocalDateTime?): Resource =
-    if(dateTime == null) this
-    else {
-        safeAddLiteral(property, model.createTypedLiteral("$dateTime:00",XSDDatatype.XSDdateTime))
-    }
+fun Resource.safeAddDateTimeLiteral(property: Property, dateTime: LocalDate?): Resource =
+    if ( dateTime != null ) {
+        safeAddLiteral(property, model.createTypedLiteral(dateTime.toString(), XSDDatatype.XSDdate))
+    } else this
 
 fun Resource.safeAddLinkedProperty(property: Property, value: String?): Resource =
     if (value.isNullOrEmpty()) this
@@ -117,11 +116,11 @@ fun Resource.safeAddURLs(property: Property, value: List<String?>?): Resource {
 }
 
 
-fun String.addContactStringPrefix(prefix: String): String =
-    if (this.startsWith(prefix)) {
-        this.replace("\\s", "")
-    } else {
-        prefix + this.replace("\\s", "")
+fun String.addContactStringPrefix(prefix: String): String? =
+    when {
+        this.startsWith(prefix) -> this.trim()
+        this.isNotEmpty() -> prefix + this.trim()
+        else -> null
     }
 
 // -------- Blank Nodes --------
@@ -181,14 +180,14 @@ fun Resource.addDistribution(property: Property, distributions: Collection<Distr
 }
 
 private fun Distribution.hasNonNullProperty(): Boolean =
-    title != null ||
-    description != null ||
-    accessURL != null ||
-    license != null ||
-    conformsTo != null ||
-    page != null ||
-    format != null ||
-    accessService != null
+    title.isNullOrEmpty() ||
+    description.isNullOrEmpty() ||
+    (!accessURL.isNullOrEmpty()) ||
+    (license != null) ||
+    (!conformsTo.isNullOrEmpty()) ||
+    (!page.isNullOrEmpty()) ||
+    (!format.isNullOrEmpty()) ||
+    (!accessService.isNullOrEmpty())
 
 // TODO: add dcat:endpointURLs and make sure front-end sends necessary data (https://doc.difi.no/review/dcat-ap-no/#_obligatoriske_egenskaper_for_datatjeneste)
 // TODO: add a list of dct:MediaTypes (https://doc.difi.no/review/dcat-ap-no/#distribusjon-medietype)
