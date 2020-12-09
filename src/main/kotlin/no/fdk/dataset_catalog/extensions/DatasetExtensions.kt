@@ -10,9 +10,9 @@ fun Dataset.updateSubjects(): Dataset =
         Subject(
             id=it.id,
             uri = it.uri,
-            definition = it.definition?.text ?: emptyMap(),
-            prefLabel = it.prefLabel ?: emptyMap(),
-            altLabel = it.altLabel ?: emptyList<Map<String, String>>(),
+            definition = it.definition?.text,
+            prefLabel = it.prefLabel,
+            altLabel = it.altLabel,
             identifier = it.identifier
         )
     })
@@ -49,7 +49,7 @@ fun Dataset.update(newValues: Dataset): Dataset =
         legalBasisForAccess = newValues.legalBasisForAccess ?: legalBasisForAccess,
         hasAccuracyAnnotation = newValues.hasAccuracyAnnotation ?: hasAccuracyAnnotation,
         hasCompletenessAnnotation = newValues.hasCompletenessAnnotation ?: hasCompletenessAnnotation,
-        hasCurrentnessAnnotation = newValues.hasCompletenessAnnotation ?: hasCurrentnessAnnotation,
+        hasCurrentnessAnnotation = newValues.hasCurrentnessAnnotation ?: hasCurrentnessAnnotation,
         hasAvailabilityAnnotation = newValues.hasAvailabilityAnnotation ?: hasAvailabilityAnnotation,
         hasRelevanceAnnotation = newValues.hasRelevanceAnnotation ?: hasRelevanceAnnotation,
         references = newValues.references ?: references,

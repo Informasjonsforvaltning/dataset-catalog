@@ -5,17 +5,20 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDateTime
+import java.time.LocalDate
 
 data class DatasetDTO(
     val _embedded: Map<String, List<Dataset>>?
 )
 
-@Document( collection = "datasets" )
+@Document(collection = "datasets")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class Dataset(
     @Id
@@ -24,8 +27,8 @@ data class Dataset(
     val catalogId: String? = null,
 
     @JsonProperty(value = "_lastModified")
-    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     val lastModified: LocalDateTime? = null,
 
     val registrationStatus: REGISTRATION_STATUS? = null,
@@ -70,15 +73,15 @@ data class Dataset(
 
     //dct:issued
     //Norwegian: Utgivelsesdato
-    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
-    @JsonSerialize(using = LocalDateTimeSerializer::class)
-    val issued: LocalDateTime? = null,
+    @JsonSerialize(using = LocalDateSerializer::class)
+    @JsonDeserialize(using = LocalDateDeserializer::class)
+    val issued: LocalDate? = null,
 
     //dct:modified
     //Norwegian: Modifiseringsdato
-    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
-    @JsonSerialize(using = LocalDateTimeSerializer::class)
-    val modified: LocalDateTime? = null,
+    @JsonSerialize(using = LocalDateSerializer::class)
+    @JsonDeserialize(using = LocalDateDeserializer::class)
+    val modified: LocalDate? = null,
 
     //dct:language
     //Norwegian: Språk
@@ -194,7 +197,7 @@ enum class REGISTRATION_STATUS {
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-data class Concept (
+data class Concept(
 //    a Skos:Concept
     val id: String? = null,
 
@@ -252,7 +255,7 @@ data class TextAndURI(
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-data class Contact (
+data class Contact(
     val id: String? = null,
     val uri: String? = null,
     val fullname: String? = null,
@@ -264,7 +267,7 @@ data class Contact (
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-data class Publisher (
+data class Publisher(
     val uri: String? = null,
     val id: String? = null,
     val name: String? = null,
@@ -273,14 +276,14 @@ data class Publisher (
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-data class SkosCode (
+data class SkosCode(
     val uri: String? = null,
     val code: String? = null,
     val prefLabel: Map<String, String>? = null,
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-data class DataTheme (
+data class DataTheme(
     val id: String? = null,
     val uri: String? = null,
     val code: String? = null,
@@ -292,7 +295,7 @@ data class DataTheme (
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-data class Distribution (
+data class Distribution(
     val id: String? = null,
     val uri: String? = null,
     val title: Map<String, String>? = null,
@@ -308,39 +311,39 @@ data class Distribution (
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-data class PeriodOfTime (
+data class PeriodOfTime(
     val id: String? = null,
     val name: String? = null,
-    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
-    @JsonSerialize(using = LocalDateTimeSerializer::class)
-    val startDate: LocalDateTime? = null,
-    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
-    @JsonSerialize(using = LocalDateTimeSerializer::class)
-    val endDate: LocalDateTime? = null,
+    @JsonSerialize(using = LocalDateSerializer::class)
+    @JsonDeserialize(using = LocalDateDeserializer::class)
+    val startDate: LocalDate? = null,
+    @JsonSerialize(using = LocalDateSerializer::class)
+    @JsonDeserialize(using = LocalDateDeserializer::class)
+    val endDate: LocalDate? = null,
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-data class SkosConcept (
+data class SkosConcept(
     val uri: String? = null,
-    val prefLabel: Map<String, String> = mutableMapOf(),
+    val prefLabel: Map<String, String>? = null,
     val extraType: String? = null,
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-data class QualityAnnotation (
+data class QualityAnnotation(
     val inDimension: String? = null,
     val motivatedBy: String? = null,
     val hasBody: Map<String, String>? = null
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-data class Reference (
+data class Reference(
     val referenceType: SkosCode? = null,
     val source: SkosConcept? = null // link to Dataset
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-data class ConceptSchema (
+data class ConceptSchema(
     val id: String? = null,
     val title: Map<String, String>? = null,
     val versioninfo: String? = null,
@@ -348,7 +351,7 @@ data class ConceptSchema (
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-data class DataDistributionService (
+data class DataDistributionService(
     val id: String? = null,
     val uri: String? = null,
 

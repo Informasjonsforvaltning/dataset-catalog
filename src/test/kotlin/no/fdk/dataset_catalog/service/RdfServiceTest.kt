@@ -96,8 +96,6 @@ class RdfServiceTest {
             val expected = responseReader.parseFile("catalog_2.ttl", "TURTLE")
             val responseModel = RDFService.getById(catalog.id!!)!!
 
-            println(expected.createRDFResponse())
-            println(responseModel.createRDFResponse())
             assertTrue(checkIfIsomorphicAndPrintDiff(responseModel, expected, "Serializing complete catalog", logger))
         }
     }

@@ -22,6 +22,7 @@ private val mapper = jacksonObjectMapper()
 @ContextConfiguration(initializers = [ApiTestContext.Initializer::class])
 @Tag("contract")
 class DatasetContractTest: ApiTestContext() {
+
     @Nested
     internal inner class CreateDataset{
         @Test
@@ -50,12 +51,13 @@ class DatasetContractTest: ApiTestContext() {
             val rspCreate = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/", mapper.writeValueAsString(DATASET_1), JwtToken(Access.ORG_WRITE).toString(), "POST")
             Assumptions.assumeTrue(HttpStatus.CREATED.value() == rspCreate["status"])
 
-
             val rspGet = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/$DATASET_ID_1", null, JwtToken(Access.ORG_WRITE).toString(), "GET")
             Assumptions.assumeTrue(HttpStatus.OK.value() == rspGet["status"])
 
             val bodyGet: Dataset = mapper.readValue(rspGet["body"] as String)
+
             assertEquals(DATASET_1.copy(lastModified = bodyGet.lastModified, uri = bodyGet.uri, publisher = bodyGet.publisher), bodyGet)
+
         }
 
         @Test
@@ -63,11 +65,11 @@ class DatasetContractTest: ApiTestContext() {
             val rspCreate = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/", mapper.writeValueAsString(DATASET_2), JwtToken(Access.ORG_WRITE).toString(), "POST")
             Assumptions.assumeTrue(HttpStatus.CREATED.value() == rspCreate["status"])
 
-
             val rspGet = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/$DATASET_ID_2", null, JwtToken(Access.ORG_WRITE).toString(), "GET")
             Assumptions.assumeTrue(HttpStatus.OK.value() == rspGet["status"])
 
             val bodyGet: Dataset = mapper.readValue(rspGet["body"] as String)
+
             assertEquals(
                 DATASET_2.copy(
                     lastModified = bodyGet.lastModified,
@@ -76,7 +78,6 @@ class DatasetContractTest: ApiTestContext() {
                     uri = bodyGet.uri)
                 , bodyGet)
         }
-
     }
 
     @Nested

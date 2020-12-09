@@ -128,20 +128,20 @@
                                           skos:prefLabel  "The first one"@nb
                                         ] ;
         dct:identifier                  "42" ;
-        dct:issued                      "2012-01-01T00:00:00"^^xsd:dateTime ;
+        dct:issued                      "2012-01-01"^^xsd:date ;
         dct:language                    <http://publications.europa.eu/resource/authority/language/ENG> , <http://publications.europa.eu/resource/authority/language/NOR> ;
-        dct:modified                    "2016-09-21T00:00:00"^^xsd:dateTime ;
+        dct:modified                    "2016-09-21"^^xsd:date ;
         dct:provenance                  <http://data.brreg.no/datakatalog/provenance/vedtak> ;
         dct:publisher                   <http://data.brreg.no/enhetsregisteret/enhet/987654321> ;
         dct:relation                    <http://uri-2> , <http://uri-1> ;
         dct:spatial                     <http://www.geonames.org/3162656/asker.html> , <http://www.geonames.org/3141104/royken.html> , <http://www.geonames.org/3162212/baerum.html> , <http://www.geonames.org/3151404/hurum.html> ;
         dct:subject                     <https://data-david.github.io/Begrep/begrep/Enhet> ;
         dct:temporal                    [ a                 dct:PeriodOfTime ;
-                                          schema:endDate    "2017-12-31T00:00:00"^^xsd:dateTime ;
-                                          schema:startDate  "2017-01-01T00:00:00"^^xsd:dateTime
+                                          schema:endDate    "2017-12-31"^^xsd:date ;
+                                          schema:startDate  "2017-01-01"^^xsd:date
                                         ] ;
         dct:temporal                    [ a               dct:PeriodOfTime ;
-                                          schema:endDate  "2018-10-20T00:00:00"^^xsd:dateTime
+                                          schema:endDate  "2018-10-20"^^xsd:date
                                         ] ;
         dct:title                       "Markagrensen Oslo Kommune og nærliggende kommuner"@nb ;
         dct:type                        "Kodeliste" ;

@@ -3,11 +3,11 @@ package no.fdk.dataset_catalog.model
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 data class CatalogDTO(
     val _embedded: Map<String, List<Catalog>>?
@@ -21,23 +21,23 @@ data class Catalog(
     val uri: String? = null,
 
 //    dct:title
-    val title: Map<String, String>? = emptyMap(),
+    val title: Map<String, String>? = null,
 
 //    dct:description
-    val description: Map<String, String>? = emptyMap(),
+    val description: Map<String, String>? = null,
 
 //    dct:publisher
     val publisher: Publisher? = null,
 
 //    dct:issued
-    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
-    @JsonSerialize(using = LocalDateTimeSerializer::class)
-    val issued: LocalDateTime? = null,
+    @JsonSerialize(using = LocalDateSerializer::class)
+    @JsonDeserialize(using = LocalDateDeserializer::class)
+    val issued: LocalDate? = null,
 
 //    dct:modified
-    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
-    @JsonSerialize(using = LocalDateTimeSerializer::class)
-    val modified: LocalDateTime? = null,
+    @JsonSerialize(using = LocalDateSerializer::class)
+    @JsonDeserialize(using = LocalDateDeserializer::class)
+    val modified: LocalDate? = null,
 
 //    dct:language
     val language: String? = null,

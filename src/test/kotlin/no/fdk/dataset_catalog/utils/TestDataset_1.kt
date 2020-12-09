@@ -4,7 +4,7 @@ import no.fdk.dataset_catalog.model.*
 import no.fdk.dataset_catalog.rdf.DQV
 import org.apache.jena.sparql.vocabulary.FOAF
 import org.apache.jena.vocabulary.DCTerms
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 val CATALOG_ID = "987654321"
 val CATALOG_URI = "http://brreg.no/catalogs/$CATALOG_ID"
@@ -126,11 +126,11 @@ val TEST_DATASET_1 = Dataset(
     ),
     publisher = PUBLISHER,
     informationModel = listOf(SkosConcept(uri="https://www.w3.org/2004/02/skos/",prefLabel=mapOf(Pair("nb","SKOS")),extraType = null)),
-    temporal = listOf(PeriodOfTime(startDate = LocalDateTime.of(2017,1,1,0,0,0),endDate = LocalDateTime.of(2017,12,31,0,0,0)), PeriodOfTime(endDate = LocalDateTime.of(2018,10,20,0,0,0))),
+    temporal = listOf(PeriodOfTime(startDate = LocalDate.of(2017,1,1),endDate = LocalDate.of(2017,12,31)), PeriodOfTime(endDate=LocalDate.of(2018,10,20))),
     subject=listOf(SUBJECT),
     accrualPeriodicity=SkosCode(uri="http://publications.europa.eu/resource/authority/frequency/ANNUAL", code="ANNUAL", prefLabel=mapOf(Pair("nb", "årlig"))),
-    issued=LocalDateTime.of(2012, 1, 1,0,0,0),
-    modified=LocalDateTime.of(2016, 9, 21,0,0,0),
+    issued=LocalDate.of(2012, 1, 1),
+    modified=LocalDate.of(2016, 9, 21),
     provenance=SkosCode(uri="http://data.brreg.no/datakatalog/provenance/vedtak", code="vedtak", prefLabel = mapOf(Pair("nb", "Vedtak"))),
     spatial=SPATIAL,
     contactPoint = CONTACTS,
