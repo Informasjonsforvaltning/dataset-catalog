@@ -19,7 +19,7 @@ fun Dataset.updateSubjects(): Dataset =
 
 fun Dataset.update(newValues: Dataset): Dataset =
     copy(
-        lastModified = LocalDateTime.now(),
+        lastModified = newValues.lastModified ?: LocalDateTime.now(),
         registrationStatus = newValues.registrationStatus ?: registrationStatus,
         concepts = newValues.concepts ?: concepts,
         subject = newValues.subject ?: subject,

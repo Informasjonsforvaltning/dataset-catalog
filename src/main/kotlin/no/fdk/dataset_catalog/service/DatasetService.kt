@@ -45,7 +45,7 @@ class DatasetService(
             .copy(
                 id = datasetId,
                 catalogId = catalogId,
-                lastModified = LocalDateTime.now(),
+                lastModified = dataset.lastModified ?: LocalDateTime.now(),
                 uri = "http://brreg.no/catalogs/$catalogId/datasets/$datasetId",
                 publisher = dataset.publisher ?: catalog.publisher,
                 registrationStatus = dataset.registrationStatus ?: REGISTRATION_STATUS.DRAFT)
