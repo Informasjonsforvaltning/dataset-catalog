@@ -4,6 +4,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.fdk.dataset_catalog.model.Dataset
 import no.fdk.dataset_catalog.model.DatasetDTO
+import no.fdk.dataset_catalog.model.DatasetEmbeddedWrapperDTO
 import no.fdk.dataset_catalog.utils.*
 import no.fdk.dataset_catalog.utils.jwk.Access
 import no.fdk.dataset_catalog.utils.jwk.JwtToken
@@ -109,7 +110,7 @@ class DatasetContractTest: ApiTestContext() {
         @Test
         fun `Get All datasets returns all datasets in catalog`() {
             val rspRead = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_2/datasets", null, JwtToken(Access.ROOT).toString(), "GET")
-            val bodyRead: DatasetDTO = mapper.readValue(rspRead["body"] as String)
+            val bodyRead: DatasetEmbeddedWrapperDTO = mapper.readValue(rspRead["body"] as String)
 
             assertEquals(listOf(DB_DATASET_ID_4, DB_DATASET_ID_5, DB_DATASET_ID_6), bodyRead._embedded?.get("datasets")?.map { it.id })
         }
@@ -157,24 +158,23 @@ class DatasetContractTest: ApiTestContext() {
 
         @Test
         fun `Only specified fields are updated`() {
-            val updated = DB_DATASET_2.copy(
+            val update = DatasetDTO(
                 source = "brreg",
-                catalog = DB_CATALOG_1
             )
 
-            val rspUpdate = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_2}", mapper.writeValueAsString(updated), JwtToken(Access.ORG_WRITE).toString(), "PATCH")
+            val rspUpdate = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", mapper.writeValueAsString(update), JwtToken(Access.ORG_WRITE).toString(), "PATCH")
             Assumptions.assumeTrue(HttpStatus.OK.value() == rspUpdate["status"])
 
-            val postUpdate = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_2}", null, JwtToken(Access.ORG_WRITE).toString(), "GET")
+            val postUpdate = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", null, JwtToken(Access.ORG_WRITE).toString(), "GET")
             Assumptions.assumeTrue(HttpStatus.OK.value() == postUpdate["status"])
 
             val bodyPostUpdate: Dataset = mapper.readValue(postUpdate["body"] as String)
 
             assertEquals(
-                updated.copy(
+                DB_DATASET_1.copy(
                     lastModified = bodyPostUpdate.lastModified,
-                    concepts = bodyPostUpdate.concepts,
-                    subject = bodyPostUpdate.subject,)
+                    source = "brreg",
+                )
                 , bodyPostUpdate)
         }
     }

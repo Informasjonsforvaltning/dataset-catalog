@@ -14,8 +14,65 @@ import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDateTime
 import java.time.LocalDate
 
-data class DatasetDTO(
+data class DatasetEmbeddedWrapperDTO(
     val _embedded: Map<String, List<Dataset>>?
+)
+
+data class PeriodOfTimeDTO(
+    val id: String? = null,
+    val name: String? = null,
+    val startDate: String? = null,
+    val endDate: String? = null,
+)
+
+data class DatasetDTO(
+    val id: String? = null,
+    val catalogId: String? = null,
+    val lastModified: String? = null,
+    val registrationStatus: REGISTRATION_STATUS? = null,
+    val concepts: Collection<Concept>? = null,
+    val subject: List<Subject>? = null,
+    val uri: String? = null,
+    val originalUri: String? = null,
+    val source: String? = null,
+    val title: Map<String, String>? = null,
+    val description: Map<String, String>? = null,
+    val descriptionFormatted: Map<String, String>? = null,
+    val objective: Map<String, String>? = null,
+    val contactPoint: List<Contact>? = null,
+    val keyword: List<Map<String, String>>? = null,
+    val publisher: Publisher? = null,
+    val issued: String? = null,
+    val modified: String? = null,
+    val language: List<SkosCode>? = null,
+    val landingPage: List<String>? = null,
+    val theme: List<DataTheme>? = null,
+    val distribution: List<Distribution>? = null,
+    val sample: List<Distribution>? = null,
+    val temporal: List<PeriodOfTimeDTO>? = null,
+    val spatial: List<SkosCode>? = null,
+    val accessRights: SkosCode? = null,
+    val accessRightsComment: List<String>? = null,
+    val legalBasisForRestriction: List<SkosConcept>? = null,
+    val legalBasisForProcessing: List<SkosConcept>? = null,
+    val legalBasisForAccess: List<SkosConcept>? = null,
+    val hasAccuracyAnnotation: QualityAnnotation? = null,
+    val hasCompletenessAnnotation: QualityAnnotation? = null,
+    val hasCurrentnessAnnotation: QualityAnnotation? = null,
+    val hasAvailabilityAnnotation: QualityAnnotation? = null,
+    val hasRelevanceAnnotation: QualityAnnotation? = null,
+    val references: List<Reference>? = null,
+    val relations: List<SkosConcept>? = null,
+    val provenance: SkosCode? = null,
+    val identifier: List<String>? = null,
+    val page: List<String>? = null,
+    val accrualPeriodicity: SkosCode? = null,
+    val admsIdentifier: List<String>? = null,
+    val conformsTo: List<SkosConcept>? = null,
+    val informationModel: List<SkosConcept>? = null,
+    val qualifiedAttributions: Set<String>? = null,
+    val type: String? = null,
+    val catalog: Catalog? = null,
 )
 
 @Document(collection = "datasets")

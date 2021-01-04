@@ -57,7 +57,7 @@ class DatasetService(
         datasetRepository.count()
     }
 
-    fun updateDataset(catalogId: String, id: String, patch: Dataset): Dataset? {
+    fun updateDataset(catalogId: String, id: String, patch: DatasetDTO): Dataset? {
         val dataset = getByID(catalogId, id)
 
         return dataset

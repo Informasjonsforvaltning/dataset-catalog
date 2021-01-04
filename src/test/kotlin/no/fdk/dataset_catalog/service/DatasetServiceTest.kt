@@ -1,5 +1,6 @@
 package no.fdk.dataset_catalog.service
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.nhaarman.mockitokotlin2.*
 import no.fdk.dataset_catalog.extensions.updateSubjects
 import no.fdk.dataset_catalog.model.*
@@ -99,7 +100,7 @@ class DatasetServiceTest {
             whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
             whenever(datasetRepository.save(any())).thenReturn(expected)
             whenever(catalogService.getByID("catId")).thenReturn(Catalog())
-            val actual = datasetService.updateDataset("catId","dsId", expected)
+            val actual = datasetService.updateDataset("catId","dsId", DatasetDTO("dsId", "catId"))
 
             assertEquals(expected.copy( lastModified = actual?.lastModified), actual)
         }
@@ -141,7 +142,7 @@ class DatasetServiceTest {
             whenever(datasetRepository.save(any())).thenReturn(ds)
             whenever(catalogService.getByID("catId")).thenReturn(cat)
 
-            datasetService.updateDataset("catId","dsId", ds)
+            datasetService.updateDataset("catId","dsId", DatasetDTO())
 
             verify(publishingService, times(1)).triggerHarvest("dsId", "catId", "pubId")
         }
@@ -155,7 +156,7 @@ class DatasetServiceTest {
             whenever(datasetRepository.save(any())).thenReturn(ds)
             whenever(catalogService.getByID("catId")).thenReturn(cat)
 
-            datasetService.updateDataset("catId","dsId", ds)
+            datasetService.updateDataset("catId","dsId", DatasetDTO("dsId", "catId", source = "hei"))
 
             verify(publishingService, times(0)).triggerHarvest("dsId", "catId", "pubId")
         }
@@ -170,7 +171,7 @@ class DatasetServiceTest {
             whenever(catalogService.getByID("catId")).thenReturn(cat)
 
             datasetService.create("catId", ds)
-            datasetService.updateDataset("catId","dsId", ds.copy(registrationStatus = REGISTRATION_STATUS.PUBLISH))
+            datasetService.updateDataset("catId","dsId", DatasetDTO(registrationStatus = REGISTRATION_STATUS.PUBLISH))
 
             verify(catalogService, times(1)).addDataSource(cat)
         }
@@ -185,7 +186,7 @@ class DatasetServiceTest {
             whenever(catalogService.getByID("catId")).thenReturn(cat)
 
             datasetService.create("catId", ds)
-            datasetService.updateDataset("catId","dsId", ds.copy(registrationStatus = REGISTRATION_STATUS.PUBLISH))
+            datasetService.updateDataset("catId","dsId", DatasetDTO(registrationStatus = REGISTRATION_STATUS.PUBLISH))
 
             verify(catalogService, times(0)).addDataSource(cat)
         }
@@ -199,7 +200,7 @@ class DatasetServiceTest {
             whenever(datasetRepository.save(any())).thenReturn(ds)
             whenever(catalogService.getByID("catId")).thenReturn(cat)
 
-            datasetService.updateDataset("catId","dsId", ds)
+            datasetService.updateDataset("catId","dsId", DatasetDTO())
 
             verify(publishingService, times(1)).triggerHarvest("dsId", "catId", "pubId")
             verify(catalogService, times(1)).addDataSource(cat)
