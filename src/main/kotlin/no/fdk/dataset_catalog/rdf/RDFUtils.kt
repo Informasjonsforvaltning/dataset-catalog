@@ -383,12 +383,15 @@ fun Model.createRDFResponse(): String =
     }
 
 fun Model.safeCreateResource(value: String? = null): Resource =
-    if (value != null && URI(value).let {
-            !it.scheme.isNullOrEmpty() &&
-                !it.host.isNullOrEmpty() &&
-                it.path != null }) {
-        createResource(value)
-    } else createResource()
+    try {
+        value
+            ?.let(::URI)
+            ?.takeIf { it.isAbsolute && !it.isOpaque && !it.host.isNullOrEmpty() }
+            ?.let { createResource(value) }
+            ?: createResource()
+    } catch (e: Exception) {
+        createResource()
+    }
 
 fun Model.safeCreateLinkedResource(value: String? = null) : Resource? =
     if (!value.isNullOrEmpty()) {
