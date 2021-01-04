@@ -3,6 +3,7 @@ package no.fdk.dataset_catalog.controller
 import no.fdk.dataset_catalog.extensions.toDTO
 import no.fdk.dataset_catalog.model.Dataset
 import no.fdk.dataset_catalog.model.DatasetDTO
+import no.fdk.dataset_catalog.model.DatasetEmbeddedWrapperDTO
 import no.fdk.dataset_catalog.security.EndpointPermissions
 import no.fdk.dataset_catalog.service.DatasetService
 import org.slf4j.LoggerFactory
@@ -24,7 +25,7 @@ class DatasetController(
 
     @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getAllDatasets(@AuthenticationPrincipal jwt: Jwt,
-                       @PathVariable("catalogId") catalogId: String): ResponseEntity<DatasetDTO> =
+                       @PathVariable("catalogId") catalogId: String): ResponseEntity<DatasetEmbeddedWrapperDTO> =
         if (endpointPermissions.hasOrgReadPermission(jwt, catalogId)) {
             logger.info("Fetching datasets for catalog with ID $catalogId")
             ResponseEntity(datasetService.getAll(catalogId).toDTO(), HttpStatus.OK)
@@ -62,7 +63,8 @@ class DatasetController(
     fun updateDataset(@AuthenticationPrincipal jwt: Jwt,
                       @PathVariable("catalogId") catalogId: String,
                       @PathVariable id: String,
-                      @RequestBody patch: Dataset): ResponseEntity<Dataset> =
+                      @RequestBody patch: DatasetDTO,
+    ): ResponseEntity<Dataset> =
         if (endpointPermissions.hasOrgWritePermission(jwt, catalogId)) {
             try {
                 logger.info("Updating dataset with ID $id for catalog with ID $catalogId")

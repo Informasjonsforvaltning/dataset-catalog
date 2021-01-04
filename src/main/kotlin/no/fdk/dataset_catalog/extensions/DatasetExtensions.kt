@@ -1,14 +1,18 @@
 package no.fdk.dataset_catalog.extensions
 
 import no.fdk.dataset_catalog.model.*
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
-fun List<Dataset>.toDTO() : DatasetDTO = DatasetDTO(mapOf(Pair("datasets", this)))
+private val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+
+fun List<Dataset>.toDTO() : DatasetEmbeddedWrapperDTO = DatasetEmbeddedWrapperDTO(mapOf(Pair("datasets", this)))
 
 fun Dataset.updateSubjects(): Dataset =
     copy(subject = concepts?.map {
         Subject(
-            id=it.id,
+            id = it.id,
             uri = it.uri,
             definition = it.definition?.text,
             prefLabel = it.prefLabel,
@@ -17,7 +21,7 @@ fun Dataset.updateSubjects(): Dataset =
         )
     })
 
-fun Dataset.update(newValues: Dataset): Dataset =
+fun Dataset.update(newValues: DatasetDTO): Dataset =
     copy(
         lastModified = LocalDateTime.now(),
         registrationStatus = newValues.registrationStatus ?: registrationStatus,
@@ -33,16 +37,16 @@ fun Dataset.update(newValues: Dataset): Dataset =
         contactPoint = newValues.contactPoint ?: contactPoint,
         keyword = newValues.keyword ?: keyword,
         publisher = newValues.publisher ?: publisher,
-        issued = newValues.issued ?: issued,
-        modified = newValues.modified ?: modified,
+        issued = updateTime(newValues.issued, issued),
+        modified = updateTime(newValues.modified, modified),
         language = newValues.language ?: language,
         landingPage = newValues.landingPage ?: landingPage,
         theme = newValues.theme ?: theme,
         distribution = newValues.distribution ?: distribution,
         sample = newValues.sample ?: sample,
-        temporal = newValues.temporal ?: temporal,
+        temporal = updatePeriodsOfTime(newValues.temporal, temporal),
         spatial = newValues.spatial ?: spatial,
-        accessRights = newValues.accessRights?: accessRights,
+        accessRights = newValues.accessRights ?: accessRights,
         accessRightsComment = newValues.accessRightsComment ?: accessRightsComment,
         legalBasisForRestriction = newValues.legalBasisForRestriction ?: legalBasisForRestriction,
         legalBasisForProcessing = newValues.legalBasisForProcessing ?: legalBasisForProcessing,
@@ -65,3 +69,25 @@ fun Dataset.update(newValues: Dataset): Dataset =
         type = newValues.type ?: type,
         catalog = newValues.catalog ?: catalog,
     )
+
+private fun updateTime(dtoTime: String?, dboTime: LocalDate?): LocalDate? {
+    return try {
+        LocalDate.parse(dtoTime, dateTimeFormatter)
+    } catch (e: Exception) {
+        if (dtoTime == null) {
+            dboTime
+        } else {
+            null
+        }
+    }
+}
+
+private fun updatePeriodsOfTime(dtoTime: List<PeriodOfTimeDTO>?, dboTime: List<PeriodOfTime>?): List<PeriodOfTime>? =
+    dtoTime?.map {
+        PeriodOfTime(
+            id = it.id,
+            name = it.name,
+            startDate = updateTime(it.startDate, null),
+            endDate = updateTime(it.endDate, null)
+        )
+    } ?: dboTime
