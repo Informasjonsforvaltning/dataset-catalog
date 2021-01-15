@@ -69,6 +69,13 @@ class DatasetService(
             }
     }
 
+    fun updateLastModified(catalogId: String, id: String, lastModified: LocalDateTime?): Dataset? =
+        if (lastModified != null) {
+            getByID(catalogId, id)
+                ?.copy ( lastModified = lastModified )
+                ?.let { datasetRepository.save(it) }
+        } else null
+
     fun delete(catalogId: String, id: String) {
         getByID(catalogId, id)
             ?.let { datasetRepository.delete(it) }?: throw Exception()
