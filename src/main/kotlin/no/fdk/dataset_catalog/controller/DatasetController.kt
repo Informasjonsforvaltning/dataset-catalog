@@ -76,24 +76,6 @@ class DatasetController(
         } else ResponseEntity(HttpStatus.FORBIDDEN)
 
 
-    @PatchMapping(value = ["/lastmodified/{id}"], consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun updateLastChanged(@AuthenticationPrincipal jwt: Jwt,
-                      @PathVariable("catalogId") catalogId: String,
-                      @PathVariable id: String,
-                      @RequestBody patch: Dataset): ResponseEntity<Dataset> =
-        if (endpointPermissions.hasSysAdminPermission(jwt)) {
-            try {
-                logger.info("Updating lastModified for dataset with ID $id for catalog with ID $catalogId")
-                datasetService.updateLastModified(catalogId, id, patch.lastModified)
-                    ?.let {ResponseEntity(it, HttpStatus.OK) }
-                    ?: ResponseEntity(HttpStatus.BAD_REQUEST)
-            } catch (e : Exception) {
-                logger.error("Failed to update dataset. Reason:", e)
-                ResponseEntity(HttpStatus.BAD_REQUEST)
-            }
-        } else ResponseEntity(HttpStatus.FORBIDDEN)
-
-
     @DeleteMapping(value = ["/{id}"])
     fun removeDataset(@AuthenticationPrincipal jwt: Jwt,
                       @PathVariable("catalogId") catalogId: String,
