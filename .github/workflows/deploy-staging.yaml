@@ -9,7 +9,7 @@ on:
 jobs:
   build-and-deploy:
     name: Build and deploy to staging environment when pull request is created
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     if: github.event.pull_request.draft == false
 
     steps:
