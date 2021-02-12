@@ -13,15 +13,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      # Setup gcloud CLI
-      - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+      - name: Setup gcloud CLI
+        uses: google-github-actions/setup-gcloud@master
         with:
-          version: '270.0.0'
           service_account_email: ${{ secrets.GCP_SA_DIGDIR_FDK_GCR_EMAIL }}
           service_account_key: ${{ secrets.GCP_SA_DIGDIR_FDK_GCR_KEY }}
 
-      # Configure docker to use the gcloud command-line tool as a credential helper
-      - run: gcloud auth configure-docker
+      - name: Configure docker to use the gcloud command-line tool as a credential helper
+        run: gcloud auth configure-docker eu.gcr.io
 
       - name: Package & run tests with maven
         run: mvn clean install --no-transfer-progress
@@ -30,7 +29,7 @@ jobs:
         run: docker build . -t eu.gcr.io/digdir-fdk-infra/dataset-catalog:$GITHUB_SHA -t eu.gcr.io/digdir-fdk-infra/dataset-catalog:latest
 
       - name: Publish docker image to Google Cloud
-        run: docker -- push eu.gcr.io/digdir-fdk-infra/dataset-catalog
+        run: docker -- push eu.gcr.io/digdir-fdk-infra/dataset-catalog -a
 
       - name: Apply Helm template
         run: |
