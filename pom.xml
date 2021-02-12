@@ -30,7 +30,7 @@
         <!--end standard properties-->
 
         <kotlin.version>1.4.10</kotlin.version>
-        <testcontainers.version>1.15.0-rc2</testcontainers.version>
+        <testcontainers.version>1.15.1</testcontainers.version>
 
         <start-class>no.fdk.dataset_catalog.Application</start-class>
     </properties>
