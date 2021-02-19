@@ -46,7 +46,7 @@ class PublishingService(
         }
     }
 
-    fun sendNewDataSourceMessage(publisherId: String?, url: String?, description: String?): Boolean {
+    fun sendNewDataSourceMessage(publisherId: String?, url: String?): Boolean {
         logger.info("Adding data source for $publisherId")
 
         if (!publisherId.isNullOrEmpty() && !url.isNullOrEmpty()) {
@@ -56,7 +56,8 @@ class PublishingService(
             payload.put("dataSourceType", "DCAT-AP-NO")
             payload.put("dataType", "dataset")
             payload.put("acceptHeaderValue", "text/turtle")
-            description?.let { payload.put("description", it) }
+            payload.put("description",
+                    String.format("Automatically generated data source for %s", publisherId))
 
             try {
                 rabbitTemplate.convertAndSend(applicationProperties.newDataSourceRoute, payload)
