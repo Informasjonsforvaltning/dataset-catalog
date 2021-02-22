@@ -56,8 +56,7 @@ class PublishingService(
             payload.put("dataSourceType", "DCAT-AP-NO")
             payload.put("dataType", "dataset")
             payload.put("acceptHeaderValue", "text/turtle")
-            payload.put("description",
-                    String.format("Automatically generated data source for %s", publisherId))
+            payload.put("description", "Automatically generated data source for $publisherId")
 
             try {
                 rabbitTemplate.convertAndSend(applicationProperties.newDataSourceRoute, payload)
