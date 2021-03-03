@@ -59,11 +59,6 @@
                 "ENG" ;
         skos:prefLabel  "Engelsk"@nb .
 
-<http://data.brreg.no/enhetsregisteret/enhet/987654321>
-        a               foaf:Agent ;
-        dct:identifier  "987654321" ;
-        foaf:name       "TESTETATEN" .
-
 <http://uri-1>  a   rdfs:Resource ;
         rdfs:label  "label-1-en"@en , "label-1-nb"@nb .
 
