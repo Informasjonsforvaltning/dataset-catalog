@@ -326,12 +326,16 @@ private fun String?.getIfNotNullOrEmpty(): String? =
 
 fun Resource.addPublisher(publisher: Publisher?): Resource {
     publisher?.let {
-        addProperty(DCTerms.publisher,
-            model.safeCreateResource(it.uri.getIfNotNullOrEmpty() ?: it.id.getIfNotNullOrEmpty())
-                .addProperty(RDF.type, FOAF.Agent)
-                .addPublisherName(it)
-                .safeAddLiteralByLang(SKOS.prefLabel, it.prefLabel)
-                .safeAddStringLiteral(DCTerms.identifier, it.id))
+        if (it.uri != null) addProperty(DCTerms.publisher, model.safeCreateResource(it.uri))
+        else {
+            addProperty(
+                DCTerms.publisher,
+                model.createResource()
+                    .addProperty(RDF.type, FOAF.Agent)
+                    .addPublisherName(it)
+                    .safeAddStringLiteral(DCTerms.identifier, it.id)
+            )
+        }
     }
     return this
 }
