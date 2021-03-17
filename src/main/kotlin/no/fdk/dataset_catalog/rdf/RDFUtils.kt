@@ -240,7 +240,7 @@ fun Resource.addQualityAnnotation(qualityAnnotation: QualityAnnotation?): Resour
 fun Resource.addQualityAnnotationDimension(property: Property, dimension: String?): Resource {
     DQV.resolveDimensionResource(dimension)
         ?.let {
-            safeAddLinkedProperty(property, dimension)
+            safeAddLinkedProperty(property, it.uri)
         }
     return this
 }

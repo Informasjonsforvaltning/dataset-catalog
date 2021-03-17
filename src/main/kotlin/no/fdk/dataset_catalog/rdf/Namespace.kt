@@ -84,6 +84,12 @@ class DQV {
 
         val dimensions = arrayOf(Accuracy, Availability, Completeness, Currentness, Relevance)
 
+        /**
+         * Resolve dimension. Dimensions should be prefixed with 'iso:'
+         * or defined with complete resource uri. Currently the following
+         * dimensions are supported: Accuracy, Availability, Completeness,
+         * Currentness, Relevance.
+         */
         fun resolveDimensionResource(dimension: String?): Resource? {
             val dimensionUri = dimension?.replace("iso:", ISO)
             dimensions.forEach {
