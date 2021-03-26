@@ -18,6 +18,9 @@ tags:
     description: Dataset catalog
   - name: dataset
     description: Dataset
+servers:
+  - url: 'https://dataset-catalog.fellesdatakatalog.digdir.no'
+    description: Produksjonsmiljø
 paths:
   /search:
     post:
