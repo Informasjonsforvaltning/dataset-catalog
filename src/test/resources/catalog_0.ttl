@@ -1,5 +1,4 @@
 @prefix schema: <http://schema.org/> .
-@prefix dcatapi: <http://dcat.no/dcatapi/> .
 @prefix adms:  <http://www.w3.org/ns/adms#> .
 @prefix iso:   <http://www.w3.org/ns/dqvNS#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .

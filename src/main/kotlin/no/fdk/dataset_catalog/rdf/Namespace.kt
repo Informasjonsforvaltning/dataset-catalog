@@ -45,16 +45,6 @@ class AT {
     }
 }
 
-class DCATapi {
-    companion object {
-        private val model = ModelFactory.createDefaultModel()
-        const val uri = "http://dcat.no/dcatapi/"
-        val accessService = model.createProperty("${uri}accessService")
-        val DataDistributionService = model.createProperty("${uri}DataDistributionService")
-        val endpointDescription = model.createProperty("${uri}endpointDescription")
-    }
-}
-
 class Schema {
     companion object {
         private val model = ModelFactory.createDefaultModel()

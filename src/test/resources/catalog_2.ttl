@@ -1,5 +1,4 @@
 @prefix schema: <http://schema.org/> .
-@prefix dcatapi: <http://dcat.no/dcatapi/> .
 @prefix adms:  <http://www.w3.org/ns/adms#> .
 @prefix iso:   <http://www.w3.org/ns/dqvNS#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
@@ -15,8 +14,8 @@
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 
 <http://www.hjem.no/>
-        a                            dcatapi:DataDistributionService ;
-        dcatapi:endpointDescription  [ a               foaf:Document , skos:Concept ;
+        a                            dcat:DataService ;
+        dcat:endpointDescription  [ a               foaf:Document , skos:Concept ;
                                        dct:source      "http://lenke/til/en/api-beskrivelse" ;
                                        skos:prefLabel  "Oppføring i API-katalog"@nb
                                      ] ;
@@ -64,7 +63,7 @@
 
 <http://brreg.no/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d/distributions/d1>
         a                      dcat:Distribution ;
-        dcatapi:accessService  <http://www.hjem.no/> ;
+        dcat:accessService  <http://www.hjem.no/> ;
         dct:conformsTo         [ a               dct:Standard , skos:Concept ;
                                  dct:source      "https://www.kartverket.no/geodataarbeid/standarder/sosi/" ;
                                  skos:prefLabel  "SOSI"@nb
