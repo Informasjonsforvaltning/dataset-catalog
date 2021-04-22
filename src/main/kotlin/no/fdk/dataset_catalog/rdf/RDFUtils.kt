@@ -199,14 +199,14 @@ fun Resource.addDataDistributionServices(dataDistributionServices: Collection<Da
             !it.id.isNullOrEmpty() -> "$baseURI/accessService/${it.id}"
             else -> null
         }
-        addProperty(DCATapi.accessService,
+        addProperty(DCAT.accessService,
             model.safeCreateResource(uri)
-                .addProperty(RDF.type, DCATapi.DataDistributionService)
+                .addProperty(RDF.type, DCAT.DataService)
                 .safeAddStringLiteral(DCTerms.identifier, it.id)
                 .safeAddLiteralByLang(DCTerms.title, it.title)
                 .safeAddLiteralByLang(DCTerms.description, it.description)
                 .addPublisher(it.publisher)
-                .addSkosConcepts(DCATapi.endpointDescription, it.endpointDescription, FOAF.Document)
+                .addSkosConcepts(DCAT.endpointDescription, it.endpointDescription, FOAF.Document)
         )
     }
     return this
