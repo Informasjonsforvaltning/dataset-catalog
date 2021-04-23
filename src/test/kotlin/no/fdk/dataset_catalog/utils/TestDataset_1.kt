@@ -16,8 +16,6 @@ val DATASET_TITLE = mapOf(Pair("nb", "Markagrensen Oslo Kommune og nærliggende 
 
 val DATASET_DESCRIPTION = mapOf(Pair("nb", "Datasettet avgrenser område for virkeområdet til lov 6. juni 2009 nr. 35 om naturområder i Oslo og nærliggende kommuner (markaloven) som trådte i kraft 1. september 2009. Markalovens virkeområde er fastsatt i forskrift 4. september 2015 nr. 1032 om justering av markagrensen fastlegger markalovens geografiske virkeområde med tilhørende kart."))
 
-val DATASET_OBJECTIVE = mapOf(Pair("nb", "Datasettes formål er nullam quis rius eget urna mollis ornare vel eu leo. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Cras mattis consectetur purus sit amet fermentum. Vestibulum id ligula porta felis euismod semper."))
-
 val PUBLISHER = Publisher(
     id="987654321",
     name="TESTETATEN",
@@ -116,7 +114,6 @@ val TEST_DATASET_1 = Dataset(
     uri = DATASET_URI,
     title = DATASET_TITLE,
     description = DATASET_DESCRIPTION,
-    objective = DATASET_OBJECTIVE,
     keyword = KEYWORD,
     type="Kodeliste",
     accessRights = SkosCode(

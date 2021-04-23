@@ -12,7 +12,6 @@ class DCATNO {
 
         val source: Property = model.createProperty("${uri}source")
         val accessRightsComment: Property = model.createProperty("${uri}accessRightsComment")
-        val objective: Property = model.createProperty("${uri}objective")
         val legalBasisForProcessing: Property = model.createProperty("${uri}legalBasisForProcessing")
         val legalBasisForRestriction: Property = model.createProperty("${uri}legalBasisForRestriction")
         val legalBasisForAccess: Property = model.createProperty("${uri}legalBasisForAccess")

@@ -24,8 +24,6 @@ fun Resource.createDatasetResource(ds: Dataset, datasetUri: String): Resource {
                     .safeAddProperty(DCTerms.source, ds.source)
                     .safeAddLiteralByLang(DCTerms.title, ds.title)
                     .safeAddLiteralByLang(DCTerms.description, ds.description)
-                    .safeAddLiteralByLang(DCTerms.description, ds.descriptionFormatted)
-                    .safeAddLiteralByLang(DCATNO.objective, ds.objective)
                     .addContactPoints(ds.contactPoint)
                     .safeAddLangListProperty(DCAT.keyword, ds.keyword)
                     .safeAddDateTimeLiteral(DCTerms.issued, ds.issued)
