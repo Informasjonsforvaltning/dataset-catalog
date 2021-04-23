@@ -494,11 +494,6 @@ components:
           type: object
           $ref: "#/components/schemas/SkosCode"
           description: Associated access rights mapped as SkosCode
-        accessRightsComment:
-          type: array
-          items:
-            type: string
-          description: Comments regarding access rights to dataset
         legalBasisForRestriction:
           type: array
           items:

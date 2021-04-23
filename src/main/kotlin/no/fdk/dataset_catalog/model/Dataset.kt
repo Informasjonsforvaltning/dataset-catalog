@@ -50,7 +50,6 @@ data class DatasetDTO(
     val temporal: List<PeriodOfTimeDTO>? = null,
     val spatial: List<SkosCode>? = null,
     val accessRights: SkosCode? = null,
-    val accessRightsComment: List<String>? = null,
     val legalBasisForRestriction: List<SkosConcept>? = null,
     val legalBasisForProcessing: List<SkosConcept>? = null,
     val legalBasisForAccess: List<SkosConcept>? = null,
@@ -164,12 +163,6 @@ data class Dataset(
     //dct:accessRights
     //Norwegian: tilgangsnivå
     val accessRights: SkosCode? = null,
-
-    //dcatno:accessRightsComment
-    //Norwegian: Skjermingshjemmel.
-    //Norwegian extension to the dcat standard. Recommended used with accesRights.
-    @Deprecated("")
-    val accessRightsComment: List<String>? = null,
 
     // dcatno:legalBasisForRestriction
     //Norwegian: skjermingshjemmel
