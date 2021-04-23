@@ -186,7 +186,6 @@ val TEST_DATASET_0 = Dataset(
     temporal = listOf(PERIODOFTIME_EX),
     spatial = listOf(SKOSCODE_EX),
     accessRights = SKOSCODE_EX,
-    accessRightsComment = listOf("Comment"),
     legalBasisForRestriction = listOf(SKOSCONCEPT_EX("dcatno:legalBasisForRestriction")),
     legalBasisForProcessing = listOf(SKOSCONCEPT_EX("dcatno:legalBasisForProcessing")),
     legalBasisForAccess = listOf(SKOSCONCEPT_EX("dcatno:legalBasisForAccess")),

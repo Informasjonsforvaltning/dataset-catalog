@@ -45,7 +45,6 @@ fun Dataset.update(newValues: DatasetDTO): Dataset =
         temporal = updatePeriodsOfTime(newValues.temporal, temporal),
         spatial = newValues.spatial ?: spatial,
         accessRights = newValues.accessRights ?: accessRights,
-        accessRightsComment = newValues.accessRightsComment ?: accessRightsComment,
         legalBasisForRestriction = newValues.legalBasisForRestriction ?: legalBasisForRestriction,
         legalBasisForProcessing = newValues.legalBasisForProcessing ?: legalBasisForProcessing,
         legalBasisForAccess = newValues.legalBasisForAccess ?: legalBasisForAccess,

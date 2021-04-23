@@ -35,7 +35,6 @@ fun Resource.createDatasetResource(ds: Dataset, datasetUri: String): Resource {
                     .addTemporal(ds.temporal)
                     .safeAddLinkListProperty(DCTerms.spatial, ds.spatial?.mapNotNull { it.uri })
                     .safeAddLinkedProperty(DCTerms.accessRights, ds.accessRights?.uri)
-                    .safeAddStringListProperty(DCATNO.accessRightsComment, ds.accessRightsComment)
                     .addSkosConcepts(DCATNO.legalBasisForRestriction, ds.legalBasisForRestriction, DCTerms.RightsStatement)
                     .addSkosConcepts(DCATNO.legalBasisForProcessing, ds.legalBasisForProcessing, DCTerms.RightsStatement)
                     .addSkosConcepts(DCATNO.legalBasisForAccess, ds.legalBasisForAccess, DCTerms.RightsStatement)

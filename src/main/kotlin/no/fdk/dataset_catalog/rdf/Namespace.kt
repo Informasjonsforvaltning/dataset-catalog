@@ -10,13 +10,10 @@ class DCATNO {
 
         val uri = "http://difi.no/dcatno#"
 
-        val source: Property = model.createProperty("${uri}source")
-        val accessRightsComment: Property = model.createProperty("${uri}accessRightsComment")
         val legalBasisForProcessing: Property = model.createProperty("${uri}legalBasisForProcessing")
         val legalBasisForRestriction: Property = model.createProperty("${uri}legalBasisForRestriction")
         val legalBasisForAccess: Property = model.createProperty("${uri}legalBasisForAccess")
         val informationModel: Property = model.createProperty("${uri}informationModel")
-        val organizationPath: Property = model.createProperty("${uri}organizationPath")
     }
 }
 
