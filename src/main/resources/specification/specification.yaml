@@ -433,12 +433,6 @@ components:
         description:
           $ref: "#/components/schemas/MultiLanguageText"
           description: Description of dataset in a given language
-        descriptionFormatted:
-          $ref: "#/components/schemas/MultiLanguageText"
-          description: Formatted description of dataset in a given language
-        objective:
-          $ref: "#/components/schemas/MultiLanguageText"
-          description: Purpose of dataset in a given language
         contactPoint:
           type: array
           items:

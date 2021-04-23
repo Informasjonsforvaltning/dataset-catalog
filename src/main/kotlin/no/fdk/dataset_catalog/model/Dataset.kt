@@ -37,8 +37,6 @@ data class DatasetDTO(
     val source: String? = null,
     val title: Map<String, String>? = null,
     val description: Map<String, String>? = null,
-    val descriptionFormatted: Map<String, String>? = null,
-    val objective: Map<String, String>? = null,
     val contactPoint: List<Contact>? = null,
     val keyword: List<Map<String, String>>? = null,
     val publisher: Publisher? = null,
@@ -110,11 +108,6 @@ data class Dataset(
     //dct:description
     //Norwegian: Beskrivelse
     val description: Map<String, String>? = null,
-    val descriptionFormatted: Map<String, String>? = null,
-
-    //dcatno:objective
-    //Norwegian: Formål
-    val objective: Map<String, String>? = null,
 
     //dcat:contactPoint
     //Norwegian: Kontaktpunkt
