@@ -246,10 +246,14 @@ fun Resource.addQualityAnnotationDimension(property: Property, dimension: String
 }
 
 fun Resource.addQualityAnnotationBody(body: Map<String, String>?): Resource {
-    body?.let {
-        addProperty(PROV.hasBody,
+    body?.forEach {(key, value) ->
+        addProperty(OA.hasBody,
             model.safeCreateResource()
-                .safeAddLiteralByLang(RDF.value, body))
+                .addProperty(RDF.type, OA.TextualBody)
+                .safeAddStringLiteral(RDF.value, value)
+                .safeAddStringLiteral(DC.language, key)
+                .safeAddStringLiteral(DC.format, "text/plain")
+        )
     }
     return this
 }

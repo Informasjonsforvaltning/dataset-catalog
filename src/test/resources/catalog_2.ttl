@@ -12,6 +12,8 @@
 @prefix dcat:  <http://www.w3.org/ns/dcat#> .
 @prefix prov:  <http://www.w3.org/ns/prov#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix oa:  <http://www.w3.org/ns/oa#> .
+@prefix dc:  <http://purl.org/dc/elements/1.1/> .
 
 <http://www.hjem.no/>
         a                            dcat:DataService ;
@@ -150,23 +152,38 @@
         dcat:theme                      <http://publications.europa.eu/resource/authority/data-theme/ENVI> , <http://publications.europa.eu/resource/authority/data-theme/GOVE> ;
         dqv:hasQualityAnnotation        [ a                dqv:QualityAnnotation ;
                                           dqv:inDimension  <http://iso.org/25012/2008/dataquality/Currentness> ;
-                                          prov:hasBody     [ rdf:value  "Denne teksten sier noe om aktualiteten. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras mattis consectetur purus sit amet fermentum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus."@no ]
+                                          oa:hasBody     [ a    oa:TextualBody ;
+                                            rdf:value       "Denne teksten sier noe om aktualiteten. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras mattis consectetur purus sit amet fermentum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus." ;
+                                            dc:language     "no" ;
+                                            dc:format       "text/plain" ]
                                         ] ;
         dqv:hasQualityAnnotation        [ a                dqv:QualityAnnotation ;
                                           dqv:inDimension  <http://iso.org/25012/2008/dataquality/Completeness> ;
-                                          prov:hasBody     [ rdf:value  "Denne teksten sier noe om komplettheten. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras mattis consectetur purus sit amet fermentum."@no ]
+                                          oa:hasBody     [ a    oa:TextualBody ;
+                                            rdf:value       "Denne teksten sier noe om komplettheten. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras mattis consectetur purus sit amet fermentum." ;
+                                            dc:language     "no" ;
+                                            dc:format       "text/plain" ]
                                         ] ;
         dqv:hasQualityAnnotation        [ a                dqv:QualityAnnotation ;
                                           dqv:inDimension  <http://iso.org/25012/2008/dataquality/Accuracy> ;
-                                          prov:hasBody     [ rdf:value  "Denne teksten sier noe om nøyaktigheten. Cras mattis consectetur purus sit."@no ]
+                                          oa:hasBody     [ a    oa:TextualBody ;
+                                            rdf:value       "Denne teksten sier noe om nøyaktigheten. Cras mattis consectetur purus sit." ;
+                                            dc:language     "no" ;
+                                            dc:format       "text/plain" ]
                                         ] ;
         dqv:hasQualityAnnotation        [ a                dqv:QualityAnnotation ;
                                           dqv:inDimension  <http://iso.org/25012/2008/dataquality/Availability> ;
-                                          prov:hasBody     [ rdf:value  "Denne teksten sier noe om tilgjengeligheten. Vestibulum id ligula porta felis euismod semper. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras mattis consectetur purus sit amet fermentum."@no ]
+                                          oa:hasBody     [ a    oa:TextualBody ;
+                                            rdf:value       "Denne teksten sier noe om tilgjengeligheten. Vestibulum id ligula porta felis euismod semper. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras mattis consectetur purus sit amet fermentum." ;
+                                            dc:language     "no" ;
+                                            dc:format       "text/plain" ]
                                         ] ;
         dqv:hasQualityAnnotation        [ a                dqv:QualityAnnotation ;
                                           dqv:inDimension  <http://iso.org/25012/2008/dataquality/Relevance> ;
-                                          prov:hasBody     [ rdf:value  "Denne teksten sier noe om relevansen. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras mattis consectetur purus sit amet fermentum. Cum sociis natoque penatibus et magnis dis parturient montes."@no ]
+                                          oa:hasBody     [ a    oa:TextualBody ;
+                                            rdf:value       "Denne teksten sier noe om relevansen. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras mattis consectetur purus sit amet fermentum. Cum sociis natoque penatibus et magnis dis parturient montes." ;
+                                            dc:language     "no" ;
+                                            dc:format       "text/plain" ]
                                         ] ;
         foaf:page                       <http://uri1> .
 
