@@ -13,7 +13,6 @@
 @prefix prov:  <http://www.w3.org/ns/prov#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 @prefix oa:  <http://www.w3.org/ns/oa#> .
-@prefix dc:  <http://purl.org/dc/elements/1.1/> .
 
 <http://www.hjem.no/>
         a                            dcat:DataService ;
@@ -154,36 +153,36 @@
                                           dqv:inDimension  <http://iso.org/25012/2008/dataquality/Currentness> ;
                                           oa:hasBody     [ a    oa:TextualBody ;
                                             rdf:value       "Denne teksten sier noe om aktualiteten. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras mattis consectetur purus sit amet fermentum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus." ;
-                                            dc:language     "no" ;
-                                            dc:format       "text/plain" ]
+                                            dct:language     <http://publications.europa.eu/resource/authority/language/NOR> ;
+                                            dct:format       <http://publications.europa.eu/resource/authority/file-type/TXT> ]
                                         ] ;
         dqv:hasQualityAnnotation        [ a                dqv:QualityAnnotation ;
                                           dqv:inDimension  <http://iso.org/25012/2008/dataquality/Completeness> ;
                                           oa:hasBody     [ a    oa:TextualBody ;
                                             rdf:value       "Denne teksten sier noe om komplettheten. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras mattis consectetur purus sit amet fermentum." ;
-                                            dc:language     "no" ;
-                                            dc:format       "text/plain" ]
+                                            dct:language     <http://publications.europa.eu/resource/authority/language/NOR> ;
+                                            dct:format       <http://publications.europa.eu/resource/authority/file-type/TXT> ]
                                         ] ;
         dqv:hasQualityAnnotation        [ a                dqv:QualityAnnotation ;
                                           dqv:inDimension  <http://iso.org/25012/2008/dataquality/Accuracy> ;
                                           oa:hasBody     [ a    oa:TextualBody ;
                                             rdf:value       "Denne teksten sier noe om nøyaktigheten. Cras mattis consectetur purus sit." ;
-                                            dc:language     "no" ;
-                                            dc:format       "text/plain" ]
+                                            dct:language     <http://publications.europa.eu/resource/authority/language/NOR> ;
+                                            dct:format       <http://publications.europa.eu/resource/authority/file-type/TXT> ]
                                         ] ;
         dqv:hasQualityAnnotation        [ a                dqv:QualityAnnotation ;
                                           dqv:inDimension  <http://iso.org/25012/2008/dataquality/Availability> ;
                                           oa:hasBody     [ a    oa:TextualBody ;
                                             rdf:value       "Denne teksten sier noe om tilgjengeligheten. Vestibulum id ligula porta felis euismod semper. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras mattis consectetur purus sit amet fermentum." ;
-                                            dc:language     "no" ;
-                                            dc:format       "text/plain" ]
+                                            dct:language     <http://publications.europa.eu/resource/authority/language/NOR> ;
+                                            dct:format       <http://publications.europa.eu/resource/authority/file-type/TXT> ]
                                         ] ;
         dqv:hasQualityAnnotation        [ a                dqv:QualityAnnotation ;
                                           dqv:inDimension  <http://iso.org/25012/2008/dataquality/Relevance> ;
                                           oa:hasBody     [ a    oa:TextualBody ;
                                             rdf:value       "Denne teksten sier noe om relevansen. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras mattis consectetur purus sit amet fermentum. Cum sociis natoque penatibus et magnis dis parturient montes." ;
-                                            dc:language     "no" ;
-                                            dc:format       "text/plain" ]
+                                            dct:language     <http://publications.europa.eu/resource/authority/language/NOR> ;
+                                            dct:format       <http://publications.europa.eu/resource/authority/file-type/TXT> ]
                                         ] ;
         foaf:page                       <http://uri1> .
 
