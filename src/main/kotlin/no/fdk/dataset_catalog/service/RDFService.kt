@@ -25,7 +25,6 @@ class RDFService(private val catalogService: CatalogService,
         val model = ModelFactory.createDefaultModel()
         model.setNsPrefix("dct", DCTerms.NS)
         model.setNsPrefix("dcat", DCAT.NS)
-        model.setNsPrefix("dcatno", DCATNO.uri)
         model.setNsPrefix("adms", ADMS.uri)
         model.setNsPrefix("prov", PROV.uri)
         model.setNsPrefix("rdfs", RDFS.uri)
@@ -38,6 +37,9 @@ class RDFService(private val catalogService: CatalogService,
         model.setNsPrefix("skos", SKOS.uri)
         model.setNsPrefix("oa", OA.NS)
         model.setNsPrefix("schema", "http://schema.org/")
+        model.setNsPrefix("cpsv", CPSV.uri)
+        model.setNsPrefix("cpsvno", CPSVNO.uri)
+        model.setNsPrefix("eli", ELI.uri)
 
         forEach {
             val baseUri = "${applicationProperties.conceptCatalogueHost}/${it.id}/datasets/"

@@ -13,6 +13,9 @@
 @prefix prov:  <http://www.w3.org/ns/prov#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 @prefix oa:  <http://www.w3.org/ns/oa#> .
+@prefix eli:  <http://data.europa.eu/eli/ontology#> .
+@prefix cpsv:  <http://purl.org/vocab/cpsv#> .
+@prefix cpsvno:  <https://data.norge.no/vocabulary/cpsvno#> .
 
 <http://www.hjem.no/>
         a                            dcat:DataService ;
@@ -83,38 +86,58 @@
 
 <http://brreg.no/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d>
         a                               dcat:Dataset ;
-        dcatno:informationModel         [ a               dct:Standard , skos:Concept ;
-                                          dct:source      "https://www.w3.org/2004/02/skos/" ;
-                                          skos:prefLabel  "SKOS"@nb
-                                        ] ;
-        dcatno:legalBasisForAccess      [ a               dct:RightsStatement , skos:Concept ;
-                                          dct:source      "http://lovdata/paragraph/10" ;
-                                          skos:prefLabel  "Den siste loven med den lengste tittelen § 10"@nb
-                                        ] ;
-        dcatno:legalBasisForProcessing  [ a               dct:RightsStatement , skos:Concept ;
-                                          dct:source      "http://lovdata/paragraph/2" ;
-                                          skos:prefLabel  "Den andre loven med lenger tittel § 2"@nb
-                                        ] ;
-        dcatno:legalBasisForRestriction
-                [ a               dct:RightsStatement , skos:Concept ;
-                  dct:source      "https://lovdata.no/dokument/NL/lov/1992-12-04-126" ;
-                  skos:prefLabel  "Lov om arkiv [arkivlova]"@nb
-                ] ;
-        dcatno:legalBasisForRestriction
-                [ a               dct:RightsStatement , skos:Concept ;
-                  dct:source      "http://lovdata/paragraph/20" ;
-                  skos:prefLabel  "Den spesifikke loven § 20"@nb
-                ] ;
-        dcatno:legalBasisForRestriction
-                [ a               dct:RightsStatement , skos:Concept ;
-                  dct:source      "http://lovdata/paragraph/26" ;
-                  skos:prefLabel  "Den mindre spesifikke loven § 26"@nb
-                ] ;
+        cpsv:follows [ a cpsv:Rule ;
+            dct:type cpsvno:ruleForDisclosure ;
+            cpsv:implements [ a eli:LegalResource ;
+                rdfs:seeAlso <http://lovdata/paragraph/10> ;
+                dct:type [ a    skos:Concept ;
+                    skos:prefLabel     "Den siste loven med den lengste tittelen § 10"@nb ;
+                ]
+            ] ;
+        ] , [
+            a cpsv:Rule ;
+            dct:type cpsvno:ruleForDataProcessing ; # NB! Denne har vi ikke ennå
+            cpsv:implements [
+                a eli:LegalResource ;
+                rdfs:seeAlso <http://lovdata/paragraph/2> ;
+                dct:type [ a    skos:Concept ;
+                    skos:prefLabel     "Den andre loven med lenger tittel § 2"@nb ;
+                ]
+            ] ;
+        ] , [ a cpsv:Rule ;
+            dct:type cpsvno:ruleForNonDisclosure ;
+            cpsv:implements [ a eli:LegalResource ;
+                rdfs:seeAlso <https://lovdata.no/dokument/NL/lov/1992-12-04-126> ;
+                dct:type [ a    skos:Concept ;
+                    skos:prefLabel     "Lov om arkiv [arkivlova]"@nb ;
+                ]
+            ] ;
+        ] , [ a cpsv:Rule ;
+            dct:type cpsvno:ruleForNonDisclosure ;
+            cpsv:implements [ a eli:LegalResource ;
+                rdfs:seeAlso <http://lovdata/paragraph/20> ;
+                dct:type [ a    skos:Concept ;
+                    skos:prefLabel     "Den spesifikke loven § 20"@nb ;
+                ]
+            ] ;
+        ] , [ a cpsv:Rule ;
+            dct:type cpsvno:ruleForNonDisclosure ;
+            cpsv:implements [ a eli:LegalResource ;
+                rdfs:seeAlso <http://lovdata/paragraph/26> ;
+                dct:type [ a    skos:Concept ;
+                    skos:prefLabel     "Den mindre spesifikke loven § 26"@nb ;
+                ]
+            ] ;
+        ] ;
         dct:accessRights                <http://publications.europa.eu/resource/authority/access-right/RESTRICTED> ;
         dct:accrualPeriodicity          <http://publications.europa.eu/resource/authority/frequency/ANNUAL> ;
         dct:conformsTo                  [ a               dct:Standard , skos:Concept ;
                                           dct:source      "https://www.kartverket.no/geodataarbeid/standarder/sosi/" ;
                                           skos:prefLabel  "SOSI"@nb
+                                        ] ,
+                                        [ a   dct:Standard , skos:Concept ;
+                                              dct:source      "https://www.w3.org/2004/02/skos/" ;
+                                              skos:prefLabel  "SKOS"@nb
                                         ] ;
         dct:description                 "Datasettet avgrenser område for virkeområdet til lov 6. juni 2009 nr. 35 om naturområder i Oslo og nærliggende kommuner (markaloven) som trådte i kraft 1. september 2009. Markalovens virkeområde er fastsatt i forskrift 4. september 2015 nr. 1032 om justering av markagrensen fastlegger markalovens geografiske virkeområde med tilhørende kart."@nb ;
         dct:hasVersion                  [ a               dcat:Dataset ;
