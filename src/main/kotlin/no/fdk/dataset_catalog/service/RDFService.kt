@@ -36,6 +36,7 @@ class RDFService(private val catalogService: CatalogService,
         model.setNsPrefix("dqv", DQV.uri)
         model.setNsPrefix("rdf", RDF.uri)
         model.setNsPrefix("skos", SKOS.uri)
+        model.setNsPrefix("oa", OA.NS)
         model.setNsPrefix("schema", "http://schema.org/")
 
         forEach {

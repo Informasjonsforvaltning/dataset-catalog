@@ -246,10 +246,14 @@ fun Resource.addQualityAnnotationDimension(property: Property, dimension: String
 }
 
 fun Resource.addQualityAnnotationBody(body: Map<String, String>?): Resource {
-    body?.let {
-        addProperty(PROV.hasBody,
+    body?.forEach {(key, value) ->
+        addProperty(OA.hasBody,
             model.safeCreateResource()
-                .safeAddLiteralByLang(RDF.value, body))
+                .addProperty(RDF.type, OA.TextualBody)
+                .safeAddStringLiteral(RDF.value, value)
+                .safeAddLinkedProperty(DCTerms.language, keywordToLinguisticSystem(key).uri)
+                .safeAddLinkedProperty(DCTerms.format, "http://publications.europa.eu/resource/authority/file-type/TXT")
+        )
     }
     return this
 }
@@ -421,4 +425,19 @@ fun String?.isValidURL(): Boolean =
         true
     } catch (e: Exception) {
         false
+    }
+
+enum class LinguisticSystem(val uri: String) {
+    NOR("http://publications.europa.eu/resource/authority/language/NOR"),
+    NOB("http://publications.europa.eu/resource/authority/language/NOB"),
+    NNO("http://publications.europa.eu/resource/authority/language/NNO"),
+    ENG("http://publications.europa.eu/resource/authority/language/ENG")
+}
+
+fun keywordToLinguisticSystem(keyword: String): LinguisticSystem =
+    when(keyword) {
+        "en" -> LinguisticSystem.ENG
+        "nb" -> LinguisticSystem.NOB
+        "nn" -> LinguisticSystem.NNO
+        else -> LinguisticSystem.NOR
     }
