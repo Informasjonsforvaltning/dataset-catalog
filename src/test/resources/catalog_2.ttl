@@ -140,10 +140,7 @@
                                               skos:prefLabel  "SKOS"@nb
                                         ] ;
         dct:description                 "Datasettet avgrenser område for virkeområdet til lov 6. juni 2009 nr. 35 om naturområder i Oslo og nærliggende kommuner (markaloven) som trådte i kraft 1. september 2009. Markalovens virkeområde er fastsatt i forskrift 4. september 2015 nr. 1032 om justering av markagrensen fastlegger markalovens geografiske virkeområde med tilhørende kart."@nb ;
-        dct:hasVersion                  [ a               dcat:Dataset ;
-                                          dct:source      <http://referenced/dataset> ;
-                                          skos:prefLabel  "The first one"@nb
-                                        ] ;
+        dct:hasVersion                  <http://referenced/dataset> ;
         dct:identifier                  "42" ;
         dct:issued                      "2012-01-01"^^xsd:date ;
         dct:language                    <http://publications.europa.eu/resource/authority/language/ENG> , <http://publications.europa.eu/resource/authority/language/NOR> ;

@@ -310,18 +310,10 @@ fun Resource.addReferences(references: Collection<Reference>?): Resource {
                 it.referenceType?.code,
                 it.referenceType?.uri)
 
-            val referenceProperty = model.createProperty(referencePropertyURI)
-
-            if (it.source?.prefLabel.isNullOrEmpty()) {
-                safeAddResourceProperty(referenceProperty,
-                    model.safeCreateResource(it.source?.uri))
-            } else {
-                addProperty(referenceProperty,
-                    model.safeCreateResource()
-                        .addProperty(RDF.type, DCAT.Dataset)
-                        .safeAddLiteralByLang(SKOS.prefLabel, it.source?.prefLabel)
-                        .safeAddResourceProperty(DCTerms.source, model.safeCreateResource(it.source?.uri)))
-            }
+            safeAddResourceProperty(
+                model.createProperty(referencePropertyURI),
+                model.safeCreateResource(it.source?.uri)
+            )
         }
     }
     return this
