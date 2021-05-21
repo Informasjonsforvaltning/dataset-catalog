@@ -28,15 +28,16 @@ class ConceptService(
             .run {
                 this as HttpURLConnection
                 this.setRequestProperty("Accept", "application/json")
+
                 if (responseCode != HttpStatus.OK.value()) {
                     logger.error("Error: $responseCode")
                     return null
                 }
-                val jsonBody = inputStream.bufferedReader().use(BufferedReader::readText)
+
                 return try {
-                    jacksonObjectMapper().readValue(jsonBody)
+                    jacksonObjectMapper().readValue(inputStream, Concept::class.java)
                 } catch (t: Throwable) {
-                    logger.error("Unable to parse response from concept catalogue for '$id'")
+                    logger.error("Unable to parse response from concept catalogue for '$id'", t)
                     null
                 }
             }
