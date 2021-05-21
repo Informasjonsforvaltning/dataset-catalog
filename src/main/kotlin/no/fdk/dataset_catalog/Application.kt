@@ -1,13 +1,11 @@
 package no.fdk.dataset_catalog
 
-import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.context.properties.EnableConfigurationProperties
-import no.fdk.dataset_catalog.configuration.ApplicationProperties
-import no.fdk.dataset_catalog.configuration.SecurityProperties
 import org.springframework.boot.SpringApplication
+import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 
 @SpringBootApplication
-@EnableConfigurationProperties(ApplicationProperties::class, SecurityProperties::class)
+@ConfigurationPropertiesScan
 open class Application
 
 fun main(args: Array<String>) {

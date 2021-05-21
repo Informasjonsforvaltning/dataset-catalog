@@ -27,7 +27,7 @@ security:
 
 ---
 spring:
-  profiles: develop
+  config.activate.on-profile: develop
   data.mongodb.uri: mongodb://admin:admin@localhost:27017/datasetCatalog?authSource=admin&authMechanism=SCRAM-SHA-1
   rabbitmq:
     host: 127.0.0.1
@@ -45,7 +45,7 @@ application:
 
 ---
 spring:
-  profiles: contract-test
+  config.activate.on-profile: contract-test
   security.oauth2.resourceserver.jwt.jwk-set-uri: http://localhost:5000/auth/realms/fdk/protocol/openid-connect/certs
 server.port: 5555
 application:
