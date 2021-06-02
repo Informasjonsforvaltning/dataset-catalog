@@ -42,7 +42,7 @@ class RDFService(private val catalogService: CatalogService,
         model.setNsPrefix("eli", ELI.uri)
 
         forEach {
-            val baseUri = "${applicationProperties.conceptCatalogueHost}/${it.id}/datasets/"
+            val baseUri = "${applicationProperties.fdkBaseHost}/${it.id}/datasets/"
 
             model.createResource(it.uri)
                 .addProperty(RDF.type, DCAT.Catalog)
