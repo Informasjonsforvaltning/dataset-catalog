@@ -6,7 +6,8 @@ import org.springframework.boot.context.properties.ConstructorBinding
 @ConstructorBinding
 @ConfigurationProperties("application")
 data class ApplicationProperties(
-    val conceptCatalogueHost: String,
+    val fdkBaseHost: String,
+    val searchFulltextHost: String,
     val organizationCatalogueHost: String,
     val catalogUriHost: String,
     val harvestDelay: Long,
