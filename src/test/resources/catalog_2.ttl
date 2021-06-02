@@ -74,15 +74,9 @@
                                ] ;
         dct:description        "Dette er beskrivelsen av distribusjonen. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Vestibulum id ligula porta felis euismod semper con desbit arum. Se dokumentasjon for denne distribusjonen."@nb ;
         dct:format             "application/json" ;
-        dct:license            [ a               dct:LicenseDocument , skos:Concept ;
-                                 dct:source      "https://data.norge.no/nlod/no/2.0" ;
-                                 skos:prefLabel  "NODL"@nb
-                               ] ;
+        dct:license            <https://data.norge.no/nlod/no/2.0> ;
         dcat:accessURL         <http://www.detteerentredjelenke.no/til-en-tredje-nedlasting> , <http://www.detteerenannenlenke.no/til-en-annen-nedlasting> , <http://www.detteerenlenke.no/til-nedlasting> ;
-        foaf:page              [ a               foaf:Document , skos:Concept ;
-                                 dct:source      "http://lenke/til/mer/info" ;
-                                 skos:prefLabel  "Dokumentasjon av distribusjonen"@nb
-                               ] .
+        foaf:page              <http://lenke/til/mer/info> .
 
 <http://brreg.no/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d>
         a                               dcat:Dataset ;
