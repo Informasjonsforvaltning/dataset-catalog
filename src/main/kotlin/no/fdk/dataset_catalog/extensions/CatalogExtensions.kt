@@ -26,4 +26,4 @@ fun Catalog.update(newValues: Catalog): Catalog =
         hasPublishedDataSource = newValues.hasPublishedDataSource ?: hasPublishedDataSource,
     )
 
-private fun getCatalogURI(catalogUriHost: String, id: String): String = "$catalogUriHost/catalogs/$id"
+private fun getCatalogURI(catalogUriHost: String, id: String): String = "$catalogUriHost/$id"
