@@ -99,7 +99,7 @@ val DB_DATASET_6 = Dataset(
     DB_DATASET_ID_6,
     DB_CATALOG_ID_2,
     uri = "http://$DB_DATASET_ID_6",
-    registrationStatus = REGISTRATION_STATUS.PUBLISH,
+    registrationStatus = REGISTRATION_STATUS.DRAFT,
 )
 
 val CATALOG_1 = Catalog(

@@ -44,5 +44,29 @@ class RdfContractTest: ApiTestContext() {
             assertTrue(checkIfIsomorphicAndPrintDiff(actualGetAll, expectedGetAll, "Get All result", logger))
             assertTrue(checkIfIsomorphicAndPrintDiff(actualGetOne, expectedGetOne, "Get One result", logger))
         }
+
+        @Test
+        fun `Gets Dataset`() {
+            resetDB()
+
+            val response = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/$DB_DATASET_ID_2", method="GET", accept=MediaType("text","turtle"))
+
+            assertEquals(HttpStatus.OK.value(), response["status"])
+
+            val expected = responseReader.parseFile("dataset.ttl", "TURTLE")
+
+            val actual = ModelFactory.createDefaultModel().read(StringReader(response["body"] as String), null, "TURTLE")
+
+            assertTrue(checkIfIsomorphicAndPrintDiff(actual, expected, "Get Dataset result", logger))
+        }
+
+        @Test
+        fun `Unpublished Dataset not found`() {
+            resetDB()
+
+            val getOne = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_2/datasets/$DB_DATASET_ID_6", method="GET", accept=MediaType("text","turtle"))
+
+            assertEquals(HttpStatus.NOT_FOUND.value(), getOne["status"])
+        }
     }
 }

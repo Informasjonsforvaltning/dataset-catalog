@@ -1,0 +1,6 @@
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix dcat:  <http://www.w3.org/ns/dcat#> .
+
+<http://db2>  a          dcat:Dataset ;
+        dct:description  "test words"@en ;
+        dct:title        "enda en"@nb .

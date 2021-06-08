@@ -5,35 +5,26 @@ import no.fdk.dataset_catalog.service.RDFService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import javax.servlet.http.HttpServletRequest
 
 @RestController
 @CrossOrigin
-@RequestMapping(
-    value = ["/catalogs"],
-    produces = ["text/turtle",
-        "application/rdf+json",
-        "application/ld+json",
-        "application/rdf+xml",
-        "application/n-triples"])
-class RDFController (val rdfService: RDFService) {
+@RequestMapping(value = ["/catalogs"], produces = ["text/turtle"])
+class RDFController (private val rdfService: RDFService) {
 
-    @GetMapping()
-    fun getAll(httpServletRequest: HttpServletRequest): ResponseEntity<Any> =
-    when (acceptHeaderToJenaType(httpServletRequest.getHeader("Accept"))) {
-            JenaType.NOT_ACCEPTABLE -> ResponseEntity(HttpStatus.NOT_ACCEPTABLE)
-            else -> ResponseEntity(rdfService.getAll()?.createRDFResponse(), HttpStatus.OK)
-        }
+    @GetMapping
+    fun getAll(): ResponseEntity<String> =
+        ResponseEntity(rdfService.getAll().createRDFResponse(), HttpStatus.OK)
 
-    @GetMapping(value = ["/{id}"])
-    fun getById(httpServletRequest: HttpServletRequest, @PathVariable id: String): ResponseEntity<Any> =
-        when (acceptHeaderToJenaType(httpServletRequest.getHeader("Accept"))) {
-            JenaType.NOT_ACCEPTABLE -> ResponseEntity(HttpStatus.NOT_ACCEPTABLE)
-            else -> rdfService.getById(id)?.createRDFResponse()
+    @GetMapping(value = ["/{catalogId}"])
+    fun getCatalogById(@PathVariable catalogId: String): ResponseEntity<String> =
+        rdfService.getCatalogById(catalogId)?.createRDFResponse()
                 ?.let { ResponseEntity(it, HttpStatus.OK) }
                 ?: ResponseEntity(HttpStatus.NOT_FOUND)
-        }
 
-
+    @GetMapping(value = ["/{catalogId}/datasets/{id}"])
+    fun getDatasetById(@PathVariable catalogId: String, @PathVariable id: String): ResponseEntity<String> =
+        rdfService.getDatasetById(catalogId, id)?.createRDFResponse()
+            ?.let { ResponseEntity(it, HttpStatus.OK) }
+            ?: ResponseEntity(HttpStatus.NOT_FOUND)
 
 }
