@@ -40,18 +40,18 @@
                 "NOR" ;
         skos:prefLabel  "Norsk"@nb .
 
-<http://brreg.no/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d/samples/d2>
+<http://localhost:5000/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d/samples/d2>
         a                dcat:Distribution ;
         dct:description  "Dette er beskrivelsen av eksempeldataene. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor."@nb ;
         dct:format       "application/rdf+xml" ;
         dcat:accessURL    <http://www.detteerenlenke.no/til-nedlasting> .
 
-<http://brreg.no/catalogs/987654321>
+<http://localhost:5000/catalogs/987654321>
         a                dcat:Catalog ;
         dct:description  "Beskrivelse"@nb ;
         dct:publisher    <http://data.brreg.no/enhetsregisteret/enhet/987654321> ;
         dct:title        "Tittel"@nb ;
-        dcat:dataset     <http://brreg.no/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d> .
+        dcat:dataset     <http://localhost:5000/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d> .
 
 <http://uri-2>  a   rdfs:Resource ;
         rdfs:label  "label-2-en"@en , "label-2-nb"@nb .
@@ -65,7 +65,7 @@
 <http://uri-1>  a   rdfs:Resource ;
         rdfs:label  "label-1-en"@en , "label-1-nb"@nb .
 
-<http://brreg.no/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d/distributions/d1>
+<http://localhost:5000/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d/distributions/d1>
         a                      dcat:Distribution ;
         dcat:accessService  <http://www.hjem.no/> ;
         dct:conformsTo         [ a               dct:Standard , skos:Concept ;
@@ -78,7 +78,7 @@
         dcat:accessURL         <http://www.detteerentredjelenke.no/til-en-tredje-nedlasting> , <http://www.detteerenannenlenke.no/til-en-annen-nedlasting> , <http://www.detteerenlenke.no/til-nedlasting> ;
         foaf:page              <http://lenke/til/mer/info> .
 
-<http://brreg.no/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d>
+<http://localhost:5000/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d>
         a                               dcat:Dataset ;
         cpsv:follows [ a cpsv:Rule ;
             dct:type cpsvno:ruleForDisclosure ;
@@ -154,12 +154,12 @@
         dct:title                       "Markagrensen Oslo Kommune og nærliggende kommuner"@nb ;
         dct:type                        "Kodeliste" ;
         adms:identifier                 <http://adms.identifier.no/scheme/42> ;
-        adms:sample                     <http://brreg.no/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d/samples/d2> ;
+        adms:sample                     <http://localhost:5000/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d/samples/d2> ;
         dcat:contactPoint               <http://contact/someContactURI/123> ;
         dcat:contactPoint               [ a               vcard:Organization ;
                                           vcard:hasEmail  <mailto:anonymous@anonym.org.no>
                                         ] ;
-        dcat:distribution               <http://brreg.no/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d/distributions/d1> ;
+        dcat:distribution               <http://localhost:5000/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d/distributions/d1> ;
         dcat:keyword                    "Bestemmelse"@nb , "statlig bestemmelse"@nb , "regulering"@nb , "jord"@nb ;
         dcat:landingPage                <http://testetaten.no/landingsside/nr1> ;
         dcat:theme                      <http://publications.europa.eu/resource/authority/data-theme/ENVI> , <http://publications.europa.eu/resource/authority/data-theme/GOVE> ;

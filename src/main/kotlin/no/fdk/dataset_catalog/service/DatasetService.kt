@@ -1,5 +1,6 @@
 package no.fdk.dataset_catalog.service
 
+import no.fdk.dataset_catalog.configuration.ApplicationProperties
 import no.fdk.dataset_catalog.extensions.update
 import no.fdk.dataset_catalog.extensions.updateSubjects
 import no.fdk.dataset_catalog.model.*
@@ -15,7 +16,8 @@ class DatasetService(
     private val catalogService: CatalogService,
     private val organizationService: OrganizationService,
     private val conceptService: ConceptService,
-    private val publishingService: PublishingService
+    private val publishingService: PublishingService,
+    private val applicationProperties: ApplicationProperties
 ) {
 
     fun getAll(catalogId: String): List<Dataset> =
@@ -43,7 +45,7 @@ class DatasetService(
                 id = datasetId,
                 catalogId = catalogId,
                 lastModified = LocalDateTime.now(),
-                uri = "http://brreg.no/catalogs/$catalogId/datasets/$datasetId",
+                uri = "${applicationProperties.catalogUriHost}/$catalogId/datasets/$datasetId",
                 publisher = dataset.publisher ?: catalog.publisher,
                 registrationStatus = dataset.registrationStatus ?: REGISTRATION_STATUS.DRAFT)
             .updateConcepts()
