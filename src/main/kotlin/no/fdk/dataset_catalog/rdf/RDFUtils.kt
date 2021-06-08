@@ -157,7 +157,7 @@ fun Resource.addSkosConcepts(property: Property, skosConcept: Collection<SkosCon
     return this
 }
 
-fun Resource.addDistribution(property: Property, distributions: Collection<Distribution>?, baseURI: String): Resource {
+fun Resource.addDistribution(property: Property, distributions: Collection<Distribution>?, baseURI: String?): Resource {
     distributions?.forEach {
         if (it.hasNonNullProperty()) {
             addProperty(property,
@@ -192,7 +192,7 @@ private fun Distribution.hasNonNullProperty(): Boolean =
 // TODO: add dcat:endpointURLs and make sure front-end sends necessary data (https://doc.difi.no/review/dcat-ap-no/#_obligatoriske_egenskaper_for_datatjeneste)
 // TODO: add a list of dct:MediaTypes (https://doc.difi.no/review/dcat-ap-no/#distribusjon-medietype)
 
-fun Resource.addDataDistributionServices(dataDistributionServices: Collection<DataDistributionService>?, baseURI: String): Resource {
+fun Resource.addDataDistributionServices(dataDistributionServices: Collection<DataDistributionService>?, baseURI: String?): Resource {
     dataDistributionServices?.forEach {
         val uri = when {
             !it.uri.isNullOrEmpty() -> it.uri

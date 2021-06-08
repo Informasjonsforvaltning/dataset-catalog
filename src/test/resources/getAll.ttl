@@ -23,12 +23,10 @@
 <http://db1>  a    dcat:Dataset ;
         dct:title  "test tittel"@nb .
 
-<http://db6>  a  dcat:Dataset .
-
 <http://db4>  a  dcat:Dataset .
 
 <http://987456321>  a  dcat:Catalog ;
-        dcat:dataset  <http://db6> , <http://db5> , <http://db4> .
+        dcat:dataset  <http://db5> , <http://db4> .
 
 <http://db2>  a          dcat:Dataset ;
         dct:description  "test words"@en ;

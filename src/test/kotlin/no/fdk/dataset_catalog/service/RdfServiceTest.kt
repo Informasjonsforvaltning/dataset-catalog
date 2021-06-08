@@ -2,12 +2,10 @@ package no.fdk.dataset_catalog.service
 
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import no.fdk.dataset_catalog.configuration.ApplicationProperties
 import no.fdk.dataset_catalog.model.Catalog
 import no.fdk.dataset_catalog.model.Dataset
 import no.fdk.dataset_catalog.model.REGISTRATION_STATUS
 import no.fdk.dataset_catalog.model.SkosConcept
-import no.fdk.dataset_catalog.rdf.createRDFResponse
 import no.fdk.dataset_catalog.utils.TEST_CATALOG_1
 import no.fdk.dataset_catalog.utils.TEST_DATASET_1
 import no.fdk.dataset_catalog.utils.TestResponseReader
@@ -25,8 +23,7 @@ private val logger = LoggerFactory.getLogger(RdfServiceTest::class.java)
 class RdfServiceTest {
     private val catalogService: CatalogService = mock()
     private val datasetService: DatasetService = mock()
-    private val applicationProperties: ApplicationProperties = mock()
-    private val RDFService = RDFService(catalogService, datasetService, applicationProperties)
+    private val rdfService = RDFService(catalogService, datasetService)
     private val responseReader = TestResponseReader()
 
     @Nested
@@ -36,7 +33,7 @@ class RdfServiceTest {
         fun `Empty catalog serializes correctly`() {
             whenever(catalogService.getByID("1")).thenReturn(Catalog())
 
-            assertNotNull(RDFService.getById("1"))
+            assertNotNull(rdfService.getCatalogById("1"))
         }
 
         @Test
@@ -65,7 +62,7 @@ class RdfServiceTest {
             whenever(datasetService.getAll("http://catalog/1")).thenReturn(listOf(dataset))
 
             val expected = responseReader.parseFile("catalog_0.ttl", "TURTLE")
-            val responseModel = RDFService.getById("http://catalog/1")
+            val responseModel = rdfService.getCatalogById("http://catalog/1")
 
             assertTrue(checkIfIsomorphicAndPrintDiff(responseModel!!, expected, "Serializing dataset relations", logger))
 
@@ -80,7 +77,7 @@ class RdfServiceTest {
             whenever(datasetService.getAll("http://catalog/1")).thenReturn(listOf(dataset))
 
             val expected = responseReader.parseFile("catalog_1.ttl", "TURTLE")
-            val responseModel = RDFService.getById("http://catalog/1")
+            val responseModel = rdfService.getCatalogById("http://catalog/1")
 
             assertTrue(checkIfIsomorphicAndPrintDiff(responseModel!!, expected, "Serializing qualified attributions", logger))
         }
@@ -94,7 +91,7 @@ class RdfServiceTest {
             whenever(datasetService.getAll(catalog.id!!)).thenReturn(listOf(dataset))
 
             val expected = responseReader.parseFile("catalog_2.ttl", "TURTLE")
-            val responseModel = RDFService.getById(catalog.id!!)!!
+            val responseModel = rdfService.getCatalogById(catalog.id!!)!!
 
             assertTrue(checkIfIsomorphicAndPrintDiff(responseModel, expected, "Serializing complete catalog", logger))
         }
