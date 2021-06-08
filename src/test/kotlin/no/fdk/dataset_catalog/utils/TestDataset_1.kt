@@ -7,7 +7,7 @@ import org.apache.jena.vocabulary.DCTerms
 import java.time.LocalDate
 
 val CATALOG_ID = "987654321"
-val CATALOG_URI = "http://brreg.no/catalogs/$CATALOG_ID"
+val CATALOG_URI = "http://localhost:5000/catalogs/$CATALOG_ID"
 
 val DATASET_ID = "72a54592-692c-4cfa-a938-cd1a56a2ed8d"
 val DATASET_URI = "$CATALOG_URI/datasets/$DATASET_ID"

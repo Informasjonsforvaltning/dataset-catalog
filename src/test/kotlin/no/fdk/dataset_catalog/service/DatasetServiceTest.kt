@@ -1,7 +1,7 @@
 package no.fdk.dataset_catalog.service
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.nhaarman.mockitokotlin2.*
+import no.fdk.dataset_catalog.configuration.ApplicationProperties
 import no.fdk.dataset_catalog.extensions.updateSubjects
 import no.fdk.dataset_catalog.model.*
 import no.fdk.dataset_catalog.repository.DatasetRepository
@@ -19,7 +19,9 @@ class DatasetServiceTest {
     private val conceptService: ConceptService = mock()
     private val organizationService: OrganizationService = mock()
     private val publishingService: PublishingService = mock()
-    private val datasetService = DatasetService(datasetRepository, catalogService, organizationService, conceptService, publishingService)
+    private val applicationProperties: ApplicationProperties = mock()
+    private val datasetService = DatasetService(datasetRepository, catalogService, organizationService,
+        conceptService, publishingService, applicationProperties)
 
     @Nested
     internal inner class Create {
