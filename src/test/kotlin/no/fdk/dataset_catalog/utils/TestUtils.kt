@@ -8,6 +8,7 @@ import no.fdk.dataset_catalog.rdf.createRDFResponse
 import no.fdk.dataset_catalog.utils.ApiTestContext.Companion.mongoContainer
 import org.apache.jena.rdf.model.Model
 import org.apache.jena.rdf.model.ModelFactory
+import org.apache.jena.riot.Lang
 import org.bson.codecs.configuration.CodecRegistries
 import org.bson.codecs.pojo.PojoCodecProvider
 import org.slf4j.Logger
@@ -85,14 +86,14 @@ fun resetDB() {
 
 fun checkIfIsomorphicAndPrintDiff(actual: Model, expected: Model, name: String, logger: Logger): Boolean {
     // Its necessary to parse the created models from strings to have the same base, and ensure blank node validity
-    val parsedActual = ModelFactory.createDefaultModel().read(StringReader(actual.createRDFResponse()), null, "TURTLE")
-    val parsedExpected = ModelFactory.createDefaultModel().read(StringReader(expected.createRDFResponse()), null, "TURTLE")
+    val parsedActual = ModelFactory.createDefaultModel().read(StringReader(actual.createRDFResponse(Lang.TURTLE)), null, "TURTLE")
+    val parsedExpected = ModelFactory.createDefaultModel().read(StringReader(expected.createRDFResponse(Lang.TURTLE)), null, "TURTLE")
 
     val isIsomorphic = parsedActual.isIsomorphicWith(parsedExpected)
 
     if (!isIsomorphic) {
-        val actualDiff = parsedActual.difference(parsedExpected).createRDFResponse()
-        val expectedDiff = parsedExpected.difference(parsedActual).createRDFResponse()
+        val actualDiff = parsedActual.difference(parsedExpected).createRDFResponse(Lang.TURTLE)
+        val expectedDiff = parsedExpected.difference(parsedActual).createRDFResponse(Lang.TURTLE)
 
         if (actualDiff.isNotEmpty()) {
             logger.error("non expected nodes in $name:")
