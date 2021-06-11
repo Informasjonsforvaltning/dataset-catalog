@@ -3,10 +3,13 @@ package no.fdk.dataset_catalog.rdf
 import no.fdk.dataset_catalog.model.*
 import org.apache.jena.datatypes.xsd.XSDDatatype
 import org.apache.jena.rdf.model.*
+import org.apache.jena.riot.Lang
 import org.apache.jena.sparql.vocabulary.FOAF
 import org.apache.jena.util.URIref
 import org.apache.jena.vocabulary.*
-import java.io.ByteArrayOutputStream
+import org.springframework.http.HttpStatus
+import org.springframework.web.client.HttpServerErrorException
+import java.io.StringWriter
 import java.lang.Exception
 import java.net.URI
 import java.net.URL
@@ -405,14 +408,27 @@ fun Resource.addLanguages(language: Collection<SkosCode>?): Resource {
     return this
 }
 
+fun jenaLangFromAcceptHeader(accept: String?): Lang =
+    when {
+        accept == null -> throw HttpServerErrorException(HttpStatus.NOT_ACCEPTABLE)
+        accept.contains(Lang.TURTLE.headerString) -> Lang.TURTLE
+        accept.contains(Lang.RDFXML.headerString) -> Lang.RDFXML
+        accept.contains(Lang.RDFJSON.headerString) -> Lang.RDFJSON
+        accept.contains(Lang.JSONLD.headerString) -> Lang.JSONLD
+        accept.contains(Lang.NTRIPLES.headerString) -> Lang.NTRIPLES
+        accept.contains(Lang.NQUADS.headerString) -> Lang.NQUADS
+        accept.contains(Lang.TRIG.headerString) -> Lang.TRIG
+        accept.contains(Lang.TRIX.headerString) -> Lang.TRIX
+        accept.contains("text/n3") -> Lang.N3
+        else -> throw HttpServerErrorException(HttpStatus.NOT_ACCEPTABLE)
+    }
 
 // -------- Model Extensions --------
 
-fun Model.createRDFResponse(): String =
-    ByteArrayOutputStream().use{ out ->
-        write(out, "TURTLE")
-        out.flush()
-        out.toString("UTF-8")
+fun Model.createRDFResponse(lang: Lang): String =
+    StringWriter().use{ out ->
+        write(out, lang.name)
+        out.toString()
     }
 
 fun Model.safeCreateResource(value: String? = null): Resource =
