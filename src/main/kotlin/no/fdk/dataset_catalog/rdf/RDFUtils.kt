@@ -197,20 +197,10 @@ private fun Distribution.hasNonNullProperty(): Boolean =
 
 fun Resource.addDataDistributionServices(dataDistributionServices: Collection<DataDistributionService>?, baseURI: String?): Resource {
     dataDistributionServices?.forEach {
-        val uri = when {
-            !it.uri.isNullOrEmpty() -> it.uri
-            !it.id.isNullOrEmpty() -> "$baseURI/accessService/${it.id}"
-            else -> null
+        val accessServiceResource = model.safeCreateResource(it.uri)
+        if (accessServiceResource.isURIResource) {
+            addProperty(DCAT.accessService, accessServiceResource)
         }
-        addProperty(DCAT.accessService,
-            model.safeCreateResource(uri)
-                .addProperty(RDF.type, DCAT.DataService)
-                .safeAddStringLiteral(DCTerms.identifier, it.id)
-                .safeAddLiteralByLang(DCTerms.title, it.title)
-                .safeAddLiteralByLang(DCTerms.description, it.description)
-                .addPublisher(it.publisher)
-                .addSkosConcepts(DCAT.endpointDescription, it.endpointDescription, FOAF.Document)
-        )
     }
     return this
 }
