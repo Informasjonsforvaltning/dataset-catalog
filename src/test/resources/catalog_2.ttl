@@ -17,16 +17,6 @@
 @prefix cpsv:  <http://purl.org/vocab/cpsv#> .
 @prefix cpsvno:  <https://data.norge.no/vocabulary/cpsvno#> .
 
-<http://www.hjem.no/>
-        a                            dcat:DataService ;
-        dcat:endpointDescription  [ a               foaf:Document , skos:Concept ;
-                                       dct:source      "http://lenke/til/en/api-beskrivelse" ;
-                                       skos:prefLabel  "Oppføring i API-katalog"@nb
-                                     ] ;
-        dct:description              "Dette er eksempel på et API som er referert fra en distribusjon"@nb ;
-        dct:publisher                <http://data.brreg.no/enhetsregisteret/enhet/987654321> ;
-        dct:title                    "Eksempel-API"@nb .
-
 <http://contact/someContactURI/123>
         a                        vcard:Organization ;
         vcard:hasEmail           <mailto:digitalisering@kartverket.no> ;
