@@ -35,7 +35,7 @@ class ConceptService(
                 this.getOutputStream().write("""{"filters": [{"_id": "$id"}]}""".toByteArray())
 
                 if (responseCode != HttpStatus.OK.value()) {
-                    logger.error("Error: $responseCode")
+                    logger.error(Exception("Error: $responseCode").stackTraceToString())
                     return null
                 }
 
@@ -45,7 +45,7 @@ class ConceptService(
                         ?.hits
                         ?.firstOrNull()
                 } catch (t: Throwable) {
-                    logger.error("Unable to parse response from concept catalogue for '$id'", t)
+                    logger.error("${t.stackTraceToString()}: Unable to parse response from concept catalogue for '$id'")
                     null
                 }
             }
