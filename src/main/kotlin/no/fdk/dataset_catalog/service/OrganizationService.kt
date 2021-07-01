@@ -29,14 +29,14 @@ class OrganizationService(
                 this as HttpURLConnection
                 this.setRequestProperty("Accept", "application/json")
                 if (responseCode != HttpStatus.OK.value()) {
-                    logger.error(Exception("Error: $responseCode").stackTraceToString())
+                    logger.error("Error: $responseCode", Exception("Error: $responseCode"))
                     return null
                 }
                 val jsonBody = inputStream.bufferedReader().use(BufferedReader::readText)
                 return try {
                     jacksonObjectMapper().readValue(jsonBody)
                 } catch (t: Throwable) {
-                    logger.error("${t.stackTraceToString()}: Unable to parse response from organization catalogue for '$organizationNumber'")
+                    logger.error("Unable to parse response from organization catalogue for '$organizationNumber'", t)
                     null
                 }
             }

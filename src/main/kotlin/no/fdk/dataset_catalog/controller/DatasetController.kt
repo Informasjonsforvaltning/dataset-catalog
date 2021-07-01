@@ -53,7 +53,7 @@ class DatasetController(
                 logger.info("Creating dataset in catalog $catalogId")
                 ResponseEntity(datasetService.create(catalogId, dataset), HttpStatus.CREATED)
             } catch (e : Exception) {
-                logger.error("${e.stackTraceToString()}: Failed to create dataset.")
+                logger.error("Failed to create dataset.", e)
                 ResponseEntity(HttpStatus.BAD_REQUEST)
             }
         } else ResponseEntity(HttpStatus.FORBIDDEN)
@@ -72,7 +72,7 @@ class DatasetController(
                     ?.let {ResponseEntity(it, HttpStatus.OK) }
                     ?: ResponseEntity(HttpStatus.BAD_REQUEST)
             } catch (e : Exception) {
-                logger.error("${e.stackTraceToString()}: Failed to update dataset.")
+                logger.error("Failed to update dataset.", e)
                 ResponseEntity(HttpStatus.BAD_REQUEST)
             }
         } else ResponseEntity(HttpStatus.FORBIDDEN)

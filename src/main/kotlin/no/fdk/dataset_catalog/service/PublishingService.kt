@@ -42,7 +42,7 @@ class PublishingService(
             logger.info("Successfully sent harvest message for publisher $publisherId")
             toHarvest.remove(catalogId)
         } catch (e: Exception) {
-            logger.error("${e.stackTraceToString()}: Failed to send harvest message for publisher $publisherId")
+            logger.error("Failed to send harvest message for publisher $publisherId", e)
         }
     }
 
@@ -63,7 +63,7 @@ class PublishingService(
                 logger.info("Successfully sent data source message for $publisherId")
                 return true
             } catch (e: Exception) {
-                logger.error("${e.stackTraceToString()}: Failed to send data source message for $publisherId")
+                logger.error("Failed to send data source message for $publisherId", e)
             }
         } else {
             logger.warn("New data source message could not be sent for catalog with id $publisherId")
