@@ -28,11 +28,11 @@ class SearchController (
             }
 
         } catch (e: NotPermittedException) {
-            logger.error("Failed to execute search. Reason:", e)
+            logger.error("${e.stackTraceToString()}: Failed to execute search.")
             ResponseEntity(HttpStatus.FORBIDDEN)
 
         } catch (e : Exception) {
-                logger.error("Failed to execute search. Reason:", e)
+                logger.error("${e.stackTraceToString()}: Failed to execute search.")
                 ResponseEntity(HttpStatus.BAD_REQUEST)
         }
 }
