@@ -162,7 +162,7 @@ fun Resource.addSkosConcepts(property: Property, skosConcept: Collection<SkosCon
 
 fun Resource.addDistribution(property: Property, distributions: Collection<Distribution>?, baseURI: String?): Resource {
     distributions?.forEach {
-        if (it.hasNonNullProperty()) {
+        if (it.hasNonNullOrEmptyProperty()) {
             addProperty(property,
                 model.safeCreateResource(it.uri)
                     .addProperty(RDF.type, DCAT.Distribution)
@@ -182,15 +182,22 @@ fun Resource.addDistribution(property: Property, distributions: Collection<Distr
     return this
 }
 
-private fun Distribution.hasNonNullProperty(): Boolean =
-    title.isNullOrEmpty() ||
-    description.isNullOrEmpty() ||
-    (!accessURL.isNullOrEmpty()) ||
-    (license != null) ||
-    (!conformsTo.isNullOrEmpty()) ||
-    (!page.isNullOrEmpty()) ||
-    (!format.isNullOrEmpty()) ||
-    (!accessService.isNullOrEmpty())
+private fun Distribution.hasNonNullOrEmptyProperty(): Boolean =
+    title?.all { entry -> entry.value.isNullOrEmpty() } == false ||
+
+    description?.all { entry -> entry.value.isNullOrEmpty() } == false ||
+
+    accessURL?.all { entry -> entry.isNullOrEmpty() } == false ||
+
+    !license?.uri.isNullOrEmpty() ||
+
+    conformsTo?.all { entry -> entry.uri.isNullOrEmpty() } == false ||
+
+    page?.all { entry -> entry.uri.isNullOrEmpty() } == false ||
+
+    format?.all { entry -> entry.isNullOrEmpty() } == false ||
+
+    !accessService.isNullOrEmpty()
 
 // TODO: add dcat:endpointURLs and make sure front-end sends necessary data (https://doc.difi.no/review/dcat-ap-no/#_obligatoriske_egenskaper_for_datatjeneste)
 // TODO: add a list of dct:MediaTypes (https://doc.difi.no/review/dcat-ap-no/#distribusjon-medietype)

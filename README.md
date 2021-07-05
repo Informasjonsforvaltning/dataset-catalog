@@ -4,7 +4,7 @@ A back end service for creating dataset catalogues and datasets. Exposes a dcat-
 
 ## Requirements
 - maven
-- java 8
+- java 15
 - docker
 - docker-compose
 
