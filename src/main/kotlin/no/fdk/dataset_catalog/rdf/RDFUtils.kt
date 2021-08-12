@@ -144,16 +144,14 @@ fun Resource.addContactPoints(contactPoints: Collection<Contact>?): Resource {
     return this
 }
 
-fun Resource.addSkosConcepts(property: Property, skosConcept: Collection<SkosConcept>?, resource: Resource): Resource {
-    skosConcept?.forEach {
+fun Resource.addConformsTo(conformsTo: Collection<SkosConcept>?): Resource {
+    conformsTo?.forEach {
         if (!it.uri.isNullOrEmpty()) {
-            addProperty(property,
+            addProperty(DCTerms.conformsTo,
                 model.safeCreateResource()
-                    .addProperty(RDF.type, resource)
-                    .safeAddLinkedProperty(RDF.type, it.extraType)
-                    .addProperty(RDF.type, SKOS.Concept)
+                    .addProperty(RDF.type, DCTerms.Standard)
                     .safeAddProperty(DCTerms.source, it.uri)
-                    .safeAddLiteralByLang(SKOS.prefLabel, it.prefLabel)
+                    .safeAddLiteralByLang(DCTerms.title, it.prefLabel)
             )
         }
     }
@@ -172,7 +170,7 @@ fun Resource.addDistribution(property: Property, distributions: Collection<Distr
                     .safeAddURLs(DCAT.accessURL, it.accessURL)
                     .safeAddURLs(DCAT.downloadURL, it.downloadURL)
                     .safeAddURLs(DCTerms.license, listOfNotNull(it.license?.uri))
-                    .addSkosConcepts(DCTerms.conformsTo, it.conformsTo, DCTerms.Standard)
+                    .addConformsTo(it.conformsTo)
                     .safeAddURLs(FOAF.page, it.page?.map { page -> page.uri })
                     .safeAddStringListLiteral(DCTerms.format, it.format)
                     .addDataDistributionServices(it.accessService, baseURI)
