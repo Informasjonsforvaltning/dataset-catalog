@@ -58,9 +58,9 @@
 <http://localhost:5000/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d/distributions/d1>
         a                      dcat:Distribution ;
         dcat:accessService  <http://www.hjem.no/> ;
-        dct:conformsTo         [ a               dct:Standard , skos:Concept ;
+        dct:conformsTo         [ a               dct:Standard ;
                                  dct:source      "https://www.kartverket.no/geodataarbeid/standarder/sosi/" ;
-                                 skos:prefLabel  "SOSI"@nb
+                                 dct:title  "SOSI"@nb
                                ] ;
         dct:description        "Dette er beskrivelsen av distribusjonen. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Vestibulum id ligula porta felis euismod semper con desbit arum. Se dokumentasjon for denne distribusjonen."@nb ;
         dct:format             "application/json" ;
@@ -115,13 +115,13 @@
         ] ;
         dct:accessRights                <http://publications.europa.eu/resource/authority/access-right/RESTRICTED> ;
         dct:accrualPeriodicity          <http://publications.europa.eu/resource/authority/frequency/ANNUAL> ;
-        dct:conformsTo                  [ a               dct:Standard , skos:Concept ;
+        dct:conformsTo                  [ a               dct:Standard ;
                                           dct:source      "https://www.kartverket.no/geodataarbeid/standarder/sosi/" ;
-                                          skos:prefLabel  "SOSI"@nb
+                                          dct:title  "SOSI"@nb
                                         ] ,
-                                        [ a   dct:Standard , skos:Concept ;
+                                        [ a   dct:Standard ;
                                               dct:source      "https://www.w3.org/2004/02/skos/" ;
-                                              skos:prefLabel  "SKOS"@nb
+                                              dct:title  "SKOS"@nb
                                         ] ;
         dct:description                 "Datasettet avgrenser område for virkeområdet til lov 6. juni 2009 nr. 35 om naturområder i Oslo og nærliggende kommuner (markaloven) som trådte i kraft 1. september 2009. Markalovens virkeområde er fastsatt i forskrift 4. september 2015 nr. 1032 om justering av markagrensen fastlegger markalovens geografiske virkeområde med tilhørende kart."@nb ;
         dct:hasVersion                  <http://referenced/dataset> ;
