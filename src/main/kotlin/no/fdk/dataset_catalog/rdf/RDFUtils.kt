@@ -172,7 +172,7 @@ fun Resource.addDistribution(property: Property, distributions: Collection<Distr
                     .safeAddURLs(DCTerms.license, listOfNotNull(it.license?.uri))
                     .addConformsTo(it.conformsTo)
                     .safeAddURLs(FOAF.page, it.page?.map { page -> page.uri })
-                    .safeAddStringListLiteral(DCTerms.format, it.format)
+                    .safeAddURLs(DCTerms.format, it.format)
                     .addDataDistributionServices(it.accessService, baseURI)
             )
         }
