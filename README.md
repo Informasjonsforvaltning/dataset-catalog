@@ -8,6 +8,24 @@ A back end service for creating dataset catalogues and datasets. Exposes a dcat-
 - docker
 - docker-compose
 
+## Environment Variables
+
+```
+export FDK_BASE_HOST
+export LOG_LEVEL
+export MONGO_HOST
+export MONGO_PORT
+export MONGO_USERNAME
+export MONGO_PASSWORD
+export ORGANIZATION_CATALOGUE_HOST
+export OIDC_ISSUER
+export OIDC_JWKS
+export RABBIT_HOST
+export RABBIT_USERNAME
+export RABBIT_PASSWORD
+export SEARCH_FULLTEXT_HOST
+```
+
 ## Run tests
 Run tests with maven:
 ```
