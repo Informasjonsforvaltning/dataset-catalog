@@ -14,6 +14,22 @@ logging:
   level.no: ${LOG_LEVEL:DEBUG}
   level.org.springframework: WARN
   level.org.springframework.web: WARN
+management:
+  endpoints:
+    web:
+      path-mapping:
+        info: ping
+      exposure:
+        include: health, info, metrics
+  metrics:
+    export:
+      statsd:
+        enabled: true
+        flavor: telegraf
+        host: fdk-monitoring-services-telegraf
+        port: 8125
+    tags:
+      application: dataset-catalog
 application:
   fdkBaseHost: ${FDK_BASE_HOST:https://staging.fellesdatakatalog.digdir.no}
   searchFulltextHost: ${SEARCH_FULLTEXT_HOST:https://search.staging.fellesdatakatalog.digdir.no}
