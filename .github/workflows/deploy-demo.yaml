@@ -21,10 +21,10 @@ jobs:
           chmod o+w ./kubectlapply.yaml
           cat kubectlapply.yaml
 
-      - name: Setup gcloud CLI
+      - name: Setup gcloud CLI for deploy
         uses: google-github-actions/setup-gcloud@master
         with:
-          service_account_key: ${{ secrets.GCP_SA_DIGDIR_FDK_GCR_KEY }}
+          service_account_key: ${{ secrets.DIGDIR_FDK_DEV_AUTODEPLOY }}
           export_default_credentials: true
 
       - name: Deploy to GCP & check status
