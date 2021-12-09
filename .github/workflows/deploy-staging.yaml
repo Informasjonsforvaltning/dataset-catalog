@@ -21,7 +21,7 @@ jobs:
         with:
           java-version: '15'
 
-      - name: Auth gcloud CLI for deploy
+      - name: Auth gcloud CLI for image-store
         uses: google-github-actions/auth@main
         with:
           credentials_json: ${{ secrets.GCP_SA_DIGDIR_FDK_GCR_KEY }}
