@@ -31,7 +31,7 @@ class SearchService (
             } else {
                 logger.info("Searching for datasets with title or description containing [${searchRequest.query}]")
 
-                val queryString = searchRequest.query.toLowerCase()
+                val queryString = searchRequest.query.lowercase()
                 val titleHits = datasetRepository.findByTitleContaining(searchRequest.catalogIDs, queryString)
                 val descriptionHits = datasetRepository.findByDescriptionContaining(searchRequest.catalogIDs, queryString)
                 SearchResult(
@@ -45,11 +45,11 @@ class SearchService (
 
     private fun orderDatasetSearch(results: Set<Dataset>, query: String): List<Dataset> {
         val orderedResults = LinkedList<Dataset>()
-        val queryLC = query.toLowerCase()
+        val queryLC = query.lowercase()
         results.map {
-            if (queryLC == it.title?.get("nb")?.toLowerCase() ||
-                queryLC == it.title?.get("nn")?.toLowerCase() ||
-                queryLC == it.title?.get("en")?.toLowerCase()) {
+            if (queryLC == it.title?.get("nb")?.lowercase() ||
+                queryLC == it.title?.get("nn")?.lowercase() ||
+                queryLC == it.title?.get("en")?.lowercase()) {
                 orderedResults.addFirst(it)
             } else orderedResults.addLast(it)
         }
