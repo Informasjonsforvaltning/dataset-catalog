@@ -15,7 +15,7 @@ class RDFDatasetUtilsTest {
         val model = ModelFactory.createDefaultModel()
         val resource = model.createResource("http://my-dataset1")
 
-        resource.addDistribution(ADMS.sample, listOf(Distribution()), "")
+        resource.addDistribution(ADMS.sample, listOf(Distribution()))
 
         assertFalse { resource.hasProperty(ADMS.sample) }
     }
@@ -45,7 +45,7 @@ class RDFDatasetUtilsTest {
                     format = listOf(),
                     license = null,
                     page = null
-                )), "")
+                )))
 
         assertFalse { resource.hasProperty(ADMS.sample) }
     }
@@ -55,7 +55,7 @@ class RDFDatasetUtilsTest {
         val model = ModelFactory.createDefaultModel()
         val resource = model.createResource("http://my-dataset1")
 
-        resource.addDistribution(ADMS.sample, listOf(Distribution(accessURL = listOf("http://access-url"))), "")
+        resource.addDistribution(ADMS.sample, listOf(Distribution(accessURL = listOf("http://access-url"))))
 
         assertTrue { resource.hasProperty(ADMS.sample) }
     }
