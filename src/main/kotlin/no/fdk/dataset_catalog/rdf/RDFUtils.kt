@@ -24,11 +24,6 @@ fun Resource.safeAddLinkListProperty(property: Property, value: List<String>?): 
     return this
 }
 
-fun Resource.safeAddStringListProperty(property: Property, value: List<String>?): Resource {
-    value?.forEach{ safeAddProperty(property, it) }
-    return this
-}
-
 fun Resource.safeAddStringListLiteral(property: Property, value: List<String>?): Resource {
     value?.forEach{ safeAddStringLiteral(property, it) }
     return this
@@ -158,7 +153,7 @@ fun Resource.addConformsTo(conformsTo: Collection<SkosConcept>?): Resource {
     return this
 }
 
-fun Resource.addDistribution(property: Property, distributions: Collection<Distribution>?, baseURI: String?): Resource {
+fun Resource.addDistribution(property: Property, distributions: Collection<Distribution>?): Resource {
     distributions?.forEach {
         if (it.hasNonNullOrEmptyProperty()) {
             addProperty(property,
@@ -173,7 +168,7 @@ fun Resource.addDistribution(property: Property, distributions: Collection<Distr
                     .addConformsTo(it.conformsTo)
                     .safeAddURLs(FOAF.page, it.page?.map { page -> page.uri })
                     .safeAddURLs(DCTerms.format, it.format)
-                    .addDataDistributionServices(it.accessService, baseURI)
+                    .addDataDistributionServices(it.accessService)
             )
         }
     }
@@ -200,7 +195,7 @@ private fun Distribution.hasNonNullOrEmptyProperty(): Boolean =
 // TODO: add dcat:endpointURLs and make sure front-end sends necessary data (https://doc.difi.no/review/dcat-ap-no/#_obligatoriske_egenskaper_for_datatjeneste)
 // TODO: add a list of dct:MediaTypes (https://doc.difi.no/review/dcat-ap-no/#distribusjon-medietype)
 
-fun Resource.addDataDistributionServices(dataDistributionServices: Collection<DataDistributionService>?, baseURI: String?): Resource {
+fun Resource.addDataDistributionServices(dataDistributionServices: Collection<DataDistributionService>?): Resource {
     dataDistributionServices?.forEach {
         val accessServiceResource = model.safeCreateResource(it.uri)
         if (accessServiceResource.isURIResource) {
@@ -345,12 +340,6 @@ fun Resource.addQualifiedAttributions(qualifiedAttributions: Collection<String>?
     return this
 }
 
-private fun String?.getIfNotNullOrEmpty(): String? =
-    if (this.isNullOrEmpty())
-        null
-    else
-        this
-
 fun Resource.addPublisher(publisher: Publisher?): Resource {
     publisher?.let {
         if (it.uri != null) addProperty(DCTerms.publisher, model.safeCreateResource(it.uri))
@@ -443,12 +432,6 @@ fun Model.safeCreateLinkedResource(value: String? = null) : Resource? =
     } else null
 
 // -------- Utils --------
-
-fun acceptHeaderToJenaType(accept: String?): JenaType =
-    when (accept) {
-        "text/turtle" -> JenaType.TURTLE
-        else -> JenaType.NOT_ACCEPTABLE
-    }
 
 enum class JenaType(val value: String){
     TURTLE("TURTLE"),
