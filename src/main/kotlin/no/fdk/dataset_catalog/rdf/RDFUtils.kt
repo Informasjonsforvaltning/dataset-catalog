@@ -460,3 +460,7 @@ fun keywordToLinguisticSystem(keyword: String): LinguisticSystem =
         "nn" -> LinguisticSystem.NNO
         else -> LinguisticSystem.NOR
     }
+
+fun Dataset.dctIdentifier(): List<String>? =
+    originalUri?.let { listOf(it) }
+        ?: uri?.let { listOf(it) }

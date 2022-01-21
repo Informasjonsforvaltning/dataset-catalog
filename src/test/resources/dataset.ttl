@@ -2,5 +2,6 @@
 @prefix dcat:  <http://www.w3.org/ns/dcat#> .
 
 <http://db2>  a          dcat:Dataset ;
+        dct:identifier   <http://db2> ;
         dct:description  "test words"@en ;
         dct:title        "enda en"@nb .
