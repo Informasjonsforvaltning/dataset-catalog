@@ -21,6 +21,7 @@
 
 <http://catalog/1/dataset/1>
     a             dcat:Dataset ;
+    dct:identifier   <http://catalog/1/dataset/1> ;
     dct:relation  <http://uri-2> , <http://uri-1> .
 
 <http://catalog/1>  a  dcat:Catalog ;
