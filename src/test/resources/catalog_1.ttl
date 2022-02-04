@@ -5,7 +5,7 @@
 
 <http://catalog/1/dataset/1>
     a                          dcat:Dataset ;
-    dct:identifier             <http://catalog/1/dataset/1> ;
+    dct:identifier             "http://catalog/1/dataset/1" ;
     prov:qualifiedAttribution  [ a             prov:Attribution ;
                                  dcat:hadRole  <http://registry.it.csiro.au/def/isotc211/CI_RoleCode/contributor> ;
                                  prov:agent    <https://data.brreg.no/enhetsregisteret/api/enheter/123456789>

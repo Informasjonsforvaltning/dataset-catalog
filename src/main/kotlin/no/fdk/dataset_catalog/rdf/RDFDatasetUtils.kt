@@ -51,7 +51,7 @@ fun Model.addDatasetResource(ds: Dataset): Resource =
         .addReferences(ds.references)
         .addRelations(ds.relations)
         .safeAddLinkedProperty(DCTerms.provenance, ds.provenance?.uri)
-        .safeAddLinkListProperty(DCTerms.identifier, ds.dctIdentifier())
+        .safeAddStringListLiteral(DCTerms.identifier, ds.dctIdentifier())
         .safeAddLinkListProperty(FOAF.page, ds.page)
         .safeAddLinkedProperty(DCTerms.accrualPeriodicity, ds.accrualPeriodicity?.uri)
         .safeAddLinkListProperty(ADMS.identifier, ds.admsIdentifier)

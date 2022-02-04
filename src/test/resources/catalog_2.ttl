@@ -70,7 +70,7 @@
 
 <http://localhost:5000/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d>
         a                               dcat:Dataset ;
-        dct:identifier   <http://localhost:5000/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d> ;
+        dct:identifier   "http://localhost:5000/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d" ;
         cpsv:follows [ a cpsv:Rule ;
             dct:type cpsvno:ruleForDisclosure ;
             cpsv:implements [ a eli:LegalResource ;
