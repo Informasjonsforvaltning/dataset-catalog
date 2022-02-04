@@ -80,7 +80,6 @@ fun resetDB() {
     datasetCollection.deleteMany(org.bson.Document())
     datasetCollection.insertMany(datasetDbPopulation())
 
-
     client.close()
 }
 
