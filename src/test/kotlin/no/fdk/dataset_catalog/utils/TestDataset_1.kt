@@ -167,7 +167,6 @@ val TEST_CATALOG_1 = Catalog(
     description=mapOf(Pair("nb", "Beskrivelse")),
     uri= CATALOG_URI,
     publisher = PUBLISHER,
-    dataset = listOf(TEST_DATASET_1),
 )
 
 

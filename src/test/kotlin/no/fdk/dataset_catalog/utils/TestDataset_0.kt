@@ -159,7 +159,6 @@ val CATALOG_EX = Catalog(
     issued = LocalDate.now(),
     modified = LocalDate.now(),
     language = "nb",
-    dataset = listOf(Dataset("Id", "catalogId")),
 )
 
 val TEST_DATASET_0 = Dataset(

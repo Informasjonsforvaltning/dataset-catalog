@@ -55,8 +55,7 @@ class RdfServiceTest {
             )
 
             val catalog = Catalog(id = "http://catalog/1",
-                uri = "http://catalog/1",
-                dataset = listOf(dataset))
+                uri = "http://catalog/1")
 
             whenever(catalogService.getByID("http://catalog/1")).thenReturn(catalog)
             whenever(datasetService.getAll("http://catalog/1")).thenReturn(listOf(dataset))
@@ -71,7 +70,7 @@ class RdfServiceTest {
         @Test
         fun `Serializes dataset qualified attributions`() {
             val dataset = Dataset(registrationStatus = REGISTRATION_STATUS.PUBLISH, id = "http://catalog/1/dataset/1", uri = "http://catalog/1/dataset/1", qualifiedAttributions = setOf("123456789", "987654321"))
-            val catalog = Catalog(id = "http://catalog/1", uri = "http://catalog/1", dataset = listOf(dataset))
+            val catalog = Catalog(id = "http://catalog/1", uri = "http://catalog/1")
 
             whenever(catalogService.getByID("http://catalog/1")).thenReturn(catalog)
             whenever(datasetService.getAll("http://catalog/1")).thenReturn(listOf(dataset))
