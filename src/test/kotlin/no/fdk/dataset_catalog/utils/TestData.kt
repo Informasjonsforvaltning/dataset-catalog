@@ -114,13 +114,11 @@ val CATALOG_2 = Catalog(
 
 val DB_CATALOG_1 = Catalog(
     DB_CATALOG_ID_1,
-    dataset = listOf(DB_DATASET_1, DB_DATASET_2, DB_DATASET_3),
     uri = "http://$DB_CATALOG_ID_1",
 )
 
 val DB_CATALOG_2 = Catalog(
     DB_CATALOG_ID_2,
-    dataset = listOf(DB_DATASET_4, DB_DATASET_5, DB_DATASET_6),
     uri = "http://$DB_CATALOG_ID_2",
 )
 
@@ -159,4 +157,3 @@ private fun Catalog.mapDBO(): org.bson.Document =
     org.bson.Document()
         .append("_id", id)
         .append("uri", uri)
-        .append("dataset", dataset?.map { it.mapDBO() })

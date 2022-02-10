@@ -22,7 +22,6 @@ fun Catalog.update(newValues: Catalog): Catalog =
         issued = newValues.issued ?: issued,
         modified = newValues.modified ?: modified,
         language = newValues.language ?: language,
-        dataset = newValues.dataset ?: dataset,
         hasPublishedDataSource = newValues.hasPublishedDataSource ?: hasPublishedDataSource,
     )
 

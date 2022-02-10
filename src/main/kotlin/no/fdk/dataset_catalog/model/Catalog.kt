@@ -42,9 +42,6 @@ data class Catalog(
 //    dct:language
     val language: String? = null,
 
-//   dcat:Dataset
-    val dataset: List<Dataset>? = null,
-
     val hasPublishedDataSource: Boolean? = false,
 
     )

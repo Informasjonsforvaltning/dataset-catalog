@@ -366,11 +366,6 @@ components:
           description: Date of last modification
         language:
           type: string
-        dataset:
-          type: array
-          items:
-            $ref: "#/components/schemas/Dataset"
-          description: List of datasets in the catalog
     Publisher:
       type: object
       description: Publisher of a resource
