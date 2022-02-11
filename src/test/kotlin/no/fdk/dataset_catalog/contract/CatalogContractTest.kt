@@ -71,8 +71,10 @@ class CatalogContractTest: ApiTestContext() {
 
         @Test
         fun `Both read and write can read`() {
-            val rspRead = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_5", null, JwtToken(Access.ORG_READ).toString(), "GET")
-            val rspWrite = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_5", null, JwtToken(Access.ORG_WRITE).toString(), "GET")
+            val rspRead =
+                apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1", null, JwtToken(Access.ORG_READ).toString(), "GET")
+            val rspWrite =
+                apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_5", null, JwtToken(Access.ORG_WRITE).toString(), "GET")
 
             Assumptions.assumeTrue(HttpStatus.OK.value() == rspRead["status"])
             Assumptions.assumeTrue(HttpStatus.OK.value() == rspWrite["status"])
@@ -80,7 +82,7 @@ class CatalogContractTest: ApiTestContext() {
             val bodyRead: Catalog = mapper.readValue(rspRead["body"] as String)
             val bodyWrite: Catalog = mapper.readValue(rspWrite["body"] as String)
 
-            assertEquals(DB_CATALOG_5.copy(publisher = bodyRead.publisher), bodyRead)
+            assertEquals(DB_CATALOG_1.copy(publisher = bodyRead.publisher), bodyRead)
             assertEquals(DB_CATALOG_5.copy(publisher = bodyRead.publisher), bodyWrite)
         }
 
@@ -90,7 +92,20 @@ class CatalogContractTest: ApiTestContext() {
             val rspRead = apiAuthorizedRequest("/catalogs/", null, JwtToken(Access.ORG_READ).toString(), "GET")
             val bodyRead: CatalogDTO = mapper.readValue(rspRead["body"] as String)
 
-            assertEquals(setOf(DB_CATALOG_ID_1, DB_CATALOG_ID_5) , bodyRead._embedded?.get("catalogs")?.map { it.id }?.toSet())
+            val expectedRead: Map<String?, Int?> = mapOf(Pair(DB_CATALOG_ID_1, 3), Pair(DB_CATALOG_ID_5, 0))
+            assertEquals(expectedRead, bodyRead._embedded?.get("catalogs")?.associate { Pair(it.id, it.datasetCount) })
+
+            val rspRoot = apiAuthorizedRequest("/catalogs/", null, JwtToken(Access.ROOT).toString(), "GET")
+            val bodyRoot: CatalogDTO = mapper.readValue(rspRoot["body"] as String)
+
+            val expectedRoot: Map<String?, Int?> = mapOf(
+                Pair(DB_CATALOG_ID_1, 3),
+                Pair(DB_CATALOG_ID_2, 3),
+                Pair(DB_CATALOG_ID_3, 0),
+                Pair(DB_CATALOG_ID_4, 0),
+                Pair(DB_CATALOG_ID_5, 0)
+            )
+            assertEquals(expectedRoot, bodyRoot._embedded?.get("catalogs")?.associate { Pair(it.id, it.datasetCount) })
         }
 
     }

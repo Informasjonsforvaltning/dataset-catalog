@@ -366,6 +366,8 @@ components:
           description: Date of last modification
         language:
           type: string
+        datasetCount:
+          type: integer
     Publisher:
       type: object
       description: Publisher of a resource

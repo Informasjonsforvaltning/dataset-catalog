@@ -5,6 +5,7 @@ import no.fdk.dataset_catalog.configuration.ApplicationProperties
 import no.fdk.dataset_catalog.extensions.updateUriIfNeeded
 import no.fdk.dataset_catalog.model.Catalog
 import no.fdk.dataset_catalog.repository.CatalogRepository
+import no.fdk.dataset_catalog.repository.DatasetRepository
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -21,6 +22,7 @@ import kotlin.test.assertNull
 @Tag("unit")
 class CatalogServiceTest {
     private val catalogRepository: CatalogRepository = mock()
+    private val datasetRepository: DatasetRepository = mock()
     private val organizationService: OrganizationService = mock()
     private val publishingService: PublishingService = mock()
     private val applicationProperties = ApplicationProperties(
@@ -32,7 +34,7 @@ class CatalogServiceTest {
     "catalogHarvestRoute",
     "newDataSourceRoute",
     "harvests")
-    private val catalogService = CatalogService(catalogRepository, organizationService, publishingService, applicationProperties)
+    private val catalogService = CatalogService(catalogRepository, datasetRepository, organizationService, publishingService, applicationProperties)
 
     @Nested
     internal inner class Create{
@@ -129,6 +131,5 @@ class CatalogServiceTest {
             assertEquals(expected, actual)
         }
     }
-
 
 }
