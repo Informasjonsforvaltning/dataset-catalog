@@ -30,9 +30,9 @@ class CatalogController(
         logger.info(if (permittedOrgs.isEmpty()) "No permitted catalogs to fetch" else "Fetching catalogs for organizations in $permittedOrgs")
         return when {
             endpointPermissions.hasSysAdminPermission(jwt) ->
-                ResponseEntity(catalogService.getAll().toDTO(), HttpStatus.OK)
+                ResponseEntity(catalogService.getAllAsDTO(), HttpStatus.OK)
             permittedOrgs.isNotEmpty() ->
-                ResponseEntity(catalogService.getByIDs(permittedOrgs).toDTO(), HttpStatus.OK)
+                ResponseEntity(catalogService.getByIDsAsDTO(permittedOrgs), HttpStatus.OK)
             else -> ResponseEntity(CatalogDTO(null), HttpStatus.OK)
         }
     }
