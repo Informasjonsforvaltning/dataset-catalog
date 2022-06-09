@@ -80,6 +80,8 @@ data class Dataset(
 
     val catalogId: String? = null,
 
+    val specializedType: SpecializedType? = null,
+
     @JsonProperty(value = "_lastModified")
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
@@ -236,6 +238,10 @@ data class Dataset(
 
 enum class REGISTRATION_STATUS {
     DRAFT, APPROVE, PUBLISH
+}
+
+enum class SpecializedType {
+    SERIES
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
