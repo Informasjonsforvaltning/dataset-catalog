@@ -1,14 +1,24 @@
 package no.fdk.dataset_catalog.service
 
+import com.fasterxml.jackson.core.JsonProcessingException
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
+import jakarta.json.Json
+import jakarta.json.JsonException
 import no.fdk.dataset_catalog.configuration.ApplicationProperties
-import no.fdk.dataset_catalog.extensions.update
 import no.fdk.dataset_catalog.extensions.updateSubjects
 import no.fdk.dataset_catalog.model.*
 import no.fdk.dataset_catalog.repository.DatasetRepository
+import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import org.springframework.web.server.ResponseStatusException
+import java.io.StringReader
 import java.time.LocalDateTime
 import java.util.*
+
+private val logger = LoggerFactory.getLogger(DatasetService::class.java)
 
 @Service
 class DatasetService(
@@ -17,7 +27,8 @@ class DatasetService(
     private val organizationService: OrganizationService,
     private val conceptService: ConceptService,
     private val publishingService: PublishingService,
-    private val applicationProperties: ApplicationProperties
+    private val applicationProperties: ApplicationProperties,
+    private val mapper: ObjectMapper
 ) {
 
     fun getAll(catalogId: String): List<Dataset> =
@@ -59,16 +70,15 @@ class DatasetService(
         datasetRepository.count()
     }
 
-    fun updateDataset(catalogId: String, id: String, patch: DatasetDTO): Dataset? {
+    fun updateDataset(catalogId: String, id: String, operations: List<JsonPatchOperation>): Dataset? {
         val dataset = getByID(catalogId, id)
 
         return dataset
-            ?.update(patch)
+            ?.update(operations)
+            ?.copy(id = id, catalogId = catalogId, lastModified = LocalDateTime.now())
             ?.updateConcepts()
             ?.updateSubjects()
-            ?.let {
-                persistAndHarvest(it, catalogService.getByID(catalogId))
-            }
+            ?.let { persistAndHarvest(it, catalogService.getByID(catalogId)) }
     }
 
     fun delete(catalogId: String, id: String) {
@@ -111,5 +121,32 @@ class DatasetService(
 
     private fun addDataSource(dataset: Dataset, catalog: Catalog) {
         if (dataset.registrationStatus == REGISTRATION_STATUS.PUBLISH && catalog.hasPublishedDataSource == false) catalogService.addDataSource(catalog)
+    }
+
+    private fun Dataset.update(operations: List<JsonPatchOperation>): Dataset =
+        try {
+            patchDataset(this, operations)
+        } catch (ex: Exception) {
+            logger.error("PATCH failed for $id", ex)
+            when (ex) {
+                is JsonException -> throw ResponseStatusException(HttpStatus.BAD_REQUEST, ex.message)
+                is JsonProcessingException -> throw ResponseStatusException(HttpStatus.BAD_REQUEST, ex.message)
+                is IllegalArgumentException -> throw ResponseStatusException(HttpStatus.BAD_REQUEST, ex.message)
+                is java.lang.ClassCastException -> throw ResponseStatusException(HttpStatus.BAD_REQUEST, ex.message)
+                else -> throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.message)
+            }
+        }
+
+    private fun patchDataset(dataset: Dataset, operations: List<JsonPatchOperation>): Dataset {
+        if (operations.isNotEmpty()) {
+            with(mapper) {
+                val changes = Json.createReader(StringReader(writeValueAsString(operations))).readArray()
+                val original = Json.createReader(StringReader(writeValueAsString(dataset))).readObject()
+
+                return Json.createPatch(changes).apply(original)
+                    .let { readValue(it.toString()) }
+            }
+        }
+        return dataset
     }
 }

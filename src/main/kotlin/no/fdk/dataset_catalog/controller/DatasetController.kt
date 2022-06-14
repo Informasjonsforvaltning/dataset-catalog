@@ -2,8 +2,8 @@ package no.fdk.dataset_catalog.controller
 
 import no.fdk.dataset_catalog.extensions.toDTO
 import no.fdk.dataset_catalog.model.Dataset
-import no.fdk.dataset_catalog.model.DatasetDTO
 import no.fdk.dataset_catalog.model.DatasetEmbeddedWrapperDTO
+import no.fdk.dataset_catalog.model.JsonPatchOperation
 import no.fdk.dataset_catalog.security.EndpointPermissions
 import no.fdk.dataset_catalog.service.DatasetService
 import org.slf4j.LoggerFactory
@@ -63,12 +63,12 @@ class DatasetController(
     fun updateDataset(@AuthenticationPrincipal jwt: Jwt,
                       @PathVariable("catalogId") catalogId: String,
                       @PathVariable id: String,
-                      @RequestBody patch: DatasetDTO,
+                      @RequestBody operations: List<JsonPatchOperation>,
     ): ResponseEntity<Dataset> =
         if (endpointPermissions.hasOrgWritePermission(jwt, catalogId)) {
             try {
                 logger.info("Updating dataset with ID $id for catalog with ID $catalogId")
-                datasetService.updateDataset(catalogId, id, patch)
+                datasetService.updateDataset(catalogId, id, operations)
                     ?.let {ResponseEntity(it, HttpStatus.OK) }
                     ?: ResponseEntity(HttpStatus.BAD_REQUEST)
             } catch (e : Exception) {

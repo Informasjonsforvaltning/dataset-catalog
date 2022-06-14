@@ -3,8 +3,10 @@ package no.fdk.dataset_catalog.contract
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.fdk.dataset_catalog.model.Dataset
-import no.fdk.dataset_catalog.model.DatasetDTO
 import no.fdk.dataset_catalog.model.DatasetEmbeddedWrapperDTO
+import no.fdk.dataset_catalog.model.JsonPatchOperation
+import no.fdk.dataset_catalog.model.OpEnum
+import no.fdk.dataset_catalog.model.REGISTRATION_STATUS
 import no.fdk.dataset_catalog.utils.*
 import no.fdk.dataset_catalog.utils.jwk.Access
 import no.fdk.dataset_catalog.utils.jwk.JwtToken
@@ -121,9 +123,10 @@ class DatasetContractTest: ApiTestContext() {
     internal inner class UpdateDataset{
         @Test
         fun `Illegal update`() {
-            val notLoggedIn = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", mapper.writeValueAsString(DATASET_1), null, "PATCH")
-            val readAccess = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", mapper.writeValueAsString(DATASET_1), JwtToken(Access.ORG_READ).toString(), "PATCH")
-            val wrongOrg = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_2/datasets/${DB_DATASET_ID_1}", mapper.writeValueAsString(DATASET_1), JwtToken(Access.ORG_WRITE).toString(), "PATCH")
+            val body = mapper.writeValueAsString(listOf(JsonPatchOperation(op = OpEnum.ADD, path = "/title/en", "en title")))
+            val notLoggedIn = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", body, null, "PATCH")
+            val readAccess = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", body, JwtToken(Access.ORG_READ).toString(), "PATCH")
+            val wrongOrg = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_2/datasets/${DB_DATASET_ID_1}", body, JwtToken(Access.ORG_WRITE).toString(), "PATCH")
 
             assertEquals(HttpStatus.UNAUTHORIZED.value(), notLoggedIn["status"])
             assertEquals(HttpStatus.FORBIDDEN.value(), readAccess["status"])
@@ -132,9 +135,28 @@ class DatasetContractTest: ApiTestContext() {
 
         @Test
         fun `Invalid update`() {
-            val doesNotExist = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_4}", mapper.writeValueAsString(DATASET_1), JwtToken(Access.ORG_WRITE).toString(), "PATCH")
+            val doesNotExist = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_4}", mapper.writeValueAsString(listOf(JsonPatchOperation(op = OpEnum.ADD, path = "/source", "brreg"))), JwtToken(Access.ORG_WRITE).toString(), "PATCH")
+            val invalidValue = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", mapper.writeValueAsString(listOf(JsonPatchOperation(op = OpEnum.ADD, path = "/keyword", "invalid value"))), JwtToken(Access.ORG_WRITE).toString(), "PATCH")
+            val wrongOperation = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", mapper.writeValueAsString(listOf(JsonPatchOperation(op = OpEnum.REPLACE, path = "/source", "wrong operation"))), JwtToken(Access.ORG_WRITE).toString(), "PATCH")
+            val invalidOperation = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", mapper.writeValueAsString(listOf(JsonPatchOperation(op = OpEnum.MOVE, path = "/source", "wrong operation"))), JwtToken(Access.ORG_WRITE).toString(), "PATCH")
 
             assertEquals(HttpStatus.BAD_REQUEST.value(), doesNotExist["status"])
+            assertEquals(HttpStatus.BAD_REQUEST.value(), invalidValue["status"])
+            assertEquals(HttpStatus.BAD_REQUEST.value(), wrongOperation["status"])
+            assertEquals(HttpStatus.BAD_REQUEST.value(), invalidOperation["status"])
+        }
+
+        @Test
+        fun `Invalid fields are ignored on update`() {
+            val preUpdate = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", null, JwtToken(Access.ORG_WRITE).toString(), "GET")
+            Assumptions.assumeTrue(HttpStatus.OK.value() == preUpdate["status"])
+            val bodyPreUpdate: Dataset = mapper.readValue(preUpdate["body"] as String)
+
+            val invalidField = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", mapper.writeValueAsString(listOf(JsonPatchOperation(op = OpEnum.ADD, path = "/invalidField", "invalid field"))), JwtToken(Access.ORG_WRITE).toString(), "PATCH")
+            Assumptions.assumeTrue(HttpStatus.OK.value() == invalidField["status"])
+            val bodyInvalidField: Dataset = mapper.readValue(invalidField["body"] as String)
+
+            assertEquals(bodyPreUpdate.copy(lastModified = bodyInvalidField.lastModified), bodyInvalidField)
         }
 
         @Test
@@ -144,23 +166,20 @@ class DatasetContractTest: ApiTestContext() {
             val bodyPreUpdate: Dataset = mapper.readValue(preUpdate["body"] as String)
             Assumptions.assumeTrue(DB_DATASET_1 == bodyPreUpdate)
 
-            val toUpdate = DB_DATASET_1.copy(source = "brreg")
-            Assumptions.assumeFalse(DB_DATASET_1 == toUpdate)
+            val patchBody = mapper.writeValueAsString(listOf(JsonPatchOperation(op = OpEnum.ADD, path = "/source", "brreg")))
 
-            val rspUpdate = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", mapper.writeValueAsString(toUpdate), JwtToken(Access.ORG_WRITE).toString(), "PATCH")
+            val rspUpdate = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", patchBody, JwtToken(Access.ORG_WRITE).toString(), "PATCH")
             Assumptions.assumeTrue(HttpStatus.OK.value() == rspUpdate["status"])
 
             val postUpdate = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", null, JwtToken(Access.ORG_WRITE).toString(), "GET")
             Assumptions.assumeTrue(HttpStatus.OK.value() == postUpdate["status"])
             val bodyPostUpdate: Dataset = mapper.readValue(postUpdate["body"] as String)
-            assertEquals(toUpdate.copy(lastModified = bodyPostUpdate.lastModified), bodyPostUpdate)
+            assertEquals(DB_DATASET_1.copy(lastModified = bodyPostUpdate.lastModified, source = "brreg"), bodyPostUpdate)
         }
 
         @Test
         fun `Only specified fields are updated`() {
-            val update = DatasetDTO(
-                source = "brreg",
-            )
+            val update = listOf(JsonPatchOperation(OpEnum.ADD, "/source", "brreg"))
 
             val rspUpdate = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", mapper.writeValueAsString(update), JwtToken(Access.ORG_WRITE).toString(), "PATCH")
             Assumptions.assumeTrue(HttpStatus.OK.value() == rspUpdate["status"])
@@ -178,7 +197,6 @@ class DatasetContractTest: ApiTestContext() {
                 , bodyPostUpdate)
         }
     }
-
 
     @Nested
     internal inner class DeleteDataset{

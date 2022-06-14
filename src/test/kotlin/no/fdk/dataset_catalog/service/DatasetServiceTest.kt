@@ -1,5 +1,6 @@
 package no.fdk.dataset_catalog.service
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.nhaarman.mockitokotlin2.*
 import no.fdk.dataset_catalog.configuration.ApplicationProperties
 import no.fdk.dataset_catalog.extensions.updateSubjects
@@ -7,6 +8,7 @@ import no.fdk.dataset_catalog.model.*
 import no.fdk.dataset_catalog.repository.DatasetRepository
 import org.junit.jupiter.api.*
 import java.lang.Exception
+import java.time.LocalDate
 import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -21,7 +23,8 @@ class DatasetServiceTest {
     private val publishingService: PublishingService = mock()
     private val applicationProperties: ApplicationProperties = mock()
     private val datasetService = DatasetService(datasetRepository, catalogService, organizationService,
-        conceptService, publishingService, applicationProperties)
+        conceptService, publishingService, applicationProperties, jacksonObjectMapper()
+    )
 
     @Nested
     internal inner class Create {
@@ -92,22 +95,77 @@ class DatasetServiceTest {
         }
     }
 
-
     @Nested
     internal inner class Update {
         @Test
-        fun `update persists changes to dataset`() {
+        fun `update dataset with add operation`() {
             val ds = Dataset("dsId", "catId")
             val expected = Dataset("dsId", "catId", uri="test")
             whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
-            whenever(datasetRepository.save(any())).thenReturn(expected)
             whenever(catalogService.getByID("catId")).thenReturn(Catalog())
-            val actual = datasetService.updateDataset("catId","dsId", DatasetDTO("dsId", "catId"))
+            datasetService.updateDataset("catId","dsId", listOf(JsonPatchOperation(OpEnum.ADD, "/uri", "test")))
 
-            assertEquals(expected.copy( lastModified = actual?.lastModified), actual)
+            argumentCaptor<Dataset>().apply {
+                verify(datasetRepository, times(1)).save(capture())
+                assertEquals(expected.copy(lastModified = firstValue.lastModified), firstValue)
+            }
+        }
+        @Test
+        fun `update dataset with replace operation`() {
+            val ds = Dataset("dsId", "catId", temporal=listOf(PeriodOfTime("period-id", "period", LocalDate.of(2020, 11, 11), LocalDate.of(2021, 4, 4))))
+            val expected = Dataset("dsId", "catId", temporal=listOf(PeriodOfTime("period-id", "period", LocalDate.of(2020, 10, 10), LocalDate.of(2021, 4, 4))))
+            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
+            whenever(catalogService.getByID("catId")).thenReturn(Catalog())
+            datasetService.updateDataset("catId","dsId", listOf(JsonPatchOperation(OpEnum.REPLACE, "/temporal/0/startDate", "2020-10-10")))
+
+            argumentCaptor<Dataset>().apply {
+                verify(datasetRepository, times(1)).save(capture())
+                assertEquals(expected.copy(lastModified = firstValue.lastModified), firstValue)
+            }
+        }
+
+        @Test
+        fun `update dataset with copy operation`() {
+            val ds = Dataset("dsId", "catId", title = mapOf(Pair("nb", "tittel")))
+            val expected = Dataset("dsId", "catId", title = mapOf(Pair("nb", "tittel"), Pair("nn", "tittel")))
+            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
+            whenever(catalogService.getByID("catId")).thenReturn(Catalog())
+            datasetService.updateDataset("catId","dsId", listOf(JsonPatchOperation(OpEnum.COPY, "/title/nn", null, "/title/nb")))
+
+            argumentCaptor<Dataset>().apply {
+                verify(datasetRepository, times(1)).save(capture())
+                assertEquals(expected.copy(lastModified = firstValue.lastModified), firstValue)
+            }
+        }
+
+        @Test
+        fun `update dataset with move operation`() {
+            val ds = Dataset("dsId", "catId", title = mapOf(Pair("nb", "beskrivelse")), description = null)
+            val expected = Dataset("dsId", "catId", title = null, description = mapOf(Pair("nb", "beskrivelse")))
+            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
+            whenever(catalogService.getByID("catId")).thenReturn(Catalog())
+            datasetService.updateDataset("catId","dsId", listOf(JsonPatchOperation(OpEnum.MOVE, "/description", null, "/title")))
+
+            argumentCaptor<Dataset>().apply {
+                verify(datasetRepository, times(1)).save(capture())
+                assertEquals(expected.copy(lastModified = firstValue.lastModified), firstValue)
+            }
+        }
+
+        @Test
+        fun `update dataset with remove operation`() {
+            val ds = Dataset("dsId", "catId", source="test")
+            val expected = Dataset("dsId", "catId")
+            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
+            whenever(catalogService.getByID("catId")).thenReturn(Catalog())
+            datasetService.updateDataset("catId","dsId", listOf(JsonPatchOperation(OpEnum.REMOVE, "/source")))
+
+            argumentCaptor<Dataset>().apply {
+                verify(datasetRepository, times(1)).save(capture())
+                assertEquals(expected.copy(lastModified = firstValue.lastModified), firstValue)
+            }
         }
     }
-
 
     @Nested
     internal inner class UpdateConcepts {
@@ -144,7 +202,7 @@ class DatasetServiceTest {
             whenever(datasetRepository.save(any())).thenReturn(ds)
             whenever(catalogService.getByID("catId")).thenReturn(cat)
 
-            datasetService.updateDataset("catId","dsId", DatasetDTO())
+            datasetService.updateDataset("catId","dsId", emptyList())
 
             verify(publishingService, times(1)).triggerHarvest("dsId", "catId", "pubId")
         }
@@ -158,7 +216,7 @@ class DatasetServiceTest {
             whenever(datasetRepository.save(any())).thenReturn(ds)
             whenever(catalogService.getByID("catId")).thenReturn(cat)
 
-            datasetService.updateDataset("catId","dsId", DatasetDTO("dsId", "catId", source = "hei"))
+            datasetService.updateDataset("catId","dsId", listOf(JsonPatchOperation(OpEnum.ADD, "/source", "hei")))
 
             verify(publishingService, times(0)).triggerHarvest("dsId", "catId", "pubId")
         }
@@ -173,7 +231,7 @@ class DatasetServiceTest {
             whenever(catalogService.getByID("catId")).thenReturn(cat)
 
             datasetService.create("catId", ds)
-            datasetService.updateDataset("catId","dsId", DatasetDTO(registrationStatus = REGISTRATION_STATUS.PUBLISH))
+            datasetService.updateDataset("catId","dsId", listOf(JsonPatchOperation(OpEnum.REPLACE, "/registrationStatus", REGISTRATION_STATUS.PUBLISH)))
 
             verify(catalogService, times(1)).addDataSource(cat)
         }
@@ -188,7 +246,7 @@ class DatasetServiceTest {
             whenever(catalogService.getByID("catId")).thenReturn(cat)
 
             datasetService.create("catId", ds)
-            datasetService.updateDataset("catId","dsId", DatasetDTO(registrationStatus = REGISTRATION_STATUS.PUBLISH))
+            datasetService.updateDataset("catId","dsId", listOf(JsonPatchOperation(OpEnum.REPLACE, "/registrationStatus", REGISTRATION_STATUS.PUBLISH)))
 
             verify(catalogService, times(0)).addDataSource(cat)
         }
@@ -202,7 +260,7 @@ class DatasetServiceTest {
             whenever(datasetRepository.save(any())).thenReturn(ds)
             whenever(catalogService.getByID("catId")).thenReturn(cat)
 
-            datasetService.updateDataset("catId","dsId", DatasetDTO())
+            datasetService.updateDataset("catId","dsId", emptyList())
 
             verify(publishingService, times(1)).triggerHarvest("dsId", "catId", "pubId")
             verify(catalogService, times(1)).addDataSource(cat)
