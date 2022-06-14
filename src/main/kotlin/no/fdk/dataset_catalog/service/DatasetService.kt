@@ -7,6 +7,7 @@ import no.fdk.dataset_catalog.model.*
 import no.fdk.dataset_catalog.repository.DatasetRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.web.client.HttpClientErrorException.BadRequest
 import java.time.LocalDateTime
 import java.util.*
 
@@ -44,6 +45,8 @@ class DatasetService(
             .copy(
                 id = datasetId,
                 catalogId = catalogId,
+                inSeries = null,
+                last = null,
                 lastModified = LocalDateTime.now(),
                 uri = "${applicationProperties.catalogUriHost}/$catalogId/datasets/$datasetId",
                 publisher = dataset.publisher ?: catalog.publisher,
@@ -70,6 +73,40 @@ class DatasetService(
                 persistAndHarvest(it, catalogService.getByID(catalogId))
             }
     }
+
+    private fun Dataset.patchesFromChangedInSeries(oldInSeries: String?): List<Dataset> {
+        val newSeries = if (inSeries != oldInSeries && catalogId != null && inSeries != null) {
+            getByID(catalogId, inSeries)
+        } else null
+
+        return when {
+            id == null || catalogId == null -> listOf(this)
+            registrationStatus != REGISTRATION_STATUS.PUBLISH ->
+                listOfNotNull(
+                    copy(inSeries = null, prev = null),
+                    oldInSeries?.let { getByID(catalogId, it) }?.patchToRemoveFromSeries(id, prev)
+                )
+            newSeries?.registrationStatus == REGISTRATION_STATUS.PUBLISH ->
+                listOfNotNull(
+                    copy(prev = newSeries.last),
+                    newSeries.copy(last = id),
+                    oldInSeries?.let { getByID(catalogId, it) }?.patchToRemoveFromSeries(id, prev)
+                )
+            else ->
+                listOfNotNull(
+                    copy(inSeries = null, prev = null),
+                    oldInSeries?.let { getByID(catalogId, it) }?.patchToRemoveFromSeries(id, prev)
+                )
+        }
+    }
+
+    private fun Dataset.patchToRemoveFromSeries(toBeRemovedID: String, toBeRemovedPrev: String?): Dataset? =
+        if (last == toBeRemovedID) copy(last = toBeRemovedPrev)
+        else getDatasetByInSeriesAndPrev(catalogId, id, toBeRemovedID)?.copy(prev = toBeRemovedPrev)
+
+    private fun getDatasetByInSeriesAndPrev(catalogId: String?, inSeries: String?, prev: String): Dataset? =
+        if (catalogId == null || inSeries == null) null
+        else datasetRepository.findOneByCatalogIdAndInSeriesAndPrev(catalogId, inSeries, prev)
 
     fun delete(catalogId: String, id: String) {
         getByID(catalogId, id)

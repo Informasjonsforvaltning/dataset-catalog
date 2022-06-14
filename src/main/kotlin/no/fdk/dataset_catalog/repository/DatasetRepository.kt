@@ -20,6 +20,7 @@ const val matchDescription =
 @Repository
 interface DatasetRepository : MongoRepository<Dataset, String?> {
     fun findByCatalogId(catalogId: String) : Collection<Dataset>
+    fun findOneByCatalogIdAndInSeriesAndPrev(catalogId: String, inSeries: String, prev: String) : Dataset?
 
     @Query(matchTitle)
     fun findByTitleContaining(

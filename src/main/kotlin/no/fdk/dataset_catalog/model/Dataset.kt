@@ -81,6 +81,9 @@ data class Dataset(
     val catalogId: String? = null,
 
     val specializedType: SpecializedType? = null,
+    val inSeries: String? = null,
+    val prev: String? = null,
+    val last: String? = null,
 
     @JsonProperty(value = "_lastModified")
     @JsonSerialize(using = LocalDateTimeSerializer::class)

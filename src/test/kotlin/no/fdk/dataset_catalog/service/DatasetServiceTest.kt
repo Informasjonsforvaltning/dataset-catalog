@@ -5,12 +5,14 @@ import no.fdk.dataset_catalog.configuration.ApplicationProperties
 import no.fdk.dataset_catalog.extensions.updateSubjects
 import no.fdk.dataset_catalog.model.*
 import no.fdk.dataset_catalog.repository.DatasetRepository
+import org.apache.jena.rdf.model.Model
 import org.junit.jupiter.api.*
 import java.lang.Exception
 import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 @Tag("unit")
 class DatasetServiceTest {
@@ -31,7 +33,7 @@ class DatasetServiceTest {
                 "dsId",
                 "catId",
                 registrationStatus = REGISTRATION_STATUS.DRAFT)
-            whenever(datasetRepository.save(any())).thenReturn(ds)
+            whenever(datasetRepository.saveAll(any<List<Dataset>>())).thenReturn(listOf(ds))
             whenever(catalogService.getByID("catId")).thenReturn(Catalog("catId"))
             val actual = datasetService.create("catId", ds)
             assertEquals(ds.copy(lastModified = actual?.lastModified, uri = actual?.uri), actual)
@@ -100,7 +102,7 @@ class DatasetServiceTest {
             val ds = Dataset("dsId", "catId")
             val expected = Dataset("dsId", "catId", uri="test")
             whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
-            whenever(datasetRepository.save(any())).thenReturn(expected)
+            whenever(datasetRepository.saveAll(any<List<Dataset>>())).thenReturn(listOf(expected))
             whenever(catalogService.getByID("catId")).thenReturn(Catalog())
             val actual = datasetService.updateDataset("catId","dsId", DatasetDTO("dsId", "catId"))
 
@@ -206,6 +208,33 @@ class DatasetServiceTest {
 
             verify(publishingService, times(1)).triggerHarvest("dsId", "catId", "pubId")
             verify(catalogService, times(1)).addDataSource(cat)
+        }
+    }
+
+
+    @Nested
+    internal inner class UpdateSeries {
+        @Test
+        fun `updated inSeries also updates prev and last in series`() {
+            val cat = Catalog("catId", publisher = Publisher(id="pubId"), hasPublishedDataSource = true)
+            val series = Dataset("seriesId", "catId", last = "other", registrationStatus = REGISTRATION_STATUS.PUBLISH)
+            val ds = Dataset("dsId", "catId", registrationStatus = REGISTRATION_STATUS.PUBLISH)
+
+            whenever(datasetRepository.findById("seriesId")).thenReturn(Optional.of(series))
+            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
+            whenever(catalogService.getByID("catId")).thenReturn(cat)
+
+            datasetService.updateDataset("catId","dsId", DatasetDTO(inSeries = "seriesId"))
+
+            argumentCaptor<List<Dataset>>().apply {
+                verify(datasetRepository, times(1)).saveAll(capture())
+                val savedDataset = firstValue.find { it.id == "dsId" }
+                Assertions.assertEquals(savedDataset?.inSeries, "seriesId")
+                Assertions.assertEquals(savedDataset?.prev, "other")
+
+                val savedSeries = firstValue.find { it.id == "seriesId" }
+                Assertions.assertEquals(savedSeries?.last, "dsId")
+            }
         }
     }
 
