@@ -49,13 +49,8 @@ class DatasetController(
                       @PathVariable("catalogId") catalogId: String,
                       @RequestBody dataset: Dataset): ResponseEntity<Dataset> =
         if (endpointPermissions.hasOrgWritePermission(jwt, catalogId)) {
-            try {
-                logger.info("Creating dataset in catalog $catalogId")
-                ResponseEntity(datasetService.create(catalogId, dataset), HttpStatus.CREATED)
-            } catch (e : Exception) {
-                logger.error("Failed to create dataset.", e)
-                ResponseEntity(HttpStatus.BAD_REQUEST)
-            }
+            logger.info("Creating dataset in catalog $catalogId")
+            ResponseEntity(datasetService.create(catalogId, dataset), HttpStatus.CREATED)
         } else ResponseEntity(HttpStatus.FORBIDDEN)
 
 
@@ -66,17 +61,11 @@ class DatasetController(
                       @RequestBody operations: List<JsonPatchOperation>,
     ): ResponseEntity<Dataset> =
         if (endpointPermissions.hasOrgWritePermission(jwt, catalogId)) {
-            try {
-                logger.info("Updating dataset with ID $id for catalog with ID $catalogId")
-                datasetService.updateDataset(catalogId, id, operations)
-                    ?.let {ResponseEntity(it, HttpStatus.OK) }
-                    ?: ResponseEntity(HttpStatus.BAD_REQUEST)
-            } catch (e : Exception) {
-                logger.error("Failed to update dataset.", e)
-                ResponseEntity(HttpStatus.BAD_REQUEST)
-            }
+            logger.info("Updating dataset with ID $id for catalog with ID $catalogId")
+            datasetService.updateDataset(catalogId, id, operations)
+                ?.let {ResponseEntity(it, HttpStatus.OK) }
+                ?: ResponseEntity(HttpStatus.BAD_REQUEST)
         } else ResponseEntity(HttpStatus.FORBIDDEN)
-
 
     @DeleteMapping(value = ["/{id}"])
     fun removeDataset(@AuthenticationPrincipal jwt: Jwt,
