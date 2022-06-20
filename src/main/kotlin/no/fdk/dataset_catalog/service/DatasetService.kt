@@ -36,15 +36,11 @@ class DatasetService(
 
     fun getByID(catalogId: String, id: String): Dataset? {
         val dataset = datasetRepository.findByIdOrNull(id)
-        return if (dataset != null && dataset.catalogId == catalogId) {
-            dataset
-        } else {
-            null
-        }
+        return if (dataset?.catalogId != catalogId) null else dataset
     }
 
     fun create(catalogId: String, dataset: Dataset): Dataset? {
-        val catalog = catalogService.getByID(catalogId) ?: throw Exception("Catalog not found")
+        val catalog = catalogService.getByID(catalogId) ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Catalog not found")
         val datasetId = dataset.id ?: UUID.randomUUID().toString()
 
         if (dataset.publisher != null) {
@@ -61,14 +57,10 @@ class DatasetService(
                 registrationStatus = dataset.registrationStatus ?: REGISTRATION_STATUS.DRAFT)
             .updateConcepts()
             .updateSubjects()
-            .let {
-                persistAndHarvest(it, catalog)
-            }
+            .let { persistAndHarvest(it, catalog) }
     }
 
-    fun count() {
-        datasetRepository.count()
-    }
+    fun count() = datasetRepository.count()
 
     fun updateDataset(catalogId: String, id: String, operations: List<JsonPatchOperation>): Dataset? {
         val dataset = getByID(catalogId, id)
@@ -116,11 +108,15 @@ class DatasetService(
 
 
     private fun triggerHarvest(dataset: Dataset, catalog: Catalog) {
-        if (dataset.registrationStatus == REGISTRATION_STATUS.PUBLISH) publishingService.triggerHarvest(dataset.id, catalog.id, catalog.publisher?.id)
+        if (dataset.registrationStatus == REGISTRATION_STATUS.PUBLISH) {
+            publishingService.triggerHarvest(dataset.id, catalog.id, catalog.publisher?.id)
+        }
     }
 
     private fun addDataSource(dataset: Dataset, catalog: Catalog) {
-        if (dataset.registrationStatus == REGISTRATION_STATUS.PUBLISH && catalog.hasPublishedDataSource == false) catalogService.addDataSource(catalog)
+        if (dataset.registrationStatus == REGISTRATION_STATUS.PUBLISH && catalog.hasPublishedDataSource == false) {
+            catalogService.addDataSource(catalog)
+        }
     }
 
     private fun Dataset.update(operations: List<JsonPatchOperation>): Dataset =
