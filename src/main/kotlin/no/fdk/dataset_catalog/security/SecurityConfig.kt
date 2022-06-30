@@ -4,38 +4,32 @@ import no.fdk.dataset_catalog.configuration.SecurityProperties
 import org.apache.jena.riot.Lang
 import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator
 import org.springframework.security.oauth2.jwt.*
+import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.util.matcher.RequestMatcher
 import javax.servlet.http.HttpServletRequest
 
-@Configuration
+@EnableWebSecurity
 open class SecurityConfig(
     private val securityProperties: SecurityProperties
-) : WebSecurityConfigurerAdapter() {
-    override fun configure(http: HttpSecurity) {
-        http.csrf().disable()
+) {
 
-        http.cors()
-            .and()
-                .authorizeRequests()
-                .requestMatchers(RDFMatcher())
-                    .permitAll()
-                .antMatchers(HttpMethod.OPTIONS)
-                    .permitAll()
-                .antMatchers(HttpMethod.GET,"/ping")
-                    .permitAll()
-                .antMatchers(HttpMethod.GET,"/ready")
-                    .permitAll()
-                .anyRequest()
-                    .authenticated()
-            .and()
-                .oauth2ResourceServer()
-                    .jwt()
+    @Bean
+    open fun filterChain(http: HttpSecurity): SecurityFilterChain {
+        http.csrf().disable()
+            .cors().and()
+            .authorizeRequests{ authorize ->
+                authorize.requestMatchers(RDFMatcher()).permitAll()
+                    .antMatchers(HttpMethod.OPTIONS).permitAll()
+                    .antMatchers(HttpMethod.GET,"/ping").permitAll()
+                    .antMatchers(HttpMethod.GET,"/ready").permitAll()
+                    .anyRequest().authenticated() }
+            .oauth2ResourceServer { resourceServer -> resourceServer.jwt() }
+        return http.build()
     }
 
     @Bean
