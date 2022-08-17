@@ -33,7 +33,7 @@ management:
 application:
   fdkBaseHost: ${FDK_BASE_HOST:https://staging.fellesdatakatalog.digdir.no}
   searchFulltextHost: ${SEARCH_FULLTEXT_HOST:https://search.staging.fellesdatakatalog.digdir.no}
-  organizationCatalogueHost: ${ORGANIZATION_CATALOGUE_HOST:https://organization-catalogue.staging.fellesdatakatalog.digdir.no}
+  organizationCatalogHost: ${ORGANIZATION_CATALOG_HOST:https://organization-catalog.staging.fellesdatakatalog.digdir.no}
   catalogUriHost: ${FDK_REGISTRATION_BASE_URI:https://registrering.fellesdatakatalog.digdir.no}/catalogs
   harvestDelay: 600000
   catalogHarvestRoute: dataset.publisher.HarvestTrigger
@@ -54,7 +54,7 @@ spring:
 application:
   fdkBaseHost: https://staging.fellesdatakatalog.digdir.no
   searchFulltextHost: https://search.staging.fellesdatakatalog.digdir.no
-  organizationCatalogueHost: https://organization-catalogue.staging.fellesdatakatalog.digdir.no
+  organizationCatalogHost: https://organization-catalog.staging.fellesdatakatalog.digdir.no
   catalogUriHost: https://registrering.staging.fellesdatakatalog.digdir.no/catalogs
   harvestDelay: 10000
   catalogHarvestRoute: dataset.publisher.HarvestTrigger
@@ -69,7 +69,7 @@ server.port: 5555
 application:
   fdkBaseHost: http://localhost:5000
   searchFulltextHost: http://localhost:5000
-  organizationCatalogueHost: http://localhost:5000
+  organizationCatalogHost: http://localhost:5000
   catalogUriHost: http://localhost:5000/catalogs
   harvestDelay: 10000
   catalogHarvestRoute: dataset.publisher.HarvestTrigger

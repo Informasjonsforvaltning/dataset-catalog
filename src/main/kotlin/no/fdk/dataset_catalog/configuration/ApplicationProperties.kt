@@ -8,7 +8,7 @@ import org.springframework.boot.context.properties.ConstructorBinding
 data class ApplicationProperties(
     val fdkBaseHost: String,
     val searchFulltextHost: String,
-    val organizationCatalogueHost: String,
+    val organizationCatalogHost: String,
     val catalogUriHost: String,
     val harvestDelay: Long,
     val catalogHarvestRoute: String,
