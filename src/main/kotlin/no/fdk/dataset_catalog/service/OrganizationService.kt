@@ -23,7 +23,7 @@ class OrganizationService(
     }
 
     fun getOrganization(organizationNumber: String?): Organization? {
-        URL("${applicationProperties.organizationCatalogueHost}/organizations/$organizationNumber")
+        URL("${applicationProperties.organizationCatalogHost}/organizations/$organizationNumber")
             .openConnection()
             .run {
                 this as HttpURLConnection

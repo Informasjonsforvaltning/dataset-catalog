@@ -71,7 +71,7 @@ class CatalogService(private val catalogRepository: CatalogRepository,
                 publisher = Publisher(
                     id = id,
                     name = organizationService.getOrganization(id)?.name,
-                    uri = "${applicationProperties.organizationCatalogueHost}/organizations/$id"
+                    uri = "${applicationProperties.organizationCatalogHost}/organizations/$id"
                 )
             )
         } else this
