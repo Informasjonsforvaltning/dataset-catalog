@@ -151,9 +151,27 @@ private fun Dataset.mapDBO(): org.bson.Document =
         .append("catalogId", catalogId)
         .append("title", title)
         .append("description", description)
+        .append("references", references?.map { it.mapDBO() })
         .append("registrationStatus", registrationStatus.toString())
 
 private fun Catalog.mapDBO(): org.bson.Document =
     org.bson.Document()
         .append("_id", id)
         .append("uri", uri)
+
+private fun Reference.mapDBO(): org.bson.Document =
+    org.bson.Document()
+        .append("referenceType", referenceType?.mapDBO())
+        .append("source", source?.mapDBO())
+
+private fun SkosCode.mapDBO(): org.bson.Document =
+    org.bson.Document()
+        .append("uri", uri)
+        .append("code", code)
+        .append("prefLabel", prefLabel)
+
+private fun SkosConcept.mapDBO(): org.bson.Document =
+    org.bson.Document()
+        .append("uri", uri)
+        .append("prefLabel", prefLabel)
+        .append("extraType", extraType)
