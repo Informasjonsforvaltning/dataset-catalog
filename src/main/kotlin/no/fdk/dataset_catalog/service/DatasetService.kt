@@ -39,6 +39,10 @@ class DatasetService(
         return if (dataset?.catalogId != catalogId) null else dataset
     }
 
+    private fun getByID(id: String): Dataset? {
+        return datasetRepository.findByIdOrNull(id)
+    }
+
     fun create(catalogId: String, dataset: Dataset): Dataset? {
         val catalog = catalogService.getByID(catalogId) ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Catalog not found")
         val datasetId = dataset.id ?: UUID.randomUUID().toString()
@@ -78,8 +82,21 @@ class DatasetService(
             ?.let { datasetRepository.delete(it) }?: throw Exception()
     }
 
+    fun resolveReferences(ds: Dataset): List<Reference>? =
+        ds.references?.map {
+            if (it.source?.uri?.startsWith("${applicationProperties.catalogUriHost}/${ds.catalogId}/datasets/") == true) {
+                val relatedDataset = getByID(it.source.uri.substring(it.source.uri.lastIndexOf("/")))
+                if (relatedDataset?.originalUri !== null) {
+                    Reference(
+                        referenceType = it.referenceType,
+                        source = SkosConcept(relatedDataset.originalUri, it.source.prefLabel, it.source.extraType))
+                }
+            }
+            it
+        }
+
     fun Dataset.updateConcepts(): Dataset =
-        if (concepts != null && concepts.isNotEmpty()) {
+        if (!concepts.isNullOrEmpty()) {
             copy(concepts = getConceptsByID(concepts))
         } else this
 
