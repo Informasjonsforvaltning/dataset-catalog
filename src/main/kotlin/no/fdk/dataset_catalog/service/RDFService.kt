@@ -24,23 +24,26 @@ class RDFService(private val catalogService: CatalogService,
     fun getDatasetById(catalogId: String, id: String): Model? =
         datasetService.getByID(catalogId, id)
             ?.takeIf { it.registrationStatus == REGISTRATION_STATUS.PUBLISH }
+            ?.let { it.copy(references = datasetService.resolveReferences(it)) }
             ?.createModel()
 
     private fun List<Catalog>.createCatalogModel(): Model {
         val model = ModelFactory.createDefaultModel()
         model.setDefaultPrefixes()
 
-        forEach {
-            model.createResource(it.uri)
+        forEach { catalog ->
+            model.createResource(catalog.uri)
                 .addProperty(RDF.type, DCAT.Catalog)
-                .safeAddPropertyByLang(DCTerms.title, it.title)
-                .safeAddPropertyByLang(DCTerms.description, it.description)
-                .safeAddDateTimeLiteral(DCTerms.issued, it.issued)
-                .safeAddDateTimeLiteral(DCTerms.modified, it.modified)
-                .safeAddProperty(DCTerms.language, it.language)
-                .addPublisher(it.publisher)
+                .safeAddPropertyByLang(DCTerms.title, catalog.title)
+                .safeAddPropertyByLang(DCTerms.description, catalog.description)
+                .safeAddDateTimeLiteral(DCTerms.issued, catalog.issued)
+                .safeAddDateTimeLiteral(DCTerms.modified, catalog.modified)
+                .safeAddProperty(DCTerms.language, catalog.language)
+                .addPublisher(catalog.publisher)
                 .addDatasets(
-                    it.id?.let { catId -> datasetService.getAll(catId) })
+                    catalog.id?.let { catId -> datasetService.getAll(catId).map {
+                        it.copy(references = datasetService.resolveReferences(it))
+                    } })
         }
 
         return model
