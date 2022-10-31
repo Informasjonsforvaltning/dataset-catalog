@@ -29,8 +29,8 @@
         <maven.exec.skip>false</maven.exec.skip>
         <!--end standard properties-->
 
-        <kotlin.version>1.7.0</kotlin.version>
-        <testcontainers.version>1.17.2</testcontainers.version>
+        <kotlin.version>1.7.20</kotlin.version>
+        <testcontainers.version>1.17.4</testcontainers.version>
     </properties>
 
     <dependencies>
@@ -107,12 +107,12 @@
         <dependency>
             <groupId>jakarta.json</groupId>
             <artifactId>jakarta.json-api</artifactId>
-            <version>2.1.0</version>
+            <version>2.1.1</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.parsson</groupId>
             <artifactId>jakarta.json</artifactId>
-            <version>1.1.0</version>
+            <version>1.1.1</version>
         </dependency>
 
         <!-- TEST -->
@@ -133,9 +133,9 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>com.nhaarman.mockitokotlin2</groupId>
+            <groupId>org.mockito.kotlin</groupId>
             <artifactId>mockito-kotlin</artifactId>
-            <version>2.2.0</version>
+            <version>4.0.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
