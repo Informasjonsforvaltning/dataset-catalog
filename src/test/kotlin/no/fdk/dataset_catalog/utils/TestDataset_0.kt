@@ -84,7 +84,7 @@ val PUBLISHER_EX = Publisher(
 
 val SKOSCODE_EX = SkosCode(
     uri = "http://test.uri",
-    code = "Skos code",
+    code = "SkosCode",
     prefLabel = mapOf(Pair("nb", "foretrukket navn"))
 )
 

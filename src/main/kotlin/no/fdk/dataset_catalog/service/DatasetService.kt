@@ -39,7 +39,7 @@ class DatasetService(
         return if (dataset?.catalogId != catalogId) null else dataset
     }
 
-    private fun getByID(id: String): Dataset? {
+    fun getByID(id: String): Dataset? {
         return datasetRepository.findByIdOrNull(id)
     }
 
@@ -84,21 +84,28 @@ class DatasetService(
 
     fun resolveReferences(ds: Dataset): List<Reference>? =
         ds.references?.map {
-            if (it.source?.uri?.startsWith("${applicationProperties.catalogUriHost}/${ds.catalogId}/datasets/") == true) {
-                val relatedDataset = getByID(it.source.uri.substring(it.source.uri.lastIndexOf("/")))
-                if (relatedDataset?.originalUri !== null) {
-                    Reference(
-                        referenceType = it.referenceType,
-                        source = SkosConcept(relatedDataset.originalUri, it.source.prefLabel, it.source.extraType))
+            val originalUri: String? = if (isDatasetReference(ds.catalogId, it)) {
+                it.source?.uri?.let { uri ->
+                    getByID(uri.substring(uri.lastIndexOf("/")))
+                        ?.originalUri
                 }
+            } else null
+
+            if (originalUri != null ) {
+                Reference(referenceType = it.referenceType,
+                    source = SkosConcept(originalUri, it.source?.prefLabel, it.source?.extraType))
+            } else {
+                it
             }
-            it
         }
 
     fun Dataset.updateConcepts(): Dataset =
         if (!concepts.isNullOrEmpty()) {
             copy(concepts = getConceptsByID(concepts))
         } else this
+
+    internal fun isDatasetReference(catalogId: String?, ref: Reference?): Boolean =
+        ref?.source?.uri?.startsWith("${applicationProperties.catalogUriHost}/${catalogId}/datasets/") == true
 
     private fun validateDatasetPublisher(catalogPublisher: Publisher?, datasetPublisher: Publisher) {
         if (datasetPublisher.id != null && catalogPublisher?.id !=null &&

@@ -1,18 +1,16 @@
 package no.fdk.dataset_catalog.service
 
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
-import no.fdk.dataset_catalog.model.Catalog
-import no.fdk.dataset_catalog.model.Dataset
-import no.fdk.dataset_catalog.model.REGISTRATION_STATUS
-import no.fdk.dataset_catalog.model.SkosConcept
+import no.fdk.dataset_catalog.model.*
 import no.fdk.dataset_catalog.utils.TEST_CATALOG_1
 import no.fdk.dataset_catalog.utils.TEST_DATASET_1
 import no.fdk.dataset_catalog.utils.TestResponseReader
 import no.fdk.dataset_catalog.utils.checkIfIsomorphicAndPrintDiff
+import org.apache.jena.vocabulary.DCTerms
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.slf4j.LoggerFactory
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
@@ -85,12 +83,16 @@ class RdfServiceTest {
         fun `Serializes complete catalog`() {
             val dataset = TEST_DATASET_1
             val catalog = TEST_CATALOG_1
+            val references = listOf(Reference(
+                    SkosCode(DCTerms.references.uri, "references", mapOf(Pair("nb", "Referanse"))),
+                    SkosConcept("http://referenced/dataset/resolved", prefLabel = mapOf(Pair("nb", "Referanse datasett")))))
 
             whenever(catalogService.getByID(catalog.id!!)).thenReturn(catalog)
-            whenever(datasetService.getAll(catalog.id!!)).thenReturn(listOf(dataset))
+            whenever(datasetService.getAll("${catalog.id}")).thenReturn(listOf(dataset))
+            whenever(datasetService.resolveReferences(dataset)).thenReturn(references)
 
             val expected = responseReader.parseFile("catalog_2.ttl", "TURTLE")
-            val responseModel = rdfService.getCatalogById(catalog.id!!)!!
+            val responseModel = rdfService.getCatalogById("${catalog.id}")!!
 
             assertTrue(checkIfIsomorphicAndPrintDiff(responseModel, expected, "Serializing complete catalog", logger))
         }

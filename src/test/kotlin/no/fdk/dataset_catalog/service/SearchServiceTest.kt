@@ -1,8 +1,5 @@
 package no.fdk.dataset_catalog.service
 
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
 import no.fdk.dataset_catalog.model.Dataset
 import no.fdk.dataset_catalog.model.SEARCH_TYPE
 import no.fdk.dataset_catalog.model.SearchRequest
@@ -12,6 +9,9 @@ import no.fdk.dataset_catalog.security.EndpointPermissions
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.springframework.security.oauth2.jwt.Jwt
 import java.time.Instant
 import kotlin.test.assertEquals

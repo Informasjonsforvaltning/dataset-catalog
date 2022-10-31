@@ -110,6 +110,7 @@ val SAMPLE = Distribution(
 
 val TEST_DATASET_1 = Dataset(
     registrationStatus = REGISTRATION_STATUS.PUBLISH,
+    catalogId = CATALOG_ID,
     id = DATASET_ID,
     uri = DATASET_URI,
     title = DATASET_TITLE,
@@ -142,7 +143,7 @@ val TEST_DATASET_1 = Dataset(
         SkosCode("http://publications.europa.eu/resource/authority/language/ENG", "ENG", mapOf(Pair("nb", "Engelsk")))),
     landingPage=listOf("http://testetaten.no/landingsside/nr1", "www.this.can.happen/also"),
     theme= THEMES,
-    references= listOf(Reference(SkosCode(DCTerms.hasVersion.uri, "hasVersion", mapOf(Pair("nb", "Har versjon"))), SkosConcept("http://referenced/dataset", prefLabel = mapOf(Pair("nb", "The first one"))))),
+    references= listOf(Reference(SkosCode(DCTerms.references.uri, "references", mapOf(Pair("nb", "Referanse"))), SkosConcept("http://mycatalog/${CATALOG_ID}/datasets/1", prefLabel = mapOf(Pair("nb", "Referanse datasett"))))),
     relations=listOf(
             SkosConcept("http://uri-1", mapOf(Pair("nb", "label-1-nb"),Pair("en", "label-1-en"))),
             SkosConcept("http://uri-2", mapOf(Pair("nb", "label-2-nb"),Pair("en", "label-2-en")))

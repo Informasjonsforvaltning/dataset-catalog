@@ -1,6 +1,5 @@
 package no.fdk.dataset_catalog.service
 
-import com.nhaarman.mockitokotlin2.*
 import no.fdk.dataset_catalog.configuration.ApplicationProperties
 import no.fdk.dataset_catalog.extensions.updateUriIfNeeded
 import no.fdk.dataset_catalog.model.Catalog
@@ -10,8 +9,8 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.mockito.kotlin.*
 import org.springframework.test.context.TestPropertySource
-import java.lang.Exception
 import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
