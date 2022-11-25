@@ -10,6 +10,7 @@ data class ApplicationProperties(
     val searchFulltextHost: String,
     val organizationCatalogHost: String,
     val catalogUriHost: String,
+    val datasetCatalogUriHost: String,
     val harvestDelay: Long,
     val catalogHarvestRoute: String,
     val newDataSourceRoute: String,
