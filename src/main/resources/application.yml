@@ -28,7 +28,8 @@ application:
   fdkBaseHost: ${FDK_BASE_HOST:https://staging.fellesdatakatalog.digdir.no}
   searchFulltextHost: ${SEARCH_FULLTEXT_HOST:https://search.staging.fellesdatakatalog.digdir.no}
   organizationCatalogHost: ${ORGANIZATION_CATALOG_HOST:https://organization-catalog.staging.fellesdatakatalog.digdir.no}
-  catalogUriHost: ${FDK_REGISTRATION_BASE_URI:https://registrering.fellesdatakatalog.digdir.no}/catalogs
+  catalogUriHost: ${FDK_REGISTRATION_BASE_URI:https://registrering.staging.fellesdatakatalog.digdir.no}/catalogs
+  datasetCatalogUriHost: ${DATASET_CATALOG_URI:https://dataset-catalog.staging.fellesdatakatalog.digdir.no}/catalogs
   harvestDelay: 600000
   catalogHarvestRoute: dataset.publisher.HarvestTrigger
   newDataSourceRoute: dataset.publisher.NewDataSource

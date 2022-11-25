@@ -85,7 +85,7 @@ class CatalogService(private val catalogRepository: CatalogRepository,
     fun addDataSource(catalog: Catalog) {
         val success = publishingService.sendNewDataSourceMessage(
             catalog.id,
-            "${applicationProperties.catalogUriHost}/${catalog.id}"
+            "${applicationProperties.datasetCatalogUriHost}/${catalog.id}"
         )
         if (success) {
             catalogRepository.save(
