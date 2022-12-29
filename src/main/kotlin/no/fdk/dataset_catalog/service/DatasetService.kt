@@ -30,6 +30,14 @@ class DatasetService(
     private val applicationProperties: ApplicationProperties,
     private val mapper: ObjectMapper
 ) {
+    private var datasetUriPattern: Regex? = null
+
+    fun getDatasetUriPattern(): Regex {
+        if(datasetUriPattern == null) {
+            datasetUriPattern = "^${applicationProperties.catalogUriHost}/\\d+/datasets/".toRegex()
+        }
+        return datasetUriPattern as Regex
+    }
 
     fun getAll(catalogId: String): List<Dataset> =
         datasetRepository.findByCatalogId(catalogId) as List<Dataset>
@@ -84,7 +92,7 @@ class DatasetService(
 
     fun resolveReferences(ds: Dataset): List<Reference>? =
         ds.references?.map {
-            val originalUri: String? = if (isDatasetReference(ds.catalogId, it)) {
+            val originalUri: String? = if (isDatasetReference(it)) {
                 it.source?.uri?.let { uri ->
                     getByID(uri.substring(uri.lastIndexOf("/")))
                         ?.originalUri
@@ -104,8 +112,8 @@ class DatasetService(
             copy(concepts = getConceptsByID(concepts))
         } else this
 
-    internal fun isDatasetReference(catalogId: String?, ref: Reference?): Boolean =
-        ref?.source?.uri?.startsWith("${applicationProperties.catalogUriHost}/${catalogId}/datasets/") == true
+    internal fun isDatasetReference(ref: Reference?): Boolean =
+        ref?.source?.uri?.let { getDatasetUriPattern().containsMatchIn(it) } ?: false
 
     private fun validateDatasetPublisher(catalogPublisher: Publisher?, datasetPublisher: Publisher) {
         if (datasetPublisher.id != null && catalogPublisher?.id !=null &&
