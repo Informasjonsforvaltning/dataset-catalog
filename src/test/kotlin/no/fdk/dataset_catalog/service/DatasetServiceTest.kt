@@ -327,7 +327,7 @@ class DatasetServiceTest {
             }
 
             whenever(applicationProperties.catalogUriHost).thenReturn("http://mycatalog")
-            whenever(datasetRepository.findById(any())).thenReturn(Optional.of(referencedDataset))
+            whenever(datasetRepository.findById("1")).thenReturn(Optional.of(referencedDataset))
 
             assertEquals(resolved, datasetService.resolveReferences(dataset))
         }
