@@ -94,7 +94,7 @@ class DatasetService(
         ds.references?.map {
             val originalUri: String? = if (isDatasetReference(it)) {
                 it.source?.uri?.let { uri ->
-                    getByID(uri.substring(uri.lastIndexOf("/")))
+                    getByID(uri.substring(uri.lastIndexOf("/")+1))
                         ?.originalUri
                 }
             } else null
