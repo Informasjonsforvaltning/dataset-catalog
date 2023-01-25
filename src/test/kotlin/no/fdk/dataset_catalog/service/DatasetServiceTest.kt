@@ -34,6 +34,7 @@ class DatasetServiceTest {
             val ds = Dataset(
                 "dsId",
                 "catId",
+                specializedType = SpecializedType.SERIES,
                 registrationStatus = REGISTRATION_STATUS.DRAFT
             )
             whenever(datasetRepository.save(any())).thenReturn(ds)
@@ -200,6 +201,19 @@ class DatasetServiceTest {
             argumentCaptor<Dataset>().apply {
                 verify(datasetRepository, times(1)).save(capture())
                 assertEquals(expected.copy(lastModified = firstValue.lastModified), firstValue)
+            }
+        }
+
+        @Test
+        fun `update of specialized type is ignored`() {
+            val ds = Dataset("dsId", "catId")
+            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
+            whenever(catalogService.getByID("catId")).thenReturn(Catalog())
+            datasetService.updateDataset("catId", "dsId", listOf(JsonPatchOperation(OpEnum.ADD, "/specializedType", "SERIES")))
+
+            argumentCaptor<Dataset>().apply {
+                verify(datasetRepository, times(1)).save(capture())
+                assertEquals(ds.copy(lastModified = firstValue.lastModified), firstValue)
             }
         }
     }
