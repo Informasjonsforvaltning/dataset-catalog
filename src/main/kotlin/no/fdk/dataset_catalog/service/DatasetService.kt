@@ -79,7 +79,11 @@ class DatasetService(
 
         return dataset
             ?.update(operations)
-            ?.copy(id = id, catalogId = catalogId, lastModified = LocalDateTime.now())
+            ?.copy(
+                id = id,
+                catalogId = catalogId,
+                specializedType = dataset.specializedType,
+                lastModified = LocalDateTime.now())
             ?.updateConcepts()
             ?.updateSubjects()
             ?.let { persistAndHarvest(it, catalogService.getByID(catalogId)) }

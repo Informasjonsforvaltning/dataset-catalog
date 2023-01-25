@@ -401,6 +401,10 @@ components:
         catalogId:
           type: string
           description: ID of catalog this dataset belongs to
+        specializedType:
+          type: string
+          enum: [ SERIES ]
+          description: Optional specialized type of the dataset
         lastModified:
           type: string
           format: date
