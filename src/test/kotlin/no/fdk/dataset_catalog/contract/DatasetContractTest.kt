@@ -161,6 +161,7 @@ class DatasetContractTest: ApiTestContext() {
 
         @Test
         fun `Able to get before and after update`() {
+            resetDB()
             val preUpdate = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", null, JwtToken(Access.ORG_WRITE).toString(), "GET")
             Assumptions.assumeTrue(HttpStatus.OK.value() == preUpdate["status"])
             val bodyPreUpdate: Dataset = mapper.readValue(preUpdate["body"] as String)
