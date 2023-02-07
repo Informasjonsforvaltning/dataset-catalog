@@ -1,6 +1,5 @@
 package no.fdk.dataset_catalog.controller
 
-import no.fdk.dataset_catalog.repository.DatasetRepository
 import no.fdk.dataset_catalog.service.DatasetService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

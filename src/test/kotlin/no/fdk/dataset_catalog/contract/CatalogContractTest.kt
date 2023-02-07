@@ -26,10 +26,10 @@ class CatalogContractTest: ApiTestContext() {
     internal inner class CreateCatalog {
         @Test
         fun `Illegal create`() {
-            val notLoggedIn = apiAuthorizedRequest("/catalogs/", mapper.writeValueAsString(CATALOG_1), null, "POST")
-            val readAccess = apiAuthorizedRequest("/catalogs/", mapper.writeValueAsString(CATALOG_1), JwtToken(Access.ORG_READ).toString(), "POST")
-            val wrongOrg = apiAuthorizedRequest("/catalogs/", mapper.writeValueAsString(CATALOG_1.copy(id="1")), JwtToken(Access.ORG_WRITE).toString(), "POST")
-            val noID = apiAuthorizedRequest("/catalogs/", mapper.writeValueAsString(Catalog()), JwtToken(Access.ORG_WRITE).toString(), "POST")
+            val notLoggedIn = apiAuthorizedRequest("/catalogs", mapper.writeValueAsString(CATALOG_1), null, "POST")
+            val readAccess = apiAuthorizedRequest("/catalogs", mapper.writeValueAsString(CATALOG_1), JwtToken(Access.ORG_READ).toString(), "POST")
+            val wrongOrg = apiAuthorizedRequest("/catalogs", mapper.writeValueAsString(CATALOG_1.copy(id="1")), JwtToken(Access.ORG_WRITE).toString(), "POST")
+            val noID = apiAuthorizedRequest("/catalogs", mapper.writeValueAsString(Catalog()), JwtToken(Access.ORG_WRITE).toString(), "POST")
 
             assertEquals(HttpStatus.UNAUTHORIZED.value(), notLoggedIn["status"])
             assertEquals(HttpStatus.FORBIDDEN.value(), readAccess["status"])
@@ -39,14 +39,14 @@ class CatalogContractTest: ApiTestContext() {
 
         @Test
         fun `Invalid create`() {
-            val emptyBody = apiAuthorizedRequest("/catalogs/", "", JwtToken(Access.ORG_WRITE).toString(), "POST")
+            val emptyBody = apiAuthorizedRequest("/catalogs", "", JwtToken(Access.ORG_WRITE).toString(), "POST")
 
             assertEquals(HttpStatus.BAD_REQUEST.value(), emptyBody["status"])
         }
 
         @Test
         fun `Able to get after create`() {
-            val rspCreate = apiAuthorizedRequest("/catalogs/", mapper.writeValueAsString(CATALOG_1), JwtToken(Access.ORG_WRITE).toString(), "POST")
+            val rspCreate = apiAuthorizedRequest("/catalogs", mapper.writeValueAsString(CATALOG_1), JwtToken(Access.ORG_WRITE).toString(), "POST")
             Assumptions.assumeTrue(HttpStatus.CREATED.value() == rspCreate["status"])
 
 
@@ -89,13 +89,13 @@ class CatalogContractTest: ApiTestContext() {
         @Test
         fun `Get All catalogs returns all permitted catalogs`() {
             resetDB()
-            val rspRead = apiAuthorizedRequest("/catalogs/", null, JwtToken(Access.ORG_READ).toString(), "GET")
+            val rspRead = apiAuthorizedRequest("/catalogs", null, JwtToken(Access.ORG_READ).toString(), "GET")
             val bodyRead: CatalogDTO = mapper.readValue(rspRead["body"] as String)
 
             val expectedRead: Map<String?, Int?> = mapOf(Pair(DB_CATALOG_ID_1, 3), Pair(DB_CATALOG_ID_5, 0))
             assertEquals(expectedRead, bodyRead._embedded?.get("catalogs")?.associate { Pair(it.id, it.datasetCount) })
 
-            val rspRoot = apiAuthorizedRequest("/catalogs/", null, JwtToken(Access.ROOT).toString(), "GET")
+            val rspRoot = apiAuthorizedRequest("/catalogs", null, JwtToken(Access.ROOT).toString(), "GET")
             val bodyRoot: CatalogDTO = mapper.readValue(rspRoot["body"] as String)
 
             val expectedRoot: Map<String?, Int?> = mapOf(
