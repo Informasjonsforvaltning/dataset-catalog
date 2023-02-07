@@ -1,6 +1,5 @@
 package no.fdk.dataset_catalog.controller
 
-import no.fdk.dataset_catalog.extensions.toDTO
 import no.fdk.dataset_catalog.model.Catalog
 import no.fdk.dataset_catalog.model.CatalogDTO
 import no.fdk.dataset_catalog.security.EndpointPermissions

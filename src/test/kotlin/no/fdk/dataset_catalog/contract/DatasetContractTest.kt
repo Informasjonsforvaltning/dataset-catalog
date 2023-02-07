@@ -30,9 +30,9 @@ class DatasetContractTest: ApiTestContext() {
     internal inner class CreateDataset{
         @Test
         fun `Illegal create`() {
-            val notLoggedIn = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/", mapper.writeValueAsString(DATASET_1), null, "POST")
-            val readAccess = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/", mapper.writeValueAsString(DATASET_1), JwtToken(Access.ORG_READ).toString(), "POST")
-            val wrongOrg = apiAuthorizedRequest("/catalogs/1/datasets/", mapper.writeValueAsString(DATASET_1), JwtToken(Access.ORG_WRITE).toString(), "POST")
+            val notLoggedIn = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets", mapper.writeValueAsString(DATASET_1), null, "POST")
+            val readAccess = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets", mapper.writeValueAsString(DATASET_1), JwtToken(Access.ORG_READ).toString(), "POST")
+            val wrongOrg = apiAuthorizedRequest("/catalogs/1/datasets", mapper.writeValueAsString(DATASET_1), JwtToken(Access.ORG_WRITE).toString(), "POST")
 
             assertEquals(HttpStatus.UNAUTHORIZED.value(), notLoggedIn["status"])
             assertEquals(HttpStatus.FORBIDDEN.value(), readAccess["status"])
@@ -42,8 +42,8 @@ class DatasetContractTest: ApiTestContext() {
 
         @Test
         fun `Invalid create`() {
-            val emptyBody = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/", "", JwtToken(Access.ORG_WRITE).toString(), "POST")
-            val nonExistingCatalog = apiAuthorizedRequest("/catalogs/$CATALOG_ID_2/datasets/", mapper.writeValueAsString(DATASET_2), JwtToken(Access.ORG_WRITE).toString(), "POST")
+            val emptyBody = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets", "", JwtToken(Access.ORG_WRITE).toString(), "POST")
+            val nonExistingCatalog = apiAuthorizedRequest("/catalogs/$CATALOG_ID_2/datasets", mapper.writeValueAsString(DATASET_2), JwtToken(Access.ORG_WRITE).toString(), "POST")
 
             assertEquals(HttpStatus.BAD_REQUEST.value(), emptyBody["status"])
             assertEquals(HttpStatus.BAD_REQUEST.value(), nonExistingCatalog["status"])
@@ -51,7 +51,7 @@ class DatasetContractTest: ApiTestContext() {
 
         @Test
         fun `Able to get after create`() {
-            val rspCreate = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/", mapper.writeValueAsString(DATASET_1), JwtToken(Access.ORG_WRITE).toString(), "POST")
+            val rspCreate = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets", mapper.writeValueAsString(DATASET_1), JwtToken(Access.ORG_WRITE).toString(), "POST")
             Assumptions.assumeTrue(HttpStatus.CREATED.value() == rspCreate["status"])
 
             val rspGet = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/$DATASET_ID_1", null, JwtToken(Access.ORG_WRITE).toString(), "GET")
@@ -65,7 +65,7 @@ class DatasetContractTest: ApiTestContext() {
 
         @Test
         fun `All fields are persisted`() {
-            val rspCreate = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/", mapper.writeValueAsString(DATASET_2), JwtToken(Access.ORG_WRITE).toString(), "POST")
+            val rspCreate = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets", mapper.writeValueAsString(DATASET_2), JwtToken(Access.ORG_WRITE).toString(), "POST")
             Assumptions.assumeTrue(HttpStatus.CREATED.value() == rspCreate["status"])
 
             val rspGet = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/$DATASET_ID_2", null, JwtToken(Access.ORG_WRITE).toString(), "GET")

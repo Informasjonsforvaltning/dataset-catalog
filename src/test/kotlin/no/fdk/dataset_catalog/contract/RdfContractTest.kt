@@ -30,10 +30,10 @@ class RdfContractTest: ApiTestContext() {
         fun `Gets all catalogs`() {
             resetDB()
 
-            val getAllTurtle = apiAuthorizedRequest("/catalogs/", method="GET", accept=MediaType("text","turtle"))
-            val getAllN3 = apiAuthorizedRequest("/catalogs/", method="GET", accept=MediaType("text","n3"))
-            val getAllTrig = apiAuthorizedRequest("/catalogs/", method="GET", accept=MediaType("application","trig"))
-            val getAllTrix = apiAuthorizedRequest("/catalogs/", method="GET", accept=MediaType("application","trix"))
+            val getAllTurtle = apiAuthorizedRequest("/catalogs", method="GET", accept=MediaType("text","turtle"))
+            val getAllN3 = apiAuthorizedRequest("/catalogs", method="GET", accept=MediaType("text","n3"))
+            val getAllTrig = apiAuthorizedRequest("/catalogs", method="GET", accept=MediaType("application","trig"))
+            val getAllTrix = apiAuthorizedRequest("/catalogs", method="GET", accept=MediaType("application","trix"))
 
             assertEquals(HttpStatus.OK.value(), getAllTurtle["status"])
             assertEquals(HttpStatus.OK.value(), getAllN3["status"])
