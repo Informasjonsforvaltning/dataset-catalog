@@ -39,5 +39,6 @@ class JwtToken (private val access: Access) {
 enum class Access(val authorities: String) {
     ORG_READ("organization:123456789:read,organization:246813579:read, organization:111111111:read"),
     ORG_WRITE("organization:123456789:write,organization:246813579:write, organization:111111111:write,organization:554433221:admin,organization:111222333:write"),
+    SERIES_WRITE("organization:123123123:admin"),
     ROOT("system:root:admin")
 }

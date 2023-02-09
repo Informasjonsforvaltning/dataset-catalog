@@ -103,7 +103,8 @@ class CatalogContractTest: ApiTestContext() {
                 Pair(DB_CATALOG_ID_2, 3),
                 Pair(DB_CATALOG_ID_3, 0),
                 Pair(DB_CATALOG_ID_4, 0),
-                Pair(DB_CATALOG_ID_5, 0)
+                Pair(DB_CATALOG_ID_5, 0),
+                Pair(SERIES_CATALOG_ID, 3)
             )
             assertEquals(expectedRoot, bodyRoot._embedded?.get("catalogs")?.associate { Pair(it.id, it.datasetCount) })
         }

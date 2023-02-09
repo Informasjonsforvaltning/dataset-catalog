@@ -40,6 +40,12 @@ val DB_DATASET_ID_4 = "db4"
 val DB_DATASET_ID_5 = "db5"
 val DB_DATASET_ID_6 = "db6"
 
+val SERIES_CATALOG_ID = "123123123"
+val SERIES_DATASET_ID_0 = "series0"
+val SERIES_DATASET_ID_1 = "series1"
+val SERIES_DATASET_ID_2 = "series2"
+val SERIES_DATASET_ID_3 = "series3"
+val SERIES_DATASET_ID_4 = "series4"
 
 
 val DATASET_1 = Dataset(
@@ -137,10 +143,57 @@ val DB_CATALOG_5 = Catalog(
     uri = "http://$DB_CATALOG_ID_5",
 )
 
-fun datasetDbPopulation() = listOf(DB_DATASET_1, DB_DATASET_2, DB_DATASET_3, DB_DATASET_4, DB_DATASET_5, DB_DATASET_6)
+val SERIES_CATALOG = Catalog(
+    SERIES_CATALOG_ID,
+    uri = "http://localhost:5000/catalogs/$SERIES_CATALOG_ID",
+)
+
+val SERIES_DATASET_0 = Dataset(
+    SERIES_DATASET_ID_0,
+    SERIES_CATALOG_ID,
+    specializedType = SpecializedType.SERIES,
+    seriesOrder = mapOf(Pair(SERIES_DATASET_ID_1, 0)),
+    registrationStatus = REGISTRATION_STATUS.DRAFT,
+    uri = "http://localhost:5000/catalogs/$SERIES_CATALOG_ID/datasets/$SERIES_DATASET_ID_3",
+)
+
+val SERIES_DATASET_1 = Dataset(
+    SERIES_DATASET_ID_1,
+    SERIES_CATALOG_ID,
+    inSeries = listOf(SERIES_DATASET_ID_0),
+    registrationStatus = REGISTRATION_STATUS.DRAFT,
+    uri = "http://localhost:5000/catalogs/$SERIES_CATALOG_ID/datasets/$SERIES_DATASET_ID_3",
+)
+
+val SERIES_DATASET_2 = Dataset(
+    SERIES_DATASET_ID_2,
+    SERIES_CATALOG_ID,
+    registrationStatus = REGISTRATION_STATUS.DRAFT,
+    uri = "http://localhost:5000/catalogs/$SERIES_CATALOG_ID/datasets/$SERIES_DATASET_ID_3",
+)
+
+val SERIES_DATASET_3 = Dataset(
+    SERIES_DATASET_ID_3,
+    SERIES_CATALOG_ID,
+    specializedType = SpecializedType.SERIES,
+    seriesOrder = mapOf(Pair(SERIES_DATASET_ID_1, 0), Pair(SERIES_DATASET_ID_2, 1)),
+    registrationStatus = REGISTRATION_STATUS.DRAFT,
+    uri = "http://localhost:5000/catalogs/$SERIES_CATALOG_ID/datasets/$SERIES_DATASET_ID_3",
+)
+
+val SERIES_DATASET_4 = Dataset(
+    SERIES_DATASET_ID_4,
+    SERIES_CATALOG_ID,
+    inSeries = listOf(SERIES_DATASET_ID_0),
+    registrationStatus = REGISTRATION_STATUS.DRAFT,
+    uri = "http://localhost:5000/catalogs/$SERIES_CATALOG_ID/datasets/$SERIES_DATASET_ID_4",
+)
+
+fun datasetDbPopulation() = listOf(DB_DATASET_1, DB_DATASET_2, DB_DATASET_3, DB_DATASET_4, DB_DATASET_5, DB_DATASET_6,
+        SERIES_DATASET_0, SERIES_DATASET_1, SERIES_DATASET_2)
     .map { it.mapDBO() }
 
-fun catalogDbPopulation() = listOf(DB_CATALOG_1, DB_CATALOG_2, DB_CATALOG_3, DB_CATALOG_4, DB_CATALOG_5)
+fun catalogDbPopulation() = listOf(DB_CATALOG_1, DB_CATALOG_2, DB_CATALOG_3, DB_CATALOG_4, DB_CATALOG_5, SERIES_CATALOG)
     .map { it.mapDBO() }
 
 
@@ -153,6 +206,9 @@ private fun Dataset.mapDBO(): org.bson.Document =
         .append("description", description)
         .append("references", references?.map { it.mapDBO() })
         .append("registrationStatus", registrationStatus.toString())
+        .append("specializedType", specializedType)
+        .append("inSeries", inSeries)
+        .append("seriesOrder", seriesOrder)
 
 private fun Catalog.mapDBO(): org.bson.Document =
     org.bson.Document()

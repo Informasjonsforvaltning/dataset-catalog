@@ -20,21 +20,21 @@ class PublishingService(
     private val toHarvest = mutableMapOf<String, TimerTask>()
 
     @Synchronized
-    fun triggerHarvest(datasetId: String?, catalogId: String?, publisherId: String?) {
+    fun triggerHarvest(catalogId: String?, publisherId: String?) {
         logger.info("Scheduling harvest for ${LocalDateTime.now().plusSeconds(applicationProperties.harvestDelay/1000)} on catalog $catalogId")
-        if (!datasetId.isNullOrEmpty() && !catalogId.isNullOrEmpty() && !publisherId.isNullOrEmpty()) {
+        if (!catalogId.isNullOrEmpty() && !publisherId.isNullOrEmpty()) {
             if (toHarvest.containsKey(catalogId)) {
                 toHarvest[catalogId]?.cancel()
             }
 
             toHarvest[catalogId] = Timer(catalogId, false).schedule(applicationProperties.harvestDelay) {
-                sendHarvestMessage(datasetId, catalogId, publisherId)
+                sendHarvestMessage(catalogId, publisherId)
             }
         }
     }
 
-    private fun sendHarvestMessage(datasetId: String, catalogId: String, publisherId: String) {
-        logger.info("Sending harvest message to queue for dataset with ID $datasetId in catalog with ID $catalogId")
+    private fun sendHarvestMessage(catalogId: String, publisherId: String) {
+        logger.info("Sending harvest message to queue for catalog with ID $catalogId")
         val payload = JsonNodeFactory.instance.objectNode()
         payload.put("publisherId", publisherId)
         try {

@@ -13,6 +13,7 @@ import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 @Tag("unit")
 class DatasetServiceTest {
@@ -37,10 +38,14 @@ class DatasetServiceTest {
                 specializedType = SpecializedType.SERIES,
                 registrationStatus = REGISTRATION_STATUS.DRAFT
             )
-            whenever(datasetRepository.save(any())).thenReturn(ds)
             whenever(catalogService.getByID("catId")).thenReturn(Catalog("catId"))
-            val actual = datasetService.create("catId", ds)
-            assertEquals(ds.copy(lastModified = actual?.lastModified, uri = actual?.uri), actual)
+            datasetService.create("catId", ds)
+            argumentCaptor<List<Dataset>>().apply {
+                verify(datasetRepository, times(1)).saveAll(capture())
+                assertTrue(firstValue.size == 1)
+                val actual = firstValue.first()
+                assertEquals(ds.copy(lastModified = actual.lastModified, uri = actual.uri), actual)
+            }
         }
     }
 
@@ -108,9 +113,10 @@ class DatasetServiceTest {
             whenever(catalogService.getByID("catId")).thenReturn(Catalog())
             datasetService.updateDataset("catId", "dsId", listOf(JsonPatchOperation(OpEnum.ADD, "/uri", "test")))
 
-            argumentCaptor<Dataset>().apply {
-                verify(datasetRepository, times(1)).save(capture())
-                assertEquals(expected.copy(lastModified = firstValue.lastModified), firstValue)
+            argumentCaptor<List<Dataset>>().apply {
+                verify(datasetRepository, times(1)).saveAll(capture())
+                assertTrue(firstValue.size == 1)
+                assertEquals(expected.copy(lastModified = firstValue.first().lastModified), firstValue.first())
             }
         }
 
@@ -148,9 +154,10 @@ class DatasetServiceTest {
                 listOf(JsonPatchOperation(OpEnum.REPLACE, "/temporal/0/startDate", "2020-10-10"))
             )
 
-            argumentCaptor<Dataset>().apply {
-                verify(datasetRepository, times(1)).save(capture())
-                assertEquals(expected.copy(lastModified = firstValue.lastModified), firstValue)
+            argumentCaptor<List<Dataset>>().apply {
+                verify(datasetRepository, times(1)).saveAll(capture())
+                assertTrue(firstValue.size == 1)
+                assertEquals(expected.copy(lastModified = firstValue.first().lastModified), firstValue.first())
             }
         }
 
@@ -166,9 +173,10 @@ class DatasetServiceTest {
                 listOf(JsonPatchOperation(OpEnum.COPY, "/title/nn", null, "/title/nb"))
             )
 
-            argumentCaptor<Dataset>().apply {
-                verify(datasetRepository, times(1)).save(capture())
-                assertEquals(expected.copy(lastModified = firstValue.lastModified), firstValue)
+            argumentCaptor<List<Dataset>>().apply {
+                verify(datasetRepository, times(1)).saveAll(capture())
+                assertTrue(firstValue.size == 1)
+                assertEquals(expected.copy(lastModified = firstValue.first().lastModified), firstValue.first())
             }
         }
 
@@ -184,9 +192,10 @@ class DatasetServiceTest {
                 listOf(JsonPatchOperation(OpEnum.MOVE, "/description", null, "/title"))
             )
 
-            argumentCaptor<Dataset>().apply {
-                verify(datasetRepository, times(1)).save(capture())
-                assertEquals(expected.copy(lastModified = firstValue.lastModified), firstValue)
+            argumentCaptor<List<Dataset>>().apply {
+                verify(datasetRepository, times(1)).saveAll(capture())
+                assertTrue(firstValue.size == 1)
+                assertEquals(expected.copy(lastModified = firstValue.first().lastModified), firstValue.first())
             }
         }
 
@@ -198,9 +207,10 @@ class DatasetServiceTest {
             whenever(catalogService.getByID("catId")).thenReturn(Catalog())
             datasetService.updateDataset("catId", "dsId", listOf(JsonPatchOperation(OpEnum.REMOVE, "/source")))
 
-            argumentCaptor<Dataset>().apply {
-                verify(datasetRepository, times(1)).save(capture())
-                assertEquals(expected.copy(lastModified = firstValue.lastModified), firstValue)
+            argumentCaptor<List<Dataset>>().apply {
+                verify(datasetRepository, times(1)).saveAll(capture())
+                assertTrue(firstValue.size == 1)
+                assertEquals(expected.copy(lastModified = firstValue.first().lastModified), firstValue.first())
             }
         }
 
@@ -211,9 +221,10 @@ class DatasetServiceTest {
             whenever(catalogService.getByID("catId")).thenReturn(Catalog())
             datasetService.updateDataset("catId", "dsId", listOf(JsonPatchOperation(OpEnum.ADD, "/specializedType", "SERIES")))
 
-            argumentCaptor<Dataset>().apply {
-                verify(datasetRepository, times(1)).save(capture())
-                assertEquals(ds.copy(lastModified = firstValue.lastModified), firstValue)
+            argumentCaptor<List<Dataset>>().apply {
+                verify(datasetRepository, times(1)).saveAll(capture())
+                assertTrue(firstValue.size == 1)
+                assertEquals(ds.copy(lastModified = firstValue.first().lastModified), firstValue.first())
             }
         }
     }
@@ -255,7 +266,7 @@ class DatasetServiceTest {
 
             datasetService.updateDataset("catId", "dsId", emptyList())
 
-            verify(publishingService, times(1)).triggerHarvest("dsId", "catId", "pubId")
+            verify(publishingService, times(1)).triggerHarvest("catId", "pubId")
         }
 
         @Test
@@ -269,7 +280,7 @@ class DatasetServiceTest {
 
             datasetService.updateDataset("catId", "dsId", listOf(JsonPatchOperation(OpEnum.ADD, "/source", "hei")))
 
-            verify(publishingService, times(0)).triggerHarvest("dsId", "catId", "pubId")
+            verify(publishingService, times(0)).triggerHarvest("catId", "pubId")
         }
 
         @Test
@@ -321,7 +332,7 @@ class DatasetServiceTest {
 
             datasetService.updateDataset("catId", "dsId", emptyList())
 
-            verify(publishingService, times(1)).triggerHarvest("dsId", "catId", "pubId")
+            verify(publishingService, times(1)).triggerHarvest("catId", "pubId")
             verify(catalogService, times(1)).addDataSource(cat)
         }
     }
