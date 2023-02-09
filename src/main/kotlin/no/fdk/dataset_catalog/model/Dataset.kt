@@ -181,6 +181,11 @@ data class Dataset(
 //    dcat:catalogue
     val catalog: Catalog? = null,
 
+    // all series that this dataset is a part of
+    val inSeries: List<String>? = null,
+
+    // datasets in this series and their order index
+    val seriesOrder: Map<String, Int>? = null
     )
 
 enum class REGISTRATION_STATUS {

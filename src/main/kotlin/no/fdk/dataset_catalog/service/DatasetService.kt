@@ -59,8 +59,7 @@ class DatasetService(
             validateDatasetPublisher(catalog.publisher, dataset.publisher)
         }
 
-        return dataset
-            .copy(
+        dataset.copy(
                 id = datasetId,
                 catalogId = catalogId,
                 lastModified = LocalDateTime.now(),
@@ -69,7 +68,10 @@ class DatasetService(
                 registrationStatus = dataset.registrationStatus ?: REGISTRATION_STATUS.DRAFT)
             .updateConcepts()
             .updateSubjects()
+            .allAffectedSeriesDatasets(null)
             .let { persistAndHarvest(it, catalog) }
+
+        return getByID(catalogId, datasetId)
     }
 
     fun count() = datasetRepository.count()
@@ -77,8 +79,7 @@ class DatasetService(
     fun updateDataset(catalogId: String, id: String, operations: List<JsonPatchOperation>): Dataset? {
         val dataset = getByID(catalogId, id)
 
-        return dataset
-            ?.update(operations)
+        dataset?.update(operations)
             ?.copy(
                 id = id,
                 catalogId = catalogId,
@@ -86,12 +87,29 @@ class DatasetService(
                 lastModified = LocalDateTime.now())
             ?.updateConcepts()
             ?.updateSubjects()
+            ?.allAffectedSeriesDatasets(dataset)
             ?.let { persistAndHarvest(it, catalogService.getByID(catalogId)) }
+
+        return getByID(catalogId, id)
     }
 
     fun delete(catalogId: String, id: String) {
         getByID(catalogId, id)
-            ?.let { datasetRepository.delete(it) }?: throw Exception()
+            ?.also { datasetRepository.delete(it) }
+            ?.removeDeletedDatasetFromSeriesFields()
+            ?: throw Exception()
+    }
+
+    private fun Dataset.removeDeletedDatasetFromSeriesFields() {
+        if (id != null) {
+            inSeries?.let { datasetRepository.findAllById(it) }
+                    ?.map { it.copy(seriesOrder = it.seriesOrder?.minus(id)) }
+                    ?.let { datasetRepository.saveAll(it) }
+
+            seriesOrder?.let { datasetRepository.findAllById(it.keys) }
+                    ?.map { it.copy(inSeries = it.inSeries?.minus(id)) }
+                    ?.let { datasetRepository.saveAll(it) }
+        }
     }
 
     fun resolveReferences(ds: Dataset): List<Reference>? =
@@ -111,12 +129,52 @@ class DatasetService(
             }
         }
 
+    private fun Dataset.allAffectedSeriesDatasets(dbDataset: Dataset?): List<Dataset> =
+        if (id == null) listOf(this)
+        else {
+            val addedInSeries = inSeries
+                ?.filter { it !in (dbDataset?.inSeries ?: emptyList()) }
+                ?.let { datasetRepository.findAllById(it) }
+                ?.map {
+                    val updatedSeriesOrder = if (it.seriesOrder.isNullOrEmpty()) {
+                        mapOf(Pair(id, 0))
+                    } else {
+                        it.seriesOrder.plus(Pair(id, it.seriesOrder.values.max() + 1))
+                    }
+                    it.copy(seriesOrder = updatedSeriesOrder)
+                } ?: emptyList()
+
+            val removedInSeries = dbDataset?.inSeries
+                ?.filter { it !in (inSeries ?: emptyList()) }
+                ?.let { datasetRepository.findAllById(it) }
+                ?.map { it.copy(seriesOrder = it.seriesOrder?.minus(id)) }
+                ?: emptyList()
+
+            val addedToOrder = if (specializedType == SpecializedType.SERIES) {
+                seriesOrder?.keys
+                    ?.filter { it !in (dbDataset?.seriesOrder?.keys ?: emptyList()) }
+                    ?.let { datasetRepository.findAllById(it) }
+                    ?.map { it.copy(inSeries = (it.inSeries?.plus(id)) ?: listOf(id)) }
+                    ?: emptyList()
+            } else emptyList()
+
+            val removedFromOrder = if (specializedType == SpecializedType.SERIES) {
+                dbDataset?.seriesOrder?.keys
+                    ?.filter { it !in (seriesOrder?.keys ?: emptyList()) }
+                    ?.let { datasetRepository.findAllById(it) }
+                    ?.map { it.copy(inSeries = it.inSeries?.minus(id)) }
+                    ?: emptyList()
+            } else emptyList()
+
+            listOf(listOf(this), addedInSeries, removedInSeries, addedToOrder, removedFromOrder).flatten()
+        }
+
     fun Dataset.updateConcepts(): Dataset =
         if (!concepts.isNullOrEmpty()) {
             copy(concepts = getConceptsByID(concepts))
         } else this
 
-    internal fun isDatasetReference(ref: Reference?): Boolean =
+    private fun isDatasetReference(ref: Reference?): Boolean =
         ref?.source?.uri?.let { getDatasetUriPattern().containsMatchIn(it) } ?: false
 
     private fun validateDatasetPublisher(catalogPublisher: Publisher?, datasetPublisher: Publisher) {
@@ -132,25 +190,25 @@ class DatasetService(
     private fun getConceptsByID(patchConcepts: Collection<Concept>): List<Concept> =
         conceptService.getConcepts(patchConcepts.mapNotNull { it.id })
 
-    private fun persistAndHarvest(dataset: Dataset?, catalog: Catalog?): Dataset? =
-        if (dataset != null && catalog != null) {
+    private fun persistAndHarvest(datasets: List<Dataset>, catalog: Catalog?) =
+        if (catalog != null) {
             datasetRepository
-                .save(dataset)
+                .saveAll(datasets)
                 .also {
-                addDataSource(dataset, catalog)
-                triggerHarvest(dataset, catalog)
+                addDataSource(datasets, catalog)
+                triggerHarvest(datasets, catalog)
             }
         } else null
 
 
-    private fun triggerHarvest(dataset: Dataset, catalog: Catalog) {
-        if (dataset.registrationStatus == REGISTRATION_STATUS.PUBLISH) {
-            publishingService.triggerHarvest(dataset.id, catalog.id, catalog.publisher?.id)
+    private fun triggerHarvest(datasets: List<Dataset>, catalog: Catalog) {
+        if (datasets.any { it.registrationStatus == REGISTRATION_STATUS.PUBLISH }) {
+            publishingService.triggerHarvest(catalog.id, catalog.publisher?.id)
         }
     }
 
-    private fun addDataSource(dataset: Dataset, catalog: Catalog) {
-        if (dataset.registrationStatus == REGISTRATION_STATUS.PUBLISH && catalog.hasPublishedDataSource == false) {
+    private fun addDataSource(datasets: List<Dataset>, catalog: Catalog) {
+        if (datasets.any { it.registrationStatus == REGISTRATION_STATUS.PUBLISH } && catalog.hasPublishedDataSource == false) {
             catalogService.addDataSource(catalog)
         }
     }

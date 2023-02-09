@@ -29,7 +29,6 @@ class PublishingServiceTest {
     internal inner class TriggerHarvest {
         @Test
         fun`triggers harvest only once`() {
-            val datasetId = "ds1"
             val catalogId = "cat1"
             val publisherId = "ps1"
 
@@ -37,7 +36,7 @@ class PublishingServiceTest {
             payload.put("publisherId", publisherId)
 
             for (i in 1..100) {
-                publishingService.triggerHarvest(datasetId, catalogId, publisherId)
+                publishingService.triggerHarvest(catalogId, publisherId)
             }
 
             Thread.sleep(applicationProperties.harvestDelay*2)
@@ -47,7 +46,6 @@ class PublishingServiceTest {
 
         @Test
         fun`triggers harvest after delay`() {
-            val datasetId = "ds1"
             val catalogId = "cat1"
             val publisherId = "ps1"
 
@@ -55,7 +53,7 @@ class PublishingServiceTest {
             payload.put("publisherId", publisherId)
 
             for (i in 1..3) {
-                publishingService.triggerHarvest(datasetId, catalogId, publisherId)
+                publishingService.triggerHarvest(catalogId, publisherId)
                 Thread.sleep(applicationProperties.harvestDelay*2)
 
             }
