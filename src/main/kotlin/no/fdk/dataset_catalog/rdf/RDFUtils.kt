@@ -320,14 +320,20 @@ private fun Reference.isValidReference(): Boolean =
 
 fun Resource.addRelations(relations: Collection<SkosConcept>?): Resource {
     relations?.forEach {
-        addProperty(DCTerms.relation,
-            model.safeCreateResource(it.uri)
-                .addProperty(RDF.type, RDFS.Resource)
-                .safeAddLiteralByLang(RDFS.label, it.prefLabel)
-        )
+        if (it.isValidRelation()) {
+            addProperty(
+                DCTerms.relation,
+                model.safeCreateResource(it.uri)
+                    .addProperty(RDF.type, RDFS.Resource)
+                    .safeAddLiteralByLang(RDFS.label, it.prefLabel)
+            )
+        }
     }
     return this
 }
+
+private fun SkosConcept.isValidRelation(): Boolean =
+    !uri.isNullOrEmpty() || !prefLabel.isNullOrEmpty()
 
 fun Resource.addQualifiedAttributions(qualifiedAttributions: Collection<String>?): Resource {
     qualifiedAttributions?.forEach {
