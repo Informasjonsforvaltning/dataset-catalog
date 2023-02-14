@@ -103,10 +103,10 @@ class DatasetService(
     private fun Dataset.removeDeletedDatasetFromSeriesFields() {
         if (id != null) {
             inSeries?.let { datasetRepository.findAllById(it) }
-                    ?.map { it.copy(seriesOrder = it.seriesOrder?.minus(id)) }
+                    ?.map { it.copy(seriesDatasetOrder = it.seriesDatasetOrder?.minus(id)) }
                     ?.let { datasetRepository.saveAll(it) }
 
-            seriesOrder?.let { datasetRepository.findAllById(it.keys) }
+            seriesDatasetOrder?.let { datasetRepository.findAllById(it.keys) }
                     ?.map { it.copy(inSeries = it.inSeries?.minus(id)) }
                     ?.let { datasetRepository.saveAll(it) }
         }
@@ -136,31 +136,31 @@ class DatasetService(
                 ?.filter { it !in (dbDataset?.inSeries ?: emptyList()) }
                 ?.let { datasetRepository.findAllById(it) }
                 ?.map {
-                    val updatedSeriesOrder = if (it.seriesOrder.isNullOrEmpty()) {
+                    val updatedSeriesOrder = if (it.seriesDatasetOrder.isNullOrEmpty()) {
                         mapOf(Pair(id, 0))
                     } else {
-                        it.seriesOrder.plus(Pair(id, it.seriesOrder.values.max() + 1))
+                        it.seriesDatasetOrder.plus(Pair(id, it.seriesDatasetOrder.values.max() + 1))
                     }
-                    it.copy(seriesOrder = updatedSeriesOrder)
+                    it.copy(seriesDatasetOrder = updatedSeriesOrder)
                 } ?: emptyList()
 
             val removedInSeries = dbDataset?.inSeries
                 ?.filter { it !in (inSeries ?: emptyList()) }
                 ?.let { datasetRepository.findAllById(it) }
-                ?.map { it.copy(seriesOrder = it.seriesOrder?.minus(id)) }
+                ?.map { it.copy(seriesDatasetOrder = it.seriesDatasetOrder?.minus(id)) }
                 ?: emptyList()
 
             val addedToOrder = if (specializedType == SpecializedType.SERIES) {
-                seriesOrder?.keys
-                    ?.filter { it !in (dbDataset?.seriesOrder?.keys ?: emptyList()) }
+                seriesDatasetOrder?.keys
+                    ?.filter { it !in (dbDataset?.seriesDatasetOrder?.keys ?: emptyList()) }
                     ?.let { datasetRepository.findAllById(it) }
                     ?.map { it.copy(inSeries = (it.inSeries?.plus(id)) ?: listOf(id)) }
                     ?: emptyList()
             } else emptyList()
 
             val removedFromOrder = if (specializedType == SpecializedType.SERIES) {
-                dbDataset?.seriesOrder?.keys
-                    ?.filter { it !in (seriesOrder?.keys ?: emptyList()) }
+                dbDataset?.seriesDatasetOrder?.keys
+                    ?.filter { it !in (seriesDatasetOrder?.keys ?: emptyList()) }
                     ?.let { datasetRepository.findAllById(it) }
                     ?.map { it.copy(inSeries = it.inSeries?.minus(id)) }
                     ?: emptyList()

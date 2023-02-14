@@ -185,7 +185,7 @@ data class Dataset(
     val inSeries: List<String>? = null,
 
     // datasets in this series and their order index
-    val seriesOrder: Map<String, Int>? = null
+    val seriesDatasetOrder: Map<String, Int>? = null
     )
 
 enum class REGISTRATION_STATUS {

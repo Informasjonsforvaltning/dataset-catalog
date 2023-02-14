@@ -65,7 +65,7 @@ class SeriesContractTest: ApiTestContext() {
             val rspGetSeries = apiAuthorizedRequest("/catalogs/$SERIES_CATALOG_ID/datasets/$SERIES_DATASET_ID_0", null, JwtToken(Access.SERIES_WRITE).toString(), "GET")
             assertEquals(HttpStatus.OK.value(), rspGetSeries["status"])
             val bodyGetSeries: Dataset = mapper.readValue(rspGetSeries["body"] as String)
-            assertTrue(bodyGetSeries.seriesOrder?.keys?.contains(SERIES_DATASET_ID_4) ?: false)
+            assertTrue(bodyGetSeries.seriesDatasetOrder?.keys?.contains(SERIES_DATASET_ID_4) ?: false)
         }
     }
 
@@ -83,13 +83,13 @@ class SeriesContractTest: ApiTestContext() {
             val rspGetSeries = apiAuthorizedRequest("/catalogs/$SERIES_CATALOG_ID/datasets/$SERIES_DATASET_ID_0", null, JwtToken(Access.SERIES_WRITE).toString(), "GET")
             assertEquals(HttpStatus.OK.value(), rspGetSeries["status"])
             val bodyGetSeries: Dataset = mapper.readValue(rspGetSeries["body"] as String)
-            assertTrue(SERIES_DATASET_ID_1 !in (bodyGetSeries.seriesOrder?.keys ?: emptyList()))
-            assertTrue(SERIES_DATASET_ID_2 in (bodyGetSeries.seriesOrder?.keys ?: emptyList()))
+            assertTrue(SERIES_DATASET_ID_1 !in (bodyGetSeries.seriesDatasetOrder?.keys ?: emptyList()))
+            assertTrue(SERIES_DATASET_ID_2 in (bodyGetSeries.seriesDatasetOrder?.keys ?: emptyList()))
         }
 
         @Test
         fun `Update of series order also updates relevant datasets`() {
-            val update = listOf(JsonPatchOperation(OpEnum.REPLACE, "/seriesOrder", mapOf(Pair(SERIES_DATASET_ID_2, 0))))
+            val update = listOf(JsonPatchOperation(OpEnum.REPLACE, "/seriesDatasetOrder", mapOf(Pair(SERIES_DATASET_ID_2, 0))))
             val rspUpdate = apiAuthorizedRequest("/catalogs/$SERIES_CATALOG_ID/datasets/$SERIES_DATASET_ID_0", mapper.writeValueAsString(update), JwtToken(Access.SERIES_WRITE).toString(), "PATCH")
             assertEquals(HttpStatus.OK.value(), rspUpdate["status"])
 
@@ -135,7 +135,7 @@ class SeriesContractTest: ApiTestContext() {
             val rspGetSeries = apiAuthorizedRequest("/catalogs/$SERIES_CATALOG_ID/datasets/$SERIES_DATASET_ID_0", null, JwtToken(Access.SERIES_WRITE).toString(), "GET")
             assertEquals(HttpStatus.OK.value(), rspGetSeries["status"])
             val bodyGetSeries: Dataset = mapper.readValue(rspGetSeries["body"] as String)
-            assertTrue(SERIES_DATASET_ID_1 !in (bodyGetSeries.seriesOrder?.keys ?: emptyList()))
+            assertTrue(SERIES_DATASET_ID_1 !in (bodyGetSeries.seriesDatasetOrder?.keys ?: emptyList()))
         }
     }
 }

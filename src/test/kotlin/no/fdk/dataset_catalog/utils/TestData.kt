@@ -152,7 +152,7 @@ val SERIES_DATASET_0 = Dataset(
     SERIES_DATASET_ID_0,
     SERIES_CATALOG_ID,
     specializedType = SpecializedType.SERIES,
-    seriesOrder = mapOf(Pair(SERIES_DATASET_ID_1, 0)),
+    seriesDatasetOrder = mapOf(Pair(SERIES_DATASET_ID_1, 0)),
     registrationStatus = REGISTRATION_STATUS.DRAFT,
     uri = "http://localhost:5000/catalogs/$SERIES_CATALOG_ID/datasets/$SERIES_DATASET_ID_3",
 )
@@ -176,7 +176,7 @@ val SERIES_DATASET_3 = Dataset(
     SERIES_DATASET_ID_3,
     SERIES_CATALOG_ID,
     specializedType = SpecializedType.SERIES,
-    seriesOrder = mapOf(Pair(SERIES_DATASET_ID_1, 0), Pair(SERIES_DATASET_ID_2, 1)),
+    seriesDatasetOrder = mapOf(Pair(SERIES_DATASET_ID_1, 0), Pair(SERIES_DATASET_ID_2, 1)),
     registrationStatus = REGISTRATION_STATUS.DRAFT,
     uri = "http://localhost:5000/catalogs/$SERIES_CATALOG_ID/datasets/$SERIES_DATASET_ID_3",
 )
@@ -208,7 +208,7 @@ private fun Dataset.mapDBO(): org.bson.Document =
         .append("registrationStatus", registrationStatus.toString())
         .append("specializedType", specializedType)
         .append("inSeries", inSeries)
-        .append("seriesOrder", seriesOrder)
+        .append("seriesDatasetOrder", seriesDatasetOrder)
 
 private fun Catalog.mapDBO(): org.bson.Document =
     org.bson.Document()
