@@ -333,7 +333,17 @@ fun Resource.addRelations(relations: Collection<SkosConcept>?): Resource {
 }
 
 private fun SkosConcept.isValidRelation(): Boolean =
-    !uri.isNullOrEmpty() || !prefLabel.isNullOrEmpty()
+    !uri.isNullOrEmpty() || prefLabel.isValidLangField()
+
+private fun Map<String, String>?.isValidLangField(): Boolean =
+    when {
+        isNullOrEmpty() -> false
+        getOrDefault("nb", "").isNotBlank() -> true
+        getOrDefault("nn", "").isNotBlank() -> true
+        getOrDefault("en", "").isNotBlank() -> true
+        getOrDefault("no", "").isNotBlank() -> true
+        else -> false
+    }
 
 fun Resource.addQualifiedAttributions(qualifiedAttributions: Collection<String>?): Resource {
     qualifiedAttributions?.forEach {
