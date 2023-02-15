@@ -60,5 +60,5 @@ fun Model.addDatasetResource(ds: Dataset): Resource =
         .addQualifiedAttributions(ds.qualifiedAttributions)
         .safeAddProperty(DCTerms.type, ds.type)
         .addPublisher(ds.publisher)
-        .addSubjects(ds.subject)
+        .addSubjects(ds.concepts)
         .addLanguages(ds.language)
