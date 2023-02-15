@@ -39,8 +39,12 @@ class DatasetService(
         return datasetUriPattern as Regex
     }
 
-    fun getAll(catalogId: String): List<Dataset> =
-        datasetRepository.findByCatalogId(catalogId) as List<Dataset>
+    fun getAll(catalogId: String, specializedTypeString: String? = null): List<Dataset> {
+        val specializedType = specializedTypeFromString(specializedTypeString)
+
+        return if (specializedType == null) datasetRepository.findByCatalogId(catalogId) as List<Dataset>
+        else datasetRepository.findByCatalogIdAndSpecializedType(catalogId, specializedType) as List<Dataset>
+    }
 
     fun getByID(catalogId: String, id: String): Dataset? {
         val dataset = datasetRepository.findByIdOrNull(id)
@@ -239,4 +243,12 @@ class DatasetService(
         }
         return dataset
     }
+
+    private fun specializedTypeFromString(string: String?): SpecializedType? =
+        try {
+            string?.uppercase()?.let { SpecializedType.valueOf(it) }
+        } catch (e: java.lang.IllegalArgumentException) {
+            null
+        }
+
 }
