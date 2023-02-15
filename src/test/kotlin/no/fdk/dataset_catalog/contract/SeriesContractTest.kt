@@ -138,4 +138,23 @@ class SeriesContractTest: ApiTestContext() {
             assertTrue(SERIES_DATASET_ID_1 !in (bodyGetSeries.seriesDatasetOrder?.keys ?: emptyList()))
         }
     }
+
+    @Nested
+    internal inner class GetDatasetsWithSeriesParam{
+        @Test
+        fun `Get all datasets with specialized-type param value series returns correct list`() {
+            val rspLower = apiAuthorizedRequest("/catalogs/$SERIES_CATALOG_ID/datasets?specializedType=series", null, JwtToken(Access.SERIES_WRITE).toString(), "GET")
+            val rspUpper = apiAuthorizedRequest("/catalogs/$SERIES_CATALOG_ID/datasets?specializedType=SERIES", null, JwtToken(Access.SERIES_WRITE).toString(), "GET")
+            val rspMixed = apiAuthorizedRequest("/catalogs/$SERIES_CATALOG_ID/datasets?specializedType=seRiEs", null, JwtToken(Access.SERIES_WRITE).toString(), "GET")
+
+            val bodyLower: DatasetEmbeddedWrapperDTO = mapper.readValue(rspLower["body"] as String)
+            val bodyUpper: DatasetEmbeddedWrapperDTO = mapper.readValue(rspUpper["body"] as String)
+            val bodyMixed: DatasetEmbeddedWrapperDTO = mapper.readValue(rspMixed["body"] as String)
+
+            assertEquals(listOf(SERIES_DATASET_ID_0), bodyLower._embedded?.get("datasets")?.map { it.id })
+            assertEquals(bodyLower, bodyUpper)
+            assertEquals(bodyLower, bodyMixed)
+        }
+
+    }
 }

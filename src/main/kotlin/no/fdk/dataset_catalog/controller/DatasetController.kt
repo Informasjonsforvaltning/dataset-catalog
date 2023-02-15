@@ -25,10 +25,11 @@ class DatasetController(
 
     @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getAllDatasets(@AuthenticationPrincipal jwt: Jwt,
-                       @PathVariable("catalogId") catalogId: String): ResponseEntity<DatasetEmbeddedWrapperDTO> =
+                       @PathVariable("catalogId") catalogId: String,
+                       @RequestParam("specializedType", required = false) specializedType: String?): ResponseEntity<DatasetEmbeddedWrapperDTO> =
         if (endpointPermissions.hasOrgReadPermission(jwt, catalogId)) {
             logger.info("Fetching datasets for catalog with ID $catalogId")
-            ResponseEntity(datasetService.getAll(catalogId).toDTO(), HttpStatus.OK)
+            ResponseEntity(datasetService.getAll(catalogId, specializedType).toDTO(), HttpStatus.OK)
         } else ResponseEntity(HttpStatus.FORBIDDEN)
 
 

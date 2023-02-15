@@ -1,6 +1,7 @@
 package no.fdk.dataset_catalog.repository
 
 import no.fdk.dataset_catalog.model.Dataset
+import no.fdk.dataset_catalog.model.SpecializedType
 import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.data.mongodb.repository.Query
 import org.springframework.data.repository.query.Param
@@ -20,6 +21,7 @@ const val matchDescription =
 @Repository
 interface DatasetRepository : MongoRepository<Dataset, String?> {
     fun findByCatalogId(catalogId: String) : Collection<Dataset>
+    fun findByCatalogIdAndSpecializedType(catalogId: String, specializedType: SpecializedType) : Collection<Dataset>
 
     @Query(matchTitle)
     fun findByTitleContaining(
