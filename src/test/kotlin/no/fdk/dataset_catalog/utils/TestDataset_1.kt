@@ -29,14 +29,10 @@ val KEYWORD = listOf(
         mapOf(Pair("nb", "statlig bestemmelse"))
     )
 
-val SUBJECT = Subject(
-    definition = mapOf(Pair("no", "alt som er registrert med et organisasjonsnummer ")),
+val CONCEPT = Concept(
+    definition = Definition(text = mapOf(Pair("no", "alt som er registrert med et organisasjonsnummer "))),
     prefLabel = mapOf(Pair("no", "enhet")),
-    note = mapOf(Pair("no", "Alle hovedenheter, underenheter og organisasjonsledd som er identifisert med et organisasjonsnummer.")),
-    source = "https://jira.brreg.no/browse/BEGREP-208",
     uri="https://data-david.github.io/Begrep/begrep/Enhet",
-    inScheme=listOf("befolking", "samfunn"),
-    creator=Publisher("987654321", "http://data.brreg.no/enhetsregisteret/enhet/987654321"),
     altLabel = listOf(
         mapOf(Pair("no", "orgnr")),
         mapOf(Pair("en", "orgzip"))
@@ -125,7 +121,7 @@ val TEST_DATASET_1 = Dataset(
     publisher = PUBLISHER,
     informationModel = listOf(SkosConcept(uri="https://www.w3.org/2004/02/skos/",prefLabel=mapOf(Pair("nb","SKOS")),extraType = null)),
     temporal = listOf(PeriodOfTime(startDate = LocalDate.of(2017,1,1),endDate = LocalDate.of(2017,12,31)), PeriodOfTime(endDate=LocalDate.of(2018,10,20))),
-    subject=listOf(SUBJECT),
+    concepts = listOf(CONCEPT),
     accrualPeriodicity=SkosCode(uri="http://publications.europa.eu/resource/authority/frequency/ANNUAL", code="ANNUAL", prefLabel=mapOf(Pair("nb", "årlig"))),
     issued=LocalDate.of(2012, 1, 1),
     modified=LocalDate.of(2016, 9, 21),

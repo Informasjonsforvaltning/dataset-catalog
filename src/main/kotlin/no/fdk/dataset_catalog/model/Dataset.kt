@@ -38,10 +38,6 @@ data class Dataset(
 
     val concepts: Collection<Concept>? = null,
 
-//    dct:subject
-//Norwegian: begrep
-    val subject: List<Subject>? = null,
-
     val uri: String? = null,
 
     val originalUri: String? = null,
@@ -199,30 +195,11 @@ enum class SpecializedType {
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class Concept(
-//    a Skos:Concept
-    val id: String? = null,
-
     val uri: String? = null,
-
     val identifier: String? = null,
-
-    val application: List<Map<String, String>>? = null,
-
     val definition: Definition? = null,
-
-    val alternativeDefinition: Definition? = null,
-
-    val subject: Map<String, String>? = null,
-
     val prefLabel: Map<String, String>? = null,
-
-    val altLabel: List<Map<String, String>>? = null,
-
-    val hiddenLabel: List<Map<String, String>>? = null,
-
-    val contactPoint: ContactPoint? = null,
-
-    val example: Map<String, String>? = null,
+    val altLabel: List<Map<String, String>>? = null
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)

@@ -6,7 +6,6 @@ import no.fdk.dataset_catalog.model.Dataset
 import no.fdk.dataset_catalog.model.DatasetEmbeddedWrapperDTO
 import no.fdk.dataset_catalog.model.JsonPatchOperation
 import no.fdk.dataset_catalog.model.OpEnum
-import no.fdk.dataset_catalog.model.REGISTRATION_STATUS
 import no.fdk.dataset_catalog.utils.*
 import no.fdk.dataset_catalog.utils.jwk.Access
 import no.fdk.dataset_catalog.utils.jwk.JwtToken
@@ -77,7 +76,6 @@ class DatasetContractTest: ApiTestContext() {
                 DATASET_2.copy(
                     lastModified = bodyGet.lastModified,
                     concepts = bodyGet.concepts,
-                    subject = bodyGet.subject,
                     uri = bodyGet.uri)
                 , bodyGet)
         }

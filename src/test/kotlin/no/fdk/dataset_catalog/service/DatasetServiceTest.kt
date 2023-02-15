@@ -2,7 +2,6 @@ package no.fdk.dataset_catalog.service
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.fdk.dataset_catalog.configuration.ApplicationProperties
-import no.fdk.dataset_catalog.extensions.updateSubjects
 import no.fdk.dataset_catalog.model.*
 import no.fdk.dataset_catalog.repository.DatasetRepository
 import no.fdk.dataset_catalog.utils.TEST_DATASET_1
@@ -19,13 +18,12 @@ import kotlin.test.assertTrue
 class DatasetServiceTest {
     private val datasetRepository: DatasetRepository = mock()
     private val catalogService: CatalogService = mock()
-    private val conceptService: ConceptService = mock()
     private val organizationService: OrganizationService = mock()
     private val publishingService: PublishingService = mock()
     private val applicationProperties: ApplicationProperties = mock()
     private val datasetService = DatasetService(
         datasetRepository, catalogService, organizationService,
-        conceptService, publishingService, applicationProperties, jacksonObjectMapper()
+        publishingService, applicationProperties, jacksonObjectMapper()
     )
 
     @Nested
@@ -226,30 +224,6 @@ class DatasetServiceTest {
                 assertTrue(firstValue.size == 1)
                 assertEquals(ds.copy(lastModified = firstValue.first().lastModified), firstValue.first())
             }
-        }
-    }
-
-    @Nested
-    internal inner class UpdateConcepts {
-        @Test
-        fun `updates concepts`() {
-            val ds = Dataset("dsId", "catId", concepts = listOf(Concept("1")))
-            val expected = Dataset("dsId", "catId", concepts = listOf(Concept("1", uri = "uri")))
-            whenever(conceptService.getConcepts(listOf("1"))).thenReturn(listOf(Concept("1", uri = "uri")))
-            val actual = with(datasetService) { ds.updateConcepts() }
-            assertEquals(expected, actual)
-        }
-    }
-
-
-    @Nested
-    internal inner class UpdateSubject {
-        @Test
-        fun `updates subject`() {
-            val ds = Dataset("dsId", "catId", concepts = listOf(Concept("1", "uri")))
-            val expected = ds.copy(subject = listOf(Subject(id = "1", uri = "uri")))
-            val actual = ds.updateSubjects()
-            assertEquals(expected, actual)
         }
     }
 

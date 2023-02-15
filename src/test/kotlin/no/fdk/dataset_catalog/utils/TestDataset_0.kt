@@ -24,43 +24,12 @@ val DEFINITION_EX = Definition(
     lastUpdated = LocalDate.now().toEpochDay()
 )
 
-val CONTACTPOINT_EX = ContactPoint(
-    email = "contact@point.com",
-    telephone = "12345678"
-)
-
 val CONCEPT_EX = Concept(
-    id = "910244132",
     uri = "http://test.uri",
     identifier = "id",
-    application = listOf(mapOf(Pair("nb", "For å teste ting"))),
     definition = DEFINITION_EX,
-    alternativeDefinition = DEFINITION_EX,
-    subject = mapOf(Pair("nb", "Tema")),
     prefLabel = mapOf(Pair("nb", "Begrep")),
-    altLabel = listOf(mapOf(Pair("en", "Concept"))),
-    hiddenLabel = listOf(mapOf(Pair("en", "hidden stuff"))),
-    contactPoint = CONTACTPOINT_EX,
-    example = mapOf(Pair("en", "an example"))
-)
-
-val SUBJECT_EX = Subject(
-    uri = "http://test.uri",
-    definition = mapOf(Pair("nb", "Testdefinisjon")),
-    prefLabel = mapOf(Pair("nb", "Subjektnavn")),
-    id = "910244132",
-    identifier = "Testidentifikasjon",
-    altLabel = listOf(mapOf(Pair("nb", "Alternativt subjektnavn"))),
-    note = mapOf(Pair("nb", "Note to self")),
-    source = "kilde",
-    creator = null,
-    inScheme = listOf("I skjema"),
-    datasets = listOf(
-        Dataset(
-            id = UUID.randomUUID().toString(),
-            catalogId = UUID.randomUUID().toString()
-        )
-    ),
+    altLabel = listOf(mapOf(Pair("en", "Concept")))
 )
 
 val CONTACT_EX = Contact(
@@ -166,7 +135,6 @@ val TEST_DATASET_0 = Dataset(
     catalogId = UUID.randomUUID().toString(),
     registrationStatus = REGISTRATION_STATUS.DRAFT,
     concepts = listOf(CONCEPT_EX),
-    subject = listOf(SUBJECT_EX),
     uri = "http://test.uri",
     originalUri = "http://original.uri",
     source = "kilde",

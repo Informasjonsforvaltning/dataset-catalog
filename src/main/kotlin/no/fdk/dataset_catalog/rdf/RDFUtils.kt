@@ -373,25 +373,15 @@ fun Resource.addPublisher(publisher: Publisher?): Resource {
 }
 
 
-fun Resource.safeAddSubjectCreatorId(property: Property, uri: String?): Resource =
-    if (uri !=null) {
-        this.safeAddLinkedProperty(property, uri)
-    } else this
-
-
-fun Resource.addSubjects(subjects: Collection<Subject>?): Resource {
+fun Resource.addSubjects(subjects: Collection<Concept>?): Resource {
     subjects?.forEach {
         addProperty(DCTerms.subject,
             model.safeCreateResource(it.uri)
                 .addProperty(RDF.type, SKOS.Concept)
                 .safeAddProperty(DCTerms.identifier, it.identifier)
-                .safeAddSubjectCreatorId(DCTerms.creator, it.creator?.id)
-                .safeAddProperty(DCTerms.source, it.source)
                 .safeAddLangListLiteral(SKOS.altLabel, it.altLabel)
-                .safeAddStringListLiteral(SKOS.inScheme, it.inScheme)
                 .safeAddPropertyByLang(SKOS.prefLabel, it.prefLabel)
-                .safeAddPropertyByLang(SKOS.note, it.note)
-                .safeAddLiteralByLang(SKOS.definition, it.definition)
+                .safeAddLiteralByLang(SKOS.definition, it.definition?.text)
         )
     }
     return this

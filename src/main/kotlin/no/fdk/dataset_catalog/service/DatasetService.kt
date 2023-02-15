@@ -6,7 +6,6 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import jakarta.json.Json
 import jakarta.json.JsonException
 import no.fdk.dataset_catalog.configuration.ApplicationProperties
-import no.fdk.dataset_catalog.extensions.updateSubjects
 import no.fdk.dataset_catalog.model.*
 import no.fdk.dataset_catalog.repository.DatasetRepository
 import org.slf4j.LoggerFactory
@@ -25,7 +24,6 @@ class DatasetService(
     private val datasetRepository: DatasetRepository,
     private val catalogService: CatalogService,
     private val organizationService: OrganizationService,
-    private val conceptService: ConceptService,
     private val publishingService: PublishingService,
     private val applicationProperties: ApplicationProperties,
     private val mapper: ObjectMapper
@@ -70,8 +68,6 @@ class DatasetService(
                 uri = "${applicationProperties.catalogUriHost}/$catalogId/datasets/$datasetId",
                 publisher = dataset.publisher ?: catalog.publisher,
                 registrationStatus = dataset.registrationStatus ?: REGISTRATION_STATUS.DRAFT)
-            .updateConcepts()
-            .updateSubjects()
             .allAffectedSeriesDatasets(null)
             .let { persistAndHarvest(it, catalog) }
 
@@ -89,8 +85,6 @@ class DatasetService(
                 catalogId = catalogId,
                 specializedType = dataset.specializedType,
                 lastModified = LocalDateTime.now())
-            ?.updateConcepts()
-            ?.updateSubjects()
             ?.allAffectedSeriesDatasets(dataset)
             ?.let { persistAndHarvest(it, catalogService.getByID(catalogId)) }
 
@@ -173,11 +167,6 @@ class DatasetService(
             listOf(listOf(this), addedInSeries, removedInSeries, addedToOrder, removedFromOrder).flatten()
         }
 
-    fun Dataset.updateConcepts(): Dataset =
-        if (!concepts.isNullOrEmpty()) {
-            copy(concepts = getConceptsByID(concepts))
-        } else this
-
     private fun isDatasetReference(ref: Reference?): Boolean =
         ref?.source?.uri?.let { getDatasetUriPattern().containsMatchIn(it) } ?: false
 
@@ -190,9 +179,6 @@ class DatasetService(
             )
         }
     }
-
-    private fun getConceptsByID(patchConcepts: Collection<Concept>): List<Concept> =
-        conceptService.getConcepts(patchConcepts.mapNotNull { it.id })
 
     private fun persistAndHarvest(datasets: List<Dataset>, catalog: Catalog?) =
         if (catalog != null) {

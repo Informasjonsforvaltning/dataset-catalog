@@ -192,10 +192,6 @@
 
 <https://data-david.github.io/Begrep/begrep/Enhet>
         a                skos:Concept ;
-        dct:creator      <http://data.brreg.no/enhetsregisteret/enhet/987654321> ;
-        dct:source       "https://jira.brreg.no/browse/BEGREP-208" ;
         skos:altLabel    "orgnr"@no , "orgzip"@en ;
         skos:definition  "alt som er registrert med et organisasjonsnummer "@no ;
-        skos:inScheme    "befolking" , "samfunn" ;
-        skos:note        "Alle hovedenheter, underenheter og organisasjonsledd som er identifisert med et organisasjonsnummer."@no ;
         skos:prefLabel   "enhet"@no .

@@ -5,7 +5,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 @ConfigurationProperties("application")
 data class ApplicationProperties(
     val fdkBaseHost: String,
-    val searchFulltextHost: String,
     val organizationCatalogHost: String,
     val catalogUriHost: String,
     val datasetCatalogUriHost: String,
