@@ -178,7 +178,7 @@ data class Dataset(
     val catalog: Catalog? = null,
 
     // all series that this dataset is a part of
-    val inSeries: List<String>? = null,
+    val inSeries: String? = null,
 
     // datasets in this series and their order index
     val seriesDatasetOrder: Map<String, Int>? = null
@@ -200,13 +200,6 @@ data class Concept(
     val definition: Definition? = null,
     val prefLabel: Map<String, String>? = null,
     val altLabel: List<Map<String, String>>? = null
-)
-
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonIgnoreProperties(ignoreUnknown = true)
-data class ContactPoint(
-    val email: String? = null,
-    val telephone: String? = null,
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)

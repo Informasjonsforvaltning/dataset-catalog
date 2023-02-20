@@ -14,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.ContextConfiguration
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 private val mapper = jacksonObjectMapper()
@@ -74,7 +75,7 @@ class SeriesContractTest: ApiTestContext() {
         @Test
         fun `Update of inSeries also updates series order`() {
             val update1 = listOf(JsonPatchOperation(OpEnum.REMOVE, "/inSeries"))
-            val update2 = listOf(JsonPatchOperation(OpEnum.ADD, "/inSeries", listOf(SERIES_DATASET_ID_0)))
+            val update2 = listOf(JsonPatchOperation(OpEnum.ADD, "/inSeries", SERIES_DATASET_ID_0))
             val rspUpdate1 = apiAuthorizedRequest("/catalogs/$SERIES_CATALOG_ID/datasets/$SERIES_DATASET_ID_1", mapper.writeValueAsString(update1), JwtToken(Access.SERIES_WRITE).toString(), "PATCH")
             val rspUpdate2 = apiAuthorizedRequest("/catalogs/$SERIES_CATALOG_ID/datasets/$SERIES_DATASET_ID_2", mapper.writeValueAsString(update2), JwtToken(Access.SERIES_WRITE).toString(), "PATCH")
             assertEquals(HttpStatus.OK.value(), rspUpdate1["status"])
@@ -96,12 +97,12 @@ class SeriesContractTest: ApiTestContext() {
             val rspGet1 = apiAuthorizedRequest("/catalogs/$SERIES_CATALOG_ID/datasets/$SERIES_DATASET_ID_1", null, JwtToken(Access.SERIES_WRITE).toString(), "GET")
             assertEquals(HttpStatus.OK.value(), rspGet1["status"])
             val bodyGet1: Dataset = mapper.readValue(rspGet1["body"] as String)
-            assertTrue(SERIES_DATASET_ID_0 !in (bodyGet1.inSeries ?: emptyList()))
+            assertNull(bodyGet1.inSeries)
 
             val rspGet2 = apiAuthorizedRequest("/catalogs/$SERIES_CATALOG_ID/datasets/$SERIES_DATASET_ID_2", null, JwtToken(Access.SERIES_WRITE).toString(), "GET")
             assertEquals(HttpStatus.OK.value(), rspGet2["status"])
             val bodyGet2: Dataset = mapper.readValue(rspGet2["body"] as String)
-            assertTrue(SERIES_DATASET_ID_0 in (bodyGet2.inSeries ?: emptyList()))
+            assertEquals(SERIES_DATASET_ID_0, bodyGet2.inSeries)
         }
     }
 
@@ -117,12 +118,12 @@ class SeriesContractTest: ApiTestContext() {
             val rspGetDataset1 = apiAuthorizedRequest("/catalogs/$SERIES_CATALOG_ID/datasets/$SERIES_DATASET_ID_1", null, JwtToken(Access.SERIES_WRITE).toString(), "GET")
             assertEquals(HttpStatus.OK.value(), rspGetDataset1["status"])
             val bodyGetDataset1: Dataset = mapper.readValue(rspGetDataset1["body"] as String)
-            assertTrue(SERIES_DATASET_ID_0 !in (bodyGetDataset1.inSeries ?: emptyList()))
+            assertNull(bodyGetDataset1.inSeries)
 
             val rspGetDataset2 = apiAuthorizedRequest("/catalogs/$SERIES_CATALOG_ID/datasets/$SERIES_DATASET_ID_2", null, JwtToken(Access.SERIES_WRITE).toString(), "GET")
             assertEquals(HttpStatus.OK.value(), rspGetDataset2["status"])
             val bodyGetDataset2: Dataset = mapper.readValue(rspGetDataset2["body"] as String)
-            assertTrue(SERIES_DATASET_ID_0 !in (bodyGetDataset2.inSeries ?: emptyList()))
+            assertNull(bodyGetDataset2.inSeries)
         }
 
         @Test
