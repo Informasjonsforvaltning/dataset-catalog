@@ -160,7 +160,7 @@ val SERIES_DATASET_0 = Dataset(
 val SERIES_DATASET_1 = Dataset(
     SERIES_DATASET_ID_1,
     SERIES_CATALOG_ID,
-    inSeries = listOf(SERIES_DATASET_ID_0),
+    inSeries = SERIES_DATASET_ID_0,
     registrationStatus = REGISTRATION_STATUS.DRAFT,
     uri = "http://localhost:5000/catalogs/$SERIES_CATALOG_ID/datasets/$SERIES_DATASET_ID_3",
 )
@@ -184,7 +184,7 @@ val SERIES_DATASET_3 = Dataset(
 val SERIES_DATASET_4 = Dataset(
     SERIES_DATASET_ID_4,
     SERIES_CATALOG_ID,
-    inSeries = listOf(SERIES_DATASET_ID_0),
+    inSeries = SERIES_DATASET_ID_0,
     registrationStatus = REGISTRATION_STATUS.DRAFT,
     uri = "http://localhost:5000/catalogs/$SERIES_CATALOG_ID/datasets/$SERIES_DATASET_ID_4",
 )
