@@ -46,4 +46,23 @@
         dcat:dataset  <http://db3> , <http://db2> , <http://db1> .
 
 <http://localhost:5000/catalogs/123123123>
-        rdf:type  dcat:Catalog .
+        rdf:type      dcat:Catalog ;
+        dcat:dataset  <http://localhost:5000/catalogs/123123123/datasets/series0> .
+
+<http://localhost:5000/catalogs/123123123/datasets/series0>
+        rdf:type        dcat:DatasetSeries , dcat:Dataset ;
+        dct:identifier  "http://localhost:5000/catalogs/123123123/datasets/series0" ;
+        dcat:first      "http://localhost:5000/catalogs/123123123/datasets/series1" ;
+        dcat:last       "http://localhost:5000/catalogs/123123123/datasets/series5" .
+
+<http://localhost:5000/catalogs/123123123/datasets/series1>
+        rdf:type        dcat:Dataset ;
+        dct:identifier  "http://localhost:5000/catalogs/123123123/datasets/series1" ;
+        dcat:next       "http://localhost:5000/catalogs/123123123/datasets/series5" ;
+        dcat:inSeries   "http://localhost:5000/catalogs/123123123/datasets/series0" .
+
+<http://localhost:5000/catalogs/123123123/datasets/series5>
+        rdf:type        dcat:Dataset ;
+        dct:identifier  "http://localhost:5000/catalogs/123123123/datasets/series5" ;
+        dcat:prev       "http://localhost:5000/catalogs/123123123/datasets/series1" ;
+        dcat:inSeries   "http://localhost:5000/catalogs/123123123/datasets/series0" .

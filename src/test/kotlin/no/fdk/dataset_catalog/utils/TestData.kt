@@ -46,6 +46,7 @@ val SERIES_DATASET_ID_1 = "series1"
 val SERIES_DATASET_ID_2 = "series2"
 val SERIES_DATASET_ID_3 = "series3"
 val SERIES_DATASET_ID_4 = "series4"
+val SERIES_DATASET_ID_5 = "series5"
 
 
 val DATASET_1 = Dataset(
@@ -152,24 +153,24 @@ val SERIES_DATASET_0 = Dataset(
     SERIES_DATASET_ID_0,
     SERIES_CATALOG_ID,
     specializedType = SpecializedType.SERIES,
-    seriesDatasetOrder = mapOf(Pair(SERIES_DATASET_ID_1, 0)),
-    registrationStatus = REGISTRATION_STATUS.DRAFT,
-    uri = "http://localhost:5000/catalogs/$SERIES_CATALOG_ID/datasets/$SERIES_DATASET_ID_3",
+    seriesDatasetOrder = mapOf(Pair(SERIES_DATASET_ID_1, 0), Pair(SERIES_DATASET_ID_5, 1)),
+    registrationStatus = REGISTRATION_STATUS.PUBLISH,
+    uri = "http://localhost:5000/catalogs/$SERIES_CATALOG_ID/datasets/$SERIES_DATASET_ID_0",
 )
 
 val SERIES_DATASET_1 = Dataset(
     SERIES_DATASET_ID_1,
     SERIES_CATALOG_ID,
     inSeries = SERIES_DATASET_ID_0,
-    registrationStatus = REGISTRATION_STATUS.DRAFT,
-    uri = "http://localhost:5000/catalogs/$SERIES_CATALOG_ID/datasets/$SERIES_DATASET_ID_3",
+    registrationStatus = REGISTRATION_STATUS.PUBLISH,
+    uri = "http://localhost:5000/catalogs/$SERIES_CATALOG_ID/datasets/$SERIES_DATASET_ID_1",
 )
 
 val SERIES_DATASET_2 = Dataset(
     SERIES_DATASET_ID_2,
     SERIES_CATALOG_ID,
     registrationStatus = REGISTRATION_STATUS.DRAFT,
-    uri = "http://localhost:5000/catalogs/$SERIES_CATALOG_ID/datasets/$SERIES_DATASET_ID_3",
+    uri = "http://localhost:5000/catalogs/$SERIES_CATALOG_ID/datasets/$SERIES_DATASET_ID_2",
 )
 
 val SERIES_DATASET_3 = Dataset(
@@ -189,8 +190,16 @@ val SERIES_DATASET_4 = Dataset(
     uri = "http://localhost:5000/catalogs/$SERIES_CATALOG_ID/datasets/$SERIES_DATASET_ID_4",
 )
 
+val SERIES_DATASET_5 = Dataset(
+    SERIES_DATASET_ID_5,
+    SERIES_CATALOG_ID,
+    inSeries = SERIES_DATASET_ID_0,
+    registrationStatus = REGISTRATION_STATUS.PUBLISH,
+    uri = "http://localhost:5000/catalogs/$SERIES_CATALOG_ID/datasets/$SERIES_DATASET_ID_5",
+)
+
 fun datasetDbPopulation() = listOf(DB_DATASET_1, DB_DATASET_2, DB_DATASET_3, DB_DATASET_4, DB_DATASET_5, DB_DATASET_6,
-        SERIES_DATASET_0, SERIES_DATASET_1, SERIES_DATASET_2)
+        SERIES_DATASET_0, SERIES_DATASET_1, SERIES_DATASET_2, SERIES_DATASET_5)
     .map { it.mapDBO() }
 
 fun catalogDbPopulation() = listOf(DB_CATALOG_1, DB_CATALOG_2, DB_CATALOG_3, DB_CATALOG_4, DB_CATALOG_5, SERIES_CATALOG)
