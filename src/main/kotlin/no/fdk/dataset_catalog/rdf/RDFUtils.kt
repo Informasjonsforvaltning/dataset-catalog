@@ -139,9 +139,9 @@ fun Resource.addContactPoints(contactPoints: Collection<Contact>?): Resource {
     return this
 }
 
-fun Resource.addSeriesType(specializedType: SpecializedType?): Resource =
+fun Resource.addDatasetRDFType(specializedType: SpecializedType?): Resource =
     when (specializedType) {
-        null -> this
+        null -> addProperty(RDF.type, DCAT.Dataset)
         SpecializedType.SERIES -> addProperty(RDF.type, ResourceFactory.createProperty("${DCAT.getURI()}DatasetSeries"))
     }
 

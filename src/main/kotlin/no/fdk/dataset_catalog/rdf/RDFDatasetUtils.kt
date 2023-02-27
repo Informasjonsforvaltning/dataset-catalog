@@ -12,8 +12,7 @@ import org.apache.jena.vocabulary.RDF
 
 fun Model.addDatasetResource(dataset: Dataset, seriesData: SeriesData): Resource =
     safeCreateResource(dataset.originalUri ?: dataset.uri)
-        .addProperty(RDF.type, DCAT.Dataset)
-        .addSeriesType(dataset.specializedType)
+        .addDatasetRDFType(dataset.specializedType)
         .safeAddProperty(DCTerms.source, dataset.source)
         .safeAddLiteralByLang(DCTerms.title, dataset.title)
         .safeAddLiteralByLang(DCTerms.description, dataset.description)
