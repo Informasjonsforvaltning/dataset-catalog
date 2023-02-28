@@ -139,6 +139,12 @@ fun Resource.addContactPoints(contactPoints: Collection<Contact>?): Resource {
     return this
 }
 
+fun Resource.addDatasetRDFType(specializedType: SpecializedType?): Resource =
+    when (specializedType) {
+        null -> addProperty(RDF.type, DCAT.Dataset)
+        SpecializedType.SERIES -> addProperty(RDF.type, ResourceFactory.createProperty("${DCAT.getURI()}DatasetSeries"))
+    }
+
 fun Resource.addConformsTo(conformsTo: Collection<SkosConcept>?): Resource {
     conformsTo?.forEach {
         if (!it.uri.isNullOrEmpty()) {
@@ -387,6 +393,10 @@ fun Resource.addSubjects(subjects: Collection<Concept>?): Resource {
     return this
 }
 
+fun Resource.addInSeries(inSeries: String?, inSeriesIsPublished: Boolean): Resource =
+    if (inSeriesIsPublished) safeAddLinkedProperty(ResourceFactory.createProperty("${DCAT.getURI()}inSeries"), inSeries)
+    else this
+
 fun Resource.addLanguages(language: Collection<SkosCode>?): Resource {
     language?.forEach {
         addProperty(DCTerms.language,
@@ -470,3 +480,11 @@ fun keywordToLinguisticSystem(keyword: String): LinguisticSystem =
 fun Dataset.dctIdentifier(): List<String>? =
     originalUri?.let { listOf(it) }
         ?: uri?.let { listOf(it) }
+
+class SeriesData(
+    val inSeries: String?,
+    val next: String?,
+    val prev: String?,
+    val first: String?,
+    val last: String?
+)

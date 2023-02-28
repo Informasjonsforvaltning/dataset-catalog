@@ -53,6 +53,9 @@ class DatasetService(
         return datasetRepository.findByIdOrNull(id)
     }
 
+    fun getListByIDs(catalogId: String, ids: List<String>) =
+        datasetRepository.findAllById(ids).filter { it.catalogId == catalogId }
+
     fun create(catalogId: String, dataset: Dataset): Dataset? {
         val catalog = catalogService.getByID(catalogId) ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Catalog not found")
         val datasetId = dataset.id ?: UUID.randomUUID().toString()
