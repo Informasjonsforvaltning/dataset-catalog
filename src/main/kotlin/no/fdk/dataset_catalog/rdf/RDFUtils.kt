@@ -139,12 +139,6 @@ fun Resource.addContactPoints(contactPoints: Collection<Contact>?): Resource {
     return this
 }
 
-fun Resource.addDatasetRDFType(specializedType: SpecializedType?): Resource =
-    when (specializedType) {
-        null -> addProperty(RDF.type, DCAT.Dataset)
-        SpecializedType.SERIES -> addProperty(RDF.type, ResourceFactory.createProperty("${DCAT.getURI()}DatasetSeries"))
-    }
-
 fun Resource.addConformsTo(conformsTo: Collection<SkosConcept>?): Resource {
     conformsTo?.forEach {
         if (!it.uri.isNullOrEmpty()) {
