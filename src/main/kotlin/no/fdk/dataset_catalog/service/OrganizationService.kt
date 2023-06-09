@@ -23,6 +23,7 @@ class OrganizationService(
     }
 
     fun getOrganization(organizationNumber: String?): Organization? {
+    if (isOrganizationNumber(organizationNumber)) {
         URL("${applicationProperties.organizationCatalogHost}/organizations/$organizationNumber")
             .openConnection()
             .run {
@@ -40,5 +41,15 @@ class OrganizationService(
                     null
                 }
             }
+        } else {
+            logger.warn("'$organizationNumber' is not a valid organization number")
+            return null
+        }
+    }
+
+    private fun isOrganizationNumber(orgnr: String?): Boolean {
+        val regex = Regex("""^[0-9]{9}$""")
+        return if (orgnr.isNullOrBlank()) false
+        else regex.containsMatchIn(orgnr)
     }
 }
