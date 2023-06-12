@@ -85,6 +85,7 @@ class DatasetContractTest: ApiTestContext() {
     internal inner class GetDataset{
         @Test
         fun `Unable to get when not logged in as a user with org access`() {
+            resetDB()
             val notLoggedIn = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DATASET_ID_1}", null, null, "GET")
             val wrongOrg = apiAuthorizedRequest("/catalogs/1/datasets/${DATASET_ID_1}", null, JwtToken(Access.ORG_READ).toString(), "GET")
 
@@ -94,6 +95,7 @@ class DatasetContractTest: ApiTestContext() {
 
         @Test
         fun `Both read and write can read`() {
+            resetDB()
             val rspRead = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", null, JwtToken(Access.ORG_READ).toString(), "GET")
             val rspWrite = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", null, JwtToken(Access.ORG_WRITE).toString(), "GET")
 
@@ -109,6 +111,7 @@ class DatasetContractTest: ApiTestContext() {
 
         @Test
         fun `Get All datasets returns all datasets in catalog`() {
+            resetDB()
             val rspRead = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_2/datasets", null, JwtToken(Access.ROOT).toString(), "GET")
             val bodyRead: DatasetEmbeddedWrapperDTO = mapper.readValue(rspRead["body"] as String)
 
@@ -121,6 +124,7 @@ class DatasetContractTest: ApiTestContext() {
     internal inner class UpdateDataset{
         @Test
         fun `Illegal update`() {
+            resetDB()
             val body = mapper.writeValueAsString(listOf(JsonPatchOperation(op = OpEnum.ADD, path = "/title/en", "en title")))
             val notLoggedIn = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", body, null, "PATCH")
             val readAccess = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", body, JwtToken(Access.ORG_READ).toString(), "PATCH")
@@ -133,6 +137,7 @@ class DatasetContractTest: ApiTestContext() {
 
         @Test
         fun `Invalid update`() {
+            resetDB()
             val doesNotExist = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_4}", mapper.writeValueAsString(listOf(JsonPatchOperation(op = OpEnum.ADD, path = "/source", "brreg"))), JwtToken(Access.ORG_WRITE).toString(), "PATCH")
             val invalidValue = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", mapper.writeValueAsString(listOf(JsonPatchOperation(op = OpEnum.ADD, path = "/keyword", "invalid value"))), JwtToken(Access.ORG_WRITE).toString(), "PATCH")
             val wrongOperation = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", mapper.writeValueAsString(listOf(JsonPatchOperation(op = OpEnum.REPLACE, path = "/source", "wrong operation"))), JwtToken(Access.ORG_WRITE).toString(), "PATCH")
@@ -146,12 +151,13 @@ class DatasetContractTest: ApiTestContext() {
 
         @Test
         fun `Invalid fields are ignored on update`() {
+            resetDB()
             val preUpdate = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", null, JwtToken(Access.ORG_WRITE).toString(), "GET")
-            Assumptions.assumeTrue(HttpStatus.OK.value() == preUpdate["status"])
+            assertEquals(HttpStatus.OK.value(), preUpdate["status"])
             val bodyPreUpdate: Dataset = mapper.readValue(preUpdate["body"] as String)
 
             val invalidField = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", mapper.writeValueAsString(listOf(JsonPatchOperation(op = OpEnum.ADD, path = "/invalidField", "invalid field"))), JwtToken(Access.ORG_WRITE).toString(), "PATCH")
-            Assumptions.assumeTrue(HttpStatus.OK.value() == invalidField["status"])
+            assertEquals(HttpStatus.OK.value(), invalidField["status"])
             val bodyInvalidField: Dataset = mapper.readValue(invalidField["body"] as String)
 
             assertEquals(bodyPreUpdate.copy(lastModified = bodyInvalidField.lastModified), bodyInvalidField)
@@ -161,30 +167,31 @@ class DatasetContractTest: ApiTestContext() {
         fun `Able to get before and after update`() {
             resetDB()
             val preUpdate = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", null, JwtToken(Access.ORG_WRITE).toString(), "GET")
-            Assumptions.assumeTrue(HttpStatus.OK.value() == preUpdate["status"])
+            assertEquals(HttpStatus.OK.value(), preUpdate["status"])
             val bodyPreUpdate: Dataset = mapper.readValue(preUpdate["body"] as String)
-            Assumptions.assumeTrue(DB_DATASET_1 == bodyPreUpdate)
+            assertEquals(DB_DATASET_1, bodyPreUpdate)
 
             val patchBody = mapper.writeValueAsString(listOf(JsonPatchOperation(op = OpEnum.ADD, path = "/source", "brreg")))
 
             val rspUpdate = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", patchBody, JwtToken(Access.ORG_WRITE).toString(), "PATCH")
-            Assumptions.assumeTrue(HttpStatus.OK.value() == rspUpdate["status"])
+            assertEquals(HttpStatus.OK.value(), rspUpdate["status"])
 
             val postUpdate = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", null, JwtToken(Access.ORG_WRITE).toString(), "GET")
-            Assumptions.assumeTrue(HttpStatus.OK.value() == postUpdate["status"])
+            assertEquals(HttpStatus.OK.value(), postUpdate["status"])
             val bodyPostUpdate: Dataset = mapper.readValue(postUpdate["body"] as String)
             assertEquals(DB_DATASET_1.copy(lastModified = bodyPostUpdate.lastModified, source = "brreg"), bodyPostUpdate)
         }
 
         @Test
         fun `Only specified fields are updated`() {
+            resetDB()
             val update = listOf(JsonPatchOperation(OpEnum.ADD, "/source", "brreg"))
 
             val rspUpdate = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", mapper.writeValueAsString(update), JwtToken(Access.ORG_WRITE).toString(), "PATCH")
-            Assumptions.assumeTrue(HttpStatus.OK.value() == rspUpdate["status"])
+            assertEquals(HttpStatus.OK.value(), rspUpdate["status"])
 
             val postUpdate = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", null, JwtToken(Access.ORG_WRITE).toString(), "GET")
-            Assumptions.assumeTrue(HttpStatus.OK.value() == postUpdate["status"])
+            assertEquals(HttpStatus.OK.value(), postUpdate["status"])
 
             val bodyPostUpdate: Dataset = mapper.readValue(postUpdate["body"] as String)
 
@@ -220,7 +227,7 @@ class DatasetContractTest: ApiTestContext() {
         @Test
         fun `Cannot get after delete`() {
             val rspDelete = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", null, JwtToken(Access.ORG_WRITE).toString(), "DELETE")
-            Assumptions.assumeTrue(HttpStatus.OK.value() == rspDelete["status"])
+            assertEquals(HttpStatus.OK.value(), rspDelete["status"])
 
             val rspGet = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", null, JwtToken(Access.ORG_WRITE).toString(), "GET")
 
