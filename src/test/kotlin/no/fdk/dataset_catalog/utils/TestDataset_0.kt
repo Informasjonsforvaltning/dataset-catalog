@@ -98,6 +98,7 @@ val DISTRIBUTION_EX = Distribution(
     conformsTo = listOf(SKOSCONCEPT_EX("dct:conformsTo")),
     page = listOf(SKOSCONCEPT_EX("foaf:page")),
     format = listOf("Formats"),
+    mediaType = listOf("MediaTypes"),
     accessService = listOf(DATADISTRIBUTIONSERVICE_EX),
 )
 
