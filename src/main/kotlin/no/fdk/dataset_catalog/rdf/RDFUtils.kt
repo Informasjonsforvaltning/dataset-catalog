@@ -168,6 +168,7 @@ fun Resource.addDistribution(property: Property, distributions: Collection<Distr
                     .addConformsTo(it.conformsTo)
                     .safeAddURLs(FOAF.page, it.page?.map { page -> page.uri })
                     .safeAddURLs(DCTerms.format, it.format)
+                    .safeAddURLs(DCAT.mediaType, it.mediaType)
                     .addDataDistributionServices(it.accessService)
             )
         }
@@ -190,10 +191,11 @@ private fun Distribution.hasNonNullOrEmptyProperty(): Boolean =
 
     format?.all { entry -> entry.isNullOrEmpty() } == false ||
 
+    mediaType?.all { entry -> entry.isNullOrEmpty() } == false ||
+
     !accessService.isNullOrEmpty()
 
 // TODO: add dcat:endpointURLs and make sure front-end sends necessary data (https://doc.difi.no/review/dcat-ap-no/#_obligatoriske_egenskaper_for_datatjeneste)
-// TODO: add a list of dct:MediaTypes (https://doc.difi.no/review/dcat-ap-no/#distribusjon-medietype)
 
 fun Resource.addDataDistributionServices(dataDistributionServices: Collection<DataDistributionService>?): Resource {
     dataDistributionServices?.forEach {

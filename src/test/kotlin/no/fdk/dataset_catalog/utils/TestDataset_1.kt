@@ -93,14 +93,16 @@ val DISTRIBUTION = Distribution(
     conformsTo= listOf(CONFORMS_TO),
     license=SkosConcept("https://data.norge.no/nlod/no/2.0", mapOf(Pair("nb", "NODL")), extraType = DCTerms.LicenseDocument.uri),
     page= listOf(SkosConcept("http://lenke/til/mer/info",  mapOf(Pair("nb", "Dokumentasjon av distribusjonen")), extraType =  FOAF.Document.uri)),
-    format=listOf("https://www.iana.org/assignments/media-types/application/json"),
+    format=listOf("http://publications.europa.eu/resource/authority/file-type/JSON"),
+    mediaType=listOf("https://www.iana.org/assignments/media-types/application/json"),
     accessService=listOf(SAMPLE_DESCRIPTION)
 )
 
 val SAMPLE = Distribution(
     uri = "$DATASET_URI/samples/d2",
     description = mapOf(Pair("nb", "Dette er beskrivelsen av eksempeldataene. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.")),
-    format =  listOf("https://www.iana.org/assignments/media-types/application/rdf+xml"),
+    format =  listOf("http://publications.europa.eu/resource/authority/file-type/RDF"),
+    mediaType =  listOf("https://www.iana.org/assignments/media-types/application/rdf+xml"),
     accessURL =  listOf("http://www.detteerenlenke.no/til-nedlasting", "www.dette.kan.også/hende")
 )
 

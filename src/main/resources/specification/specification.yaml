@@ -803,6 +803,11 @@ components:
           items:
             type: string
           description: Associated formats
+        mediaType:
+          type: array
+          items:
+            type: string
+          description: Associated media types
         accessService:
           type: array
           items:

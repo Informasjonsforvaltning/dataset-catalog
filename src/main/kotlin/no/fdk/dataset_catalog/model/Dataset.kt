@@ -287,6 +287,7 @@ data class Distribution(
     val conformsTo: List<SkosConcept>? = null,
     val page: List<SkosConcept>? = null,
     val format: List<String>? = null,
+    val mediaType: List<String>? = null,
     val accessService: List<DataDistributionService>? = null,
 )
 
