@@ -20,8 +20,8 @@ fun Model.addDatasetResource(dataset: Dataset, seriesData: SeriesData): Resource
     if (dataset.specializedType == SpecializedType.SERIES) {
         datasetResource
             .addProperty(RDF.type, ResourceFactory.createProperty("${DCAT.getURI()}DatasetSeries"))
-            .safeAddProperty(ResourceFactory.createProperty("${DCAT.getURI()}first"), seriesData.first)
-            .safeAddProperty(ResourceFactory.createProperty("${DCAT.getURI()}last"), seriesData.last)
+            .safeAddLinkedProperty(ResourceFactory.createProperty("${DCAT.getURI()}first"), seriesData.first)
+            .safeAddLinkedProperty(ResourceFactory.createProperty("${DCAT.getURI()}last"), seriesData.last)
     } else {
         datasetResource
             .addProperty(RDF.type, DCAT.Dataset)
@@ -56,9 +56,9 @@ fun Model.addDatasetResource(dataset: Dataset, seriesData: SeriesData): Resource
             .addPublisher(dataset.publisher)
             .addSubjects(dataset.concepts)
             .addLanguages(dataset.language)
-            .safeAddProperty(ResourceFactory.createProperty("${DCAT.getURI()}inSeries"), seriesData.inSeries)
-            .safeAddProperty(ResourceFactory.createProperty("${DCAT.getURI()}next"), seriesData.next)
-            .safeAddProperty(ResourceFactory.createProperty("${DCAT.getURI()}prev"), seriesData.prev)
+            .safeAddLinkedProperty(ResourceFactory.createProperty("${DCAT.getURI()}inSeries"), seriesData.inSeries)
+            .safeAddLinkedProperty(ResourceFactory.createProperty("${DCAT.getURI()}next"), seriesData.next)
+            .safeAddLinkedProperty(ResourceFactory.createProperty("${DCAT.getURI()}prev"), seriesData.prev)
     }
     return datasetResource
 }
