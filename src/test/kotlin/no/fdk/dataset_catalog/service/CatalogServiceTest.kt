@@ -25,10 +25,10 @@ class CatalogServiceTest {
     private val organizationService: OrganizationService = mock()
     private val publishingService: PublishingService = mock()
     private val applicationProperties = ApplicationProperties(
-        "localhost:5000",
-        "localhost:5000",
-        "localhost:5000",
-        "localhost:5000",
+        "localhost:5050",
+        "localhost:5050",
+        "localhost:5050",
+        "localhost:5050",
         0L,
     "catalogHarvestRoute",
     "newDataSourceRoute",
