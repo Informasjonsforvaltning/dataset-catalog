@@ -14,10 +14,10 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate
 class PublishingServiceTest {
     private val rabbitTemplate: RabbitTemplate = mock()
     private val applicationProperties = ApplicationProperties(
-        "localhost:5000",
-        "localhost:5000",
-        "localhost:5000",
-        "localhost:5000",
+        "localhost:5050",
+        "localhost:5050",
+        "localhost:5050",
+        "localhost:5050",
         50L,
     "catalogHarvestRoute",
     "newDataSourceRoute",

@@ -57,12 +57,12 @@ application:
 ---
 spring:
   config.activate.on-profile: contract-test
-  security.oauth2.resourceserver.jwt.jwk-set-uri: http://localhost:5000/auth/realms/fdk/protocol/openid-connect/certs
+  security.oauth2.resourceserver.jwt.jwk-set-uri: http://localhost:5050/auth/realms/fdk/protocol/openid-connect/certs
 server.port: 5555
 application:
-  fdkBaseHost: http://localhost:5000
-  organizationCatalogHost: http://localhost:5000
-  catalogUriHost: http://localhost:5000/catalogs
+  fdkBaseHost: http://localhost:5050
+  organizationCatalogHost: http://localhost:5050
+  catalogUriHost: http://localhost:5050/catalogs
   harvestDelay: 10000
   catalogHarvestRoute: dataset.publisher.HarvestTrigger
   newDataSourceRoute: dataset.publisher.NewDataSource
