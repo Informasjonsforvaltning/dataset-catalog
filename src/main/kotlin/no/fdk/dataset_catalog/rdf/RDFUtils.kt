@@ -145,7 +145,7 @@ fun Resource.addConformsTo(conformsTo: Collection<SkosConcept>?): Resource {
             addProperty(DCTerms.conformsTo,
                 model.safeCreateResource()
                     .addProperty(RDF.type, DCTerms.Standard)
-                    .safeAddProperty(DCTerms.source, it.uri)
+                    .safeAddLinkedProperty(RDFS.seeAlso, it.uri)
                     .safeAddLiteralByLang(DCTerms.title, it.prefLabel)
             )
         }
