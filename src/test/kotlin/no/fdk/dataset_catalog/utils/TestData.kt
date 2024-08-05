@@ -75,6 +75,7 @@ val DB_DATASET_2 = TEST_DATASET_0.copy(
     DB_DATASET_ID_2,
     DB_CATALOG_ID_1,
     uri = "http://$DB_DATASET_ID_2",
+    type = "http://publications.europa.eu/resource/authority/dataset-type/TEST_DATA",
     title = mapOf(Pair("nb", "enda en")),
     description = mapOf(Pair("en", "test words")),
     registrationStatus = REGISTRATION_STATUS.PUBLISH,
@@ -210,6 +211,7 @@ private fun Dataset.mapDBO(): org.bson.Document =
     org.bson.Document()
         .append("_id", id)
         .append("uri", uri)
+        .append("type", type)
         .append("catalogId", catalogId)
         .append("title", title)
         .append("description", description)

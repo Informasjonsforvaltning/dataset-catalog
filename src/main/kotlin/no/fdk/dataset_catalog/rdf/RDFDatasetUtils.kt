@@ -52,7 +52,7 @@ fun Model.addDatasetResource(dataset: Dataset, seriesData: SeriesData): Resource
             .addConformsTo(dataset.conformsTo)
             .addConformsTo(dataset.informationModel)
             .addQualifiedAttributions(dataset.qualifiedAttributions)
-            .safeAddProperty(DCTerms.type, dataset.type)
+            .addDatasetType(dataset.type)
             .addPublisher(dataset.publisher)
             .addSubjects(dataset.concepts)
             .addLanguages(dataset.language)
