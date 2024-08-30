@@ -141,7 +141,7 @@ fun Resource.addContactPoints(contactPoints: Collection<Contact>?): Resource {
 
 fun Resource.addConformsTo(conformsTo: Collection<SkosConcept>?): Resource {
     conformsTo?.forEach {
-        if (!it.uri.isNullOrEmpty()) {
+        if (!it.uri.isNullOrEmpty() || it.prefLabel.isValidLangField()) {
             addProperty(DCTerms.conformsTo,
                 model.safeCreateResource(it.uri)
                     .addProperty(RDF.type, DCTerms.Standard)

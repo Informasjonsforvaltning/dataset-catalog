@@ -121,7 +121,7 @@ val TEST_DATASET_1 = Dataset(
         prefLabel=mapOf(Pair("nb", "Begrenset"))
     ),
     publisher = PUBLISHER,
-    informationModel = listOf(SkosConcept(uri="https://www.w3.org/2004/02/skos/",prefLabel=mapOf(Pair("nb","SKOS")),extraType = null)),
+    informationModel = listOf(SkosConcept(uri="",prefLabel=mapOf(Pair("nb","SKOS")),extraType = null)),
     temporal = listOf(PeriodOfTime(startDate = LocalDate.of(2017,1,1),endDate = LocalDate.of(2017,12,31)), PeriodOfTime(endDate=LocalDate.of(2018,10,20))),
     concepts = listOf(CONCEPT),
     accrualPeriodicity=SkosCode(uri="http://publications.europa.eu/resource/authority/frequency/ANNUAL", code="ANNUAL", prefLabel=mapOf(Pair("nb", "årlig"))),
