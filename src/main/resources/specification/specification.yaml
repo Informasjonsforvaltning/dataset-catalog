@@ -582,6 +582,11 @@ components:
           items:
             $ref: "#/components/schemas/SkosConcept"
           description: List of associated information models mapped as SkosConcept
+        informationModelFDK:
+          type: array
+          items:
+            type: string
+          description: List of uris to associated information models in FDK
         qualifiedAttributions:
           type: array
           items:

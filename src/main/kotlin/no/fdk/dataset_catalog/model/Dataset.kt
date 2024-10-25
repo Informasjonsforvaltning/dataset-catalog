@@ -165,6 +165,7 @@ data class Dataset(
     // Norwegian: informasjonsmodell
 //    a: SkosConcept
     val informationModel: List<SkosConcept>? = null,
+    val informationModelsFromFDK: List<String>? = null,
 
     // prov:qualifiedAttribution
     // Norwegian: innholdsleverandører

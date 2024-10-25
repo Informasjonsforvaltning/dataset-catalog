@@ -51,6 +51,7 @@ fun Model.addDatasetResource(dataset: Dataset, seriesData: SeriesData): Resource
             .safeAddLinkListProperty(ADMS.identifier, dataset.admsIdentifier)
             .addConformsTo(dataset.conformsTo)
             .addConformsTo(dataset.informationModel)
+            .addConformsToFromListOfUris(dataset.informationModelsFromFDK)
             .addQualifiedAttributions(dataset.qualifiedAttributions)
             .addDatasetType(dataset.type)
             .addPublisher(dataset.publisher)
