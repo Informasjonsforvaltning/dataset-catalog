@@ -121,8 +121,11 @@
         dct:accessRights                <http://publications.europa.eu/resource/authority/access-right/RESTRICTED> ;
         dct:accrualPeriodicity          <http://publications.europa.eu/resource/authority/frequency/ANNUAL> ;
         dct:conformsTo                  <https://www.kartverket.no/geodataarbeid/standarder/sosi/> ;
-        dct:conformsTo                  [ a             dct:Standard ;
-                                          dct:title     "SKOS"@nb ] ;
+        dct:conformsTo                  [ a               dct:Standard ;
+                                          dct:title  "SKOS"@nb
+                                        ] ;
+        dct:conformsTo                 <https://raw.githubusercontent.com/Informasjonsforvaltning/fdk-testdata/master/testdata/SkatvalModellkatalog.ttl#AdresseModell> ,
+                                       <https://raw.githubusercontent.com/Informasjonsforvaltning/model-publisher/master/src/model/catalog-of-models-for-specifications.ttl#dqv-ap-no-model> ;
         dct:description                 "Datasettet avgrenser område for virkeområdet til lov 6. juni 2009 nr. 35 om naturområder i Oslo og nærliggende kommuner (markaloven) som trådte i kraft 1. september 2009. Markalovens virkeområde er fastsatt i forskrift 4. september 2015 nr. 1032 om justering av markagrensen fastlegger markalovens geografiske virkeområde med tilhørende kart."@nb ;
         dct:issued                      "2012-01-01"^^xsd:date ;
         dct:language                    <http://publications.europa.eu/resource/authority/language/ENG> , <http://publications.europa.eu/resource/authority/language/NOR> ;
@@ -188,6 +191,16 @@
                                             dct:format       <http://publications.europa.eu/resource/authority/file-type/TXT> ]
                                         ] ;
         foaf:page                       <http://uri1> .
+
+<https://raw.githubusercontent.com/Informasjonsforvaltning/fdk-testdata/master/testdata/SkatvalModellkatalog.ttl#AdresseModell>
+     a              dct:Standard ;
+     dct:source    <https://raw.githubusercontent.com/Informasjonsforvaltning/fdk-testdata/master/testdata/SkatvalModellkatalog.ttl#AdresseModell> ;
+     .
+
+<https://raw.githubusercontent.com/Informasjonsforvaltning/model-publisher/master/src/model/catalog-of-models-for-specifications.ttl#dqv-ap-no-model>
+    a               dct:Standard ;
+    dct:source      <https://raw.githubusercontent.com/Informasjonsforvaltning/model-publisher/master/src/model/catalog-of-models-for-specifications.ttl#dqv-ap-no-model> ;
+    .
 
 <https://www.kartverket.no/geodataarbeid/standarder/sosi/>
     a             dct:Standard ;

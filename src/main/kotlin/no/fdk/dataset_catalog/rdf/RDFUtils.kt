@@ -153,6 +153,17 @@ fun Resource.addConformsTo(conformsTo: Collection<SkosConcept>?): Resource {
     return this
 }
 
+fun Resource.addConformsToFromListOfUris(conformsTo: Collection<String>?): Resource {
+    conformsTo?.forEach {
+        addProperty(DCTerms.conformsTo,
+            model.safeCreateResource(it)
+                .addProperty(RDF.type, DCTerms.Standard)
+                .safeAddLinkedProperty(DCTerms.source, it)
+            )
+        }
+    return this
+}
+
 fun Resource.addDistribution(property: Property, distributions: Collection<Distribution>?): Resource {
     distributions?.forEach {
         if (it.hasNonNullOrEmptyProperty()) {

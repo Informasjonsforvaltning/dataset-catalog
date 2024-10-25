@@ -122,6 +122,9 @@ val TEST_DATASET_1 = Dataset(
     ),
     publisher = PUBLISHER,
     informationModel = listOf(SkosConcept(uri="",prefLabel=mapOf(Pair("nb","SKOS")),extraType = null)),
+    informationModelsFromFDK = listOf(
+        "https://raw.githubusercontent.com/Informasjonsforvaltning/model-publisher/master/src/model/catalog-of-models-for-specifications.ttl#dqv-ap-no-model",
+        "https://raw.githubusercontent.com/Informasjonsforvaltning/fdk-testdata/master/testdata/SkatvalModellkatalog.ttl#AdresseModell"),
     temporal = listOf(PeriodOfTime(startDate = LocalDate.of(2017,1,1),endDate = LocalDate.of(2017,12,31)), PeriodOfTime(endDate=LocalDate.of(2018,10,20))),
     concepts = listOf(CONCEPT),
     accrualPeriodicity=SkosCode(uri="http://publications.europa.eu/resource/authority/frequency/ANNUAL", code="ANNUAL", prefLabel=mapOf(Pair("nb", "årlig"))),
@@ -167,6 +170,5 @@ val TEST_CATALOG_1 = Catalog(
     uri= CATALOG_URI,
     publisher = PUBLISHER,
 )
-
 
 
