@@ -35,6 +35,7 @@ application:
   exchangeName: harvests
 security:
   fdkIssuer: ${OIDC_ISSUER:https://sso.staging.fellesdatakatalog.digdir.no/auth/realms/fdk}
+  corsOriginPatterns: "${CORS_ORIGIN_PATTERNS}"
 
 ---
 spring:
@@ -53,6 +54,7 @@ application:
   catalogHarvestRoute: dataset.publisher.HarvestTrigger
   newDataSourceRoute: dataset.publisher.NewDataSource
   exchangeName: harvests
+security.corsOriginPatterns: "*"
 
 ---
 spring:
@@ -67,3 +69,4 @@ application:
   catalogHarvestRoute: dataset.publisher.HarvestTrigger
   newDataSourceRoute: dataset.publisher.NewDataSource
   exchangeName: harvests
+security.corsOriginPatterns: "*"

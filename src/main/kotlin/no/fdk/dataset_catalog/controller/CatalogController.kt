@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*
 private val logger = LoggerFactory.getLogger(CatalogController::class.java)
 
 @RestController
-@CrossOrigin
 @RequestMapping(value = ["/catalogs"])
 class CatalogController(
     private val catalogService: CatalogService,
