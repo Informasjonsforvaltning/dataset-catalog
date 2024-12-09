@@ -12,6 +12,7 @@ import org.springframework.security.oauth2.jwt.*
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.util.matcher.RequestMatcher
 import jakarta.servlet.http.HttpServletRequest
+import org.springframework.web.cors.CorsConfiguration
 
 @Configuration
 open class SecurityConfig(
@@ -20,15 +21,27 @@ open class SecurityConfig(
 
     @Bean
     open fun filterChain(http: HttpSecurity): SecurityFilterChain {
-        http.csrf().disable()
-            .cors().and()
+        http
+            .cors { cors ->
+                cors.configurationSource { _ ->
+                    val config = CorsConfiguration()
+                    config.allowCredentials = false
+                    config.allowedHeaders = listOf("*")
+                    config.maxAge = 3600L
+                    config.allowedOriginPatterns = securityProperties.corsOriginPatterns
+                    config.allowedMethods = listOf("GET", "POST", "OPTIONS", "DELETE", "PUT", "PATCH")
+
+                    config
+                }
+            }
+            .csrf { it.disable() }
             .authorizeHttpRequests{ authorize ->
                 authorize.requestMatchers(RDFMatcher()).permitAll()
                     .requestMatchers(HttpMethod.OPTIONS).permitAll()
                     .requestMatchers(HttpMethod.GET,"/ping").permitAll()
                     .requestMatchers(HttpMethod.GET,"/ready").permitAll()
                     .anyRequest().authenticated() }
-            .oauth2ResourceServer { resourceServer -> resourceServer.jwt() }
+            .oauth2ResourceServer { resourceServer -> resourceServer.jwt { } }
         return http.build()
     }
 

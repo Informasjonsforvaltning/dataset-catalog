@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*
 private val logger = LoggerFactory.getLogger(DatasetController::class.java)
 
 @RestController
-@CrossOrigin
 @RequestMapping(value = ["/catalogs/{catalogId}/datasets"])
 class DatasetController(
     private val datasetService: DatasetService,
