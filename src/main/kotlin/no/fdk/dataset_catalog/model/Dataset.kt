@@ -290,6 +290,7 @@ data class Distribution(
     val format: List<String>? = null,
     val mediaType: List<String>? = null,
     val accessService: List<DataDistributionService>? = null,
+    var accessServiceUris: Set<String>? = null,
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
