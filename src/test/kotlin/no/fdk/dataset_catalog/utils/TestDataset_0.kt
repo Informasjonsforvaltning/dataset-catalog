@@ -100,6 +100,7 @@ val DISTRIBUTION_EX = Distribution(
     format = listOf("Formats"),
     mediaType = listOf("MediaTypes"),
     accessService = listOf(DATADISTRIBUTIONSERVICE_EX),
+    accessServiceUris = setOf("http://test.uri")
 )
 
 val PERIODOFTIME_EX = PeriodOfTime(

@@ -8,6 +8,7 @@ import jakarta.json.JsonException
 import no.fdk.dataset_catalog.configuration.ApplicationProperties
 import no.fdk.dataset_catalog.model.*
 import no.fdk.dataset_catalog.repository.DatasetRepository
+import no.fdk.dataset_catalog.utils.isValidURI
 import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
@@ -31,7 +32,7 @@ class DatasetService(
     private var datasetUriPattern: Regex? = null
 
     fun getDatasetUriPattern(): Regex {
-        if(datasetUriPattern == null) {
+        if (datasetUriPattern == null) {
             datasetUriPattern = "^${applicationProperties.catalogUriHost}/\\d+/datasets/".toRegex()
         }
         return datasetUriPattern as Regex
@@ -39,25 +40,51 @@ class DatasetService(
 
     fun getAll(catalogId: String, specializedTypeString: String? = null): List<Dataset> {
         val specializedType = specializedTypeFromString(specializedTypeString)
-
-        return if (specializedType == null) datasetRepository.findByCatalogId(catalogId) as List<Dataset>
+        val datasetList = if (specializedType == null) datasetRepository.findByCatalogId(catalogId) as List<Dataset>
         else datasetRepository.findByCatalogIdAndSpecializedType(catalogId, specializedType) as List<Dataset>
+
+        return datasetList.map { it.addOldAccessUrisToNewField() }
+    }
+
+    private fun Distribution.addOldAccessUrisToNewField(): Distribution {
+        val updatedAccessServiceUris: MutableSet<String> =
+            accessServiceUris?.toMutableSet()
+                ?: mutableSetOf()
+        accessService?.mapNotNull { it.uri }
+            ?.filter { it.isValidURI() }
+            ?.forEach { updatedAccessServiceUris.add(it) }
+        return if (updatedAccessServiceUris.isEmpty()) this
+            else copy(accessServiceUris = updatedAccessServiceUris)
+    }
+
+    private fun Dataset.addOldAccessUrisToNewField(): Dataset {
+        return copy(
+            distribution = distribution?.map {
+                it.addOldAccessUrisToNewField()
+            }
+        )
     }
 
     fun getByID(catalogId: String, id: String): Dataset? {
         val dataset = datasetRepository.findByIdOrNull(id)
+            ?.addOldAccessUrisToNewField()
         return if (dataset?.catalogId != catalogId) null else dataset
     }
 
-    fun getByID(id: String): Dataset? {
+    private fun getByID(id: String): Dataset? {
         return datasetRepository.findByIdOrNull(id)
+            ?.addOldAccessUrisToNewField()
     }
 
     fun getListByIDs(catalogId: String, ids: List<String>) =
         datasetRepository.findAllById(ids).filter { it.catalogId == catalogId }
+            .map { it.addOldAccessUrisToNewField() }
 
     fun create(catalogId: String, dataset: Dataset): Dataset? {
-        val catalog = catalogService.getByID(catalogId) ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Catalog not found")
+        val catalog = catalogService.getByID(catalogId) ?: throw ResponseStatusException(
+            HttpStatus.BAD_REQUEST,
+            "Catalog not found"
+        )
         val datasetId = dataset.id ?: UUID.randomUUID().toString()
 
         if (dataset.publisher != null) {
@@ -65,12 +92,13 @@ class DatasetService(
         }
 
         dataset.copy(
-                id = datasetId,
-                catalogId = catalogId,
-                lastModified = LocalDateTime.now(),
-                uri = "${applicationProperties.catalogUriHost}/$catalogId/datasets/$datasetId",
-                publisher = dataset.publisher ?: catalog.publisher,
-                registrationStatus = dataset.registrationStatus ?: REGISTRATION_STATUS.DRAFT)
+            id = datasetId,
+            catalogId = catalogId,
+            lastModified = LocalDateTime.now(),
+            uri = "${applicationProperties.catalogUriHost}/$catalogId/datasets/$datasetId",
+            publisher = dataset.publisher ?: catalog.publisher,
+            registrationStatus = dataset.registrationStatus ?: REGISTRATION_STATUS.DRAFT
+        )
             .allAffectedSeriesDatasets(null)
             .let { persistAndHarvest(it, catalog) }
 
@@ -87,7 +115,8 @@ class DatasetService(
                 id = id,
                 catalogId = catalogId,
                 specializedType = dataset.specializedType,
-                lastModified = LocalDateTime.now())
+                lastModified = LocalDateTime.now()
+            )
             ?.allAffectedSeriesDatasets(dataset)
             ?.let { persistAndHarvest(it, catalogService.getByID(catalogId)) }
 
@@ -104,12 +133,12 @@ class DatasetService(
     private fun Dataset.removeDeletedDatasetFromSeriesFields() {
         if (id != null) {
             inSeries?.let { datasetRepository.findByIdOrNull(it) }
-                    ?.let { it.copy(seriesDatasetOrder = it.seriesDatasetOrder?.minus(id)) }
-                    ?.let { datasetRepository.save(it) }
+                ?.let { it.copy(seriesDatasetOrder = it.seriesDatasetOrder?.minus(id)) }
+                ?.let { datasetRepository.save(it) }
 
             seriesDatasetOrder?.let { datasetRepository.findAllById(it.keys) }
-                    ?.map { it.copy(inSeries = null) }
-                    ?.let { datasetRepository.saveAll(it) }
+                ?.map { it.copy(inSeries = null) }
+                ?.let { datasetRepository.saveAll(it) }
         }
     }
 
@@ -117,14 +146,16 @@ class DatasetService(
         ds.references?.map {
             val originalUri: String? = if (isDatasetReference(it)) {
                 it.source?.uri?.let { uri ->
-                    getByID(uri.substring(uri.lastIndexOf("/")+1))
+                    getByID(uri.substring(uri.lastIndexOf("/") + 1))
                         ?.originalUri
                 }
             } else null
 
-            if (originalUri != null ) {
-                Reference(referenceType = it.referenceType,
-                    source = SkosConcept(originalUri, it.source?.prefLabel, it.source?.extraType))
+            if (originalUri != null) {
+                Reference(
+                    referenceType = it.referenceType,
+                    source = SkosConcept(originalUri, it.source?.prefLabel, it.source?.extraType)
+                )
             } else {
                 it
             }
@@ -175,9 +206,10 @@ class DatasetService(
         ref?.source?.uri?.let { getDatasetUriPattern().containsMatchIn(it) } ?: false
 
     private fun validateDatasetPublisher(catalogPublisher: Publisher?, datasetPublisher: Publisher) {
-        if (datasetPublisher.id != null && catalogPublisher?.id !=null &&
+        if (datasetPublisher.id != null && catalogPublisher?.id != null &&
             datasetPublisher.id != catalogPublisher.id &&
-            !organizationService.hasDelegationPermission(catalogPublisher.id)) {
+            !organizationService.hasDelegationPermission(catalogPublisher.id)
+        ) {
             throw Exception(
                 "Organization with ID ${catalogPublisher.id} has no delegation permission to create datasets on behalf of other organizations"
             )
@@ -189,9 +221,9 @@ class DatasetService(
             datasetRepository
                 .saveAll(datasets)
                 .also {
-                addDataSource(datasets, catalog)
-                triggerHarvest(datasets, catalog)
-            }
+                    addDataSource(datasets, catalog)
+                    triggerHarvest(datasets, catalog)
+                }
         } else null
 
 
