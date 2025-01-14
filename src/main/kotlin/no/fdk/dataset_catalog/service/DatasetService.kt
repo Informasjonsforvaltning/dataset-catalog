@@ -49,14 +49,11 @@ class DatasetService(
     private fun Distribution.addOldAccessUrisToNewField(): Distribution {
         val updatedAccessServiceUris: MutableSet<String> =
             accessServiceUris?.toMutableSet()
-                ?: emptySet<String>().toMutableSet()
+                ?: mutableSetOf()
         accessService?.mapNotNull { it.uri }
             ?.forEach { updatedAccessServiceUris.add(it) }
-        return if (updatedAccessServiceUris.isNotEmpty()) {
-            copy(
-                accessServiceUris = updatedAccessServiceUris
-            )
-        } else this
+        return if (updatedAccessServiceUris.isEmpty()) this
+            else copy(accessServiceUris = updatedAccessServiceUris)
     }
 
     private fun Dataset.addOldAccessUrisToNewField(): Dataset {
