@@ -7,6 +7,7 @@ import jakarta.json.Json
 import jakarta.json.JsonException
 import no.fdk.dataset_catalog.configuration.ApplicationProperties
 import no.fdk.dataset_catalog.model.*
+import no.fdk.dataset_catalog.rdf.isValidURL
 import no.fdk.dataset_catalog.repository.DatasetRepository
 import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
@@ -50,7 +51,8 @@ class DatasetService(
         val updatedAccessServiceUris: MutableSet<String> =
             accessServiceUris?.toMutableSet()
                 ?: mutableSetOf()
-        accessService?.mapNotNull { it.uri?.takeIf { uri -> uri.isNotBlank() } }
+        accessService?.mapNotNull { it.uri }
+            ?.filter { it.isValidURL() }
             ?.forEach { updatedAccessServiceUris.add(it) }
         return if (updatedAccessServiceUris.isEmpty()) this
             else copy(accessServiceUris = updatedAccessServiceUris)
