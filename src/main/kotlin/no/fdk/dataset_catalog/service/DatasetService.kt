@@ -50,7 +50,7 @@ class DatasetService(
         val updatedAccessServiceUris: MutableSet<String> =
             accessServiceUris?.toMutableSet()
                 ?: mutableSetOf()
-        accessService?.mapNotNull { it.uri }
+        accessService?.mapNotNull { it.uri?.takeIf { uri -> uri.isNotBlank() } }
             ?.forEach { updatedAccessServiceUris.add(it) }
         return if (updatedAccessServiceUris.isEmpty()) this
             else copy(accessServiceUris = updatedAccessServiceUris)
