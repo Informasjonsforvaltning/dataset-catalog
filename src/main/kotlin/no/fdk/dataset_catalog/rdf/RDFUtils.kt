@@ -1,6 +1,7 @@
 package no.fdk.dataset_catalog.rdf
 
 import no.fdk.dataset_catalog.model.*
+import no.fdk.dataset_catalog.utils.isValidURI
 import org.apache.jena.datatypes.xsd.XSDDatatype
 import org.apache.jena.rdf.model.*
 import org.apache.jena.riot.Lang
@@ -208,6 +209,23 @@ private fun Distribution.hasNonNullOrEmptyProperty(): Boolean =
 
 // TODO: add dcat:endpointURLs and make sure front-end sends necessary data (https://doc.difi.no/review/dcat-ap-no/#_obligatoriske_egenskaper_for_datatjeneste)
 
+
+fun Resource.addThemes(ds: Dataset): Resource {
+    val uniqueThemes = mutableSetOf<String>()
+
+    ds.theme?.mapNotNull { it.uri }
+        ?.filter { it.isValidURI() }
+        ?.let { uniqueThemes.addAll(it) }
+
+    ds.losTheme?.filter { it.isValidURI() }
+        ?.let { uniqueThemes.addAll(it) }
+
+    ds.euDataTheme?.filter { it.isValidURI() }
+        ?.let { uniqueThemes.addAll(it) }
+    safeAddLinkListProperty(DCAT.theme, uniqueThemes.toList())
+
+    return this
+}
 fun Resource.addDataDistributionServices(dataDistributionServices: Collection<DataDistributionService>?): Resource {
     dataDistributionServices?.forEach {
         val accessServiceResource = model.safeCreateResource(it.uri)

@@ -154,7 +154,7 @@
         dcat:distribution               <http://localhost:5050/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d/distributions/d1> ;
         dcat:keyword                    "Bestemmelse"@nb , "statlig bestemmelse"@nb , "regulering"@nb , "jord"@nb ;
         dcat:landingPage                <http://testetaten.no/landingsside/nr1> ;
-        dcat:theme                      <http://publications.europa.eu/resource/authority/data-theme/ENVI> , <http://publications.europa.eu/resource/authority/data-theme/GOVE> ;
+        dcat:theme                      <http://publications.europa.eu/resource/authority/data-theme/ENVI> , <http://publications.europa.eu/resource/authority/data-theme/GOVE> , <https://psi.norge.no/los/tema/lov-og-rett>;
         dqv:hasQualityAnnotation        [ a                dqv:QualityAnnotation ;
                                           dqv:inDimension  <http://iso.org/25012/2008/dataquality/Currentness> ;
                                           oa:hasBody     [ a    oa:TextualBody ;

@@ -43,9 +43,10 @@ class DatasetService(
         val datasetList = if (specializedType == null) datasetRepository.findByCatalogId(catalogId) as List<Dataset>
         else datasetRepository.findByCatalogIdAndSpecializedType(catalogId, specializedType) as List<Dataset>
 
-        return datasetList.map { it.addOldAccessUrisToNewField() }
+        return datasetList.map { it.addOldAccessUrisToNewField().addOldThemesToNewFields() }
     }
 
+    // Temporary function, remove when refactoring accessService in distribution
     private fun Distribution.addOldAccessUrisToNewField(): Distribution {
         val updatedAccessServiceUris: MutableSet<String> =
             accessServiceUris?.toMutableSet()
@@ -54,7 +55,7 @@ class DatasetService(
             ?.filter { it.isValidURI() }
             ?.forEach { updatedAccessServiceUris.add(it) }
         return if (updatedAccessServiceUris.isEmpty()) this
-            else copy(accessServiceUris = updatedAccessServiceUris)
+        else copy(accessServiceUris = updatedAccessServiceUris)
     }
 
     private fun Dataset.addOldAccessUrisToNewField(): Dataset {
@@ -65,20 +66,42 @@ class DatasetService(
         )
     }
 
+    // Temporary function, remove when refactoring themes
+    private fun Dataset.addOldThemesToNewFields(): Dataset {
+        val validUris = theme
+            ?.mapNotNull { it.uri }
+            ?.filter { it.isValidURI() }
+            ?.toList()
+            ?: emptyList()
+
+        val euDataThemes = validUris
+            .filter { it.startsWith("http://publications.europa.eu/resource/authority/data-theme") }
+            .toSet() + (euDataTheme ?: emptySet())
+
+        val losThemes = validUris
+            .filter { it.startsWith("https://psi.norge.no/los") }
+            .toSet() + (losTheme ?: emptySet())
+
+        return copy(
+            euDataTheme = euDataThemes.ifEmpty { null },
+            losTheme = losThemes.ifEmpty { null }
+        )
+    }
+
     fun getByID(catalogId: String, id: String): Dataset? {
         val dataset = datasetRepository.findByIdOrNull(id)
-            ?.addOldAccessUrisToNewField()
+            ?.addOldAccessUrisToNewField()?.addOldThemesToNewFields()
         return if (dataset?.catalogId != catalogId) null else dataset
     }
 
     private fun getByID(id: String): Dataset? {
         return datasetRepository.findByIdOrNull(id)
-            ?.addOldAccessUrisToNewField()
+            ?.addOldAccessUrisToNewField()?.addOldThemesToNewFields()
     }
 
     fun getListByIDs(catalogId: String, ids: List<String>) =
         datasetRepository.findAllById(ids).filter { it.catalogId == catalogId }
-            .map { it.addOldAccessUrisToNewField() }
+            .map { it.addOldAccessUrisToNewField().addOldThemesToNewFields() }
 
     fun create(catalogId: String, dataset: Dataset): Dataset? {
         val catalog = catalogService.getByID(catalogId) ?: throw ResponseStatusException(
@@ -97,7 +120,7 @@ class DatasetService(
             lastModified = LocalDateTime.now(),
             uri = "${applicationProperties.catalogUriHost}/$catalogId/datasets/$datasetId",
             publisher = dataset.publisher ?: catalog.publisher,
-            registrationStatus = dataset.registrationStatus ?: REGISTRATION_STATUS.DRAFT
+            registrationStatus = dataset.registrationStatus ?: REGISTRATION_STATUS.DRAFT,
         )
             .allAffectedSeriesDatasets(null)
             .let { persistAndHarvest(it, catalog) }
