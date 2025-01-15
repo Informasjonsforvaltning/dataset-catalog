@@ -59,7 +59,7 @@ val SKOSCODE_EX = SkosCode(
 
 val DATATHEME_EX = DataTheme(
     id = "id",
-    uri = "http://test.uri",
+    uri = "http://publications.europa.eu/resource/authority/data-theme/AGRI",
     code = "DataTheme code",
     pickedDate = LocalDate.now().toString(),
     startUse = LocalDate.now().toString(),
@@ -69,6 +69,10 @@ val DATATHEME_EX = DataTheme(
         versioninfo = "Version info",
         versionnumber = "Version number"
     )
+)
+
+val LOSTHEME_EX = DataTheme(
+    uri = "https://psi.norge.no/los/tema/arbeid"
 )
 
 fun SKOSCONCEPT_EX(extraType: String? = null) = SkosConcept(
@@ -149,7 +153,7 @@ val TEST_DATASET_0 = Dataset(
     modified = LocalDate.now(),
     language = listOf(SKOSCODE_EX),
     landingPage = listOf("www.hjemmeside.no"),
-    theme = listOf(DATATHEME_EX),
+    theme = listOf(DATATHEME_EX, LOSTHEME_EX),
     distribution = listOf(DISTRIBUTION_EX),
     sample = listOf(DISTRIBUTION_EX),
     temporal = listOf(PERIODOFTIME_EX),

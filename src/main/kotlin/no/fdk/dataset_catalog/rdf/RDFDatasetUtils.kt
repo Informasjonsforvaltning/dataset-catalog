@@ -31,7 +31,7 @@ fun Model.addDatasetResource(dataset: Dataset, seriesData: SeriesData): Resource
             .safeAddDateTimeLiteral(DCTerms.issued, dataset.issued)
             .safeAddDateTimeLiteral(DCTerms.modified, dataset.modified)
             .safeAddURLs(DCAT.landingPage, dataset.landingPage)
-            .safeAddLinkListProperty(DCAT.theme, dataset.theme?.mapNotNull { it.uri })
+            .addThemes(dataset)
             .addDistribution(DCAT.distribution, dataset.distribution)
             .addDistribution(ADMS.sample, dataset.sample)
             .addTemporal(dataset.temporal)

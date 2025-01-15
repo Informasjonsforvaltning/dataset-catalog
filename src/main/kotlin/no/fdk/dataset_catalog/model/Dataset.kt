@@ -89,6 +89,12 @@ data class Dataset(
     //Norwegian: Tema
     val theme: List<DataTheme>? = null,
 
+    // eu-vocabulary
+    val euDataTheme: Set<String>? = null,
+    // norwegian expansion of the eu-vocabulary
+    val losTheme: Set<String>? = null,
+
+
     //dcat:distribution
     //Norwegian: Datasett distribusjon
     val distribution: List<Distribution>? = null,

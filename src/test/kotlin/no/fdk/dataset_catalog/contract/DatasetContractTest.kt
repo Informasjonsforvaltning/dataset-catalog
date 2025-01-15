@@ -76,8 +76,10 @@ class DatasetContractTest: ApiTestContext() {
                 DATASET_2.copy(
                     lastModified = bodyGet.lastModified,
                     concepts = bodyGet.concepts,
-                    uri = bodyGet.uri)
-                , bodyGet)
+                    uri = bodyGet.uri,
+                    losTheme = setOf("https://psi.norge.no/los/tema/arbeid"), // Temporary - remove when refactoring themes
+                    euDataTheme = setOf("http://publications.europa.eu/resource/authority/data-theme/AGRI") // Temporary - remove when refactoring themes
+                ), bodyGet)
         }
     }
 
@@ -117,7 +119,6 @@ class DatasetContractTest: ApiTestContext() {
 
             assertEquals(listOf(DB_DATASET_ID_4, DB_DATASET_ID_5, DB_DATASET_ID_6), bodyRead._embedded?.get("datasets")?.map { it.id })
         }
-
     }
 
     @Nested
@@ -232,6 +233,42 @@ class DatasetContractTest: ApiTestContext() {
             val rspGet = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", null, JwtToken(Access.ORG_WRITE).toString(), "GET")
 
             assertEquals(HttpStatus.NOT_FOUND.value(), rspGet["status"])
+        }
+    }
+
+    // Temporary - remove when refactoring themes
+    @Nested
+    internal inner class Themes{
+        @Test
+        fun `losTheme and euDataTheme is saved correctly`() {
+            val rspCreate = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets", mapper.writeValueAsString(DATASET_3), JwtToken(Access.ORG_WRITE).toString(), "POST")
+            Assumptions.assumeTrue(HttpStatus.CREATED.value() == rspCreate["status"])
+
+            val rspGet = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/$DATASET_ID_3", null, JwtToken(Access.ORG_WRITE).toString(), "GET")
+            assertEquals(HttpStatus.OK.value(), rspGet["status"])
+
+            val bodyGet: Dataset = mapper.readValue(rspGet["body"] as String)
+
+            val expectedEuDataTheme = setOf("http://publications.europa.eu/resource/authority/data-theme/AGRI")
+            val expectedLosTheme = setOf("https://psi.norge.no/los/tema/arbeid")
+
+            assertEquals(DATASET_3.copy(lastModified = bodyGet.lastModified, uri = bodyGet.uri, publisher = bodyGet.publisher, euDataTheme = expectedEuDataTheme, losTheme = expectedLosTheme), bodyGet)
+        }
+
+        @Test
+        fun `losTheme and euDataTheme is separated correctly`() {
+            val rspCreate = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets", mapper.writeValueAsString(DATASET_2), JwtToken(Access.ORG_WRITE).toString(), "POST")
+            Assumptions.assumeTrue(HttpStatus.CREATED.value() == rspCreate["status"])
+
+            val rspGet = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/$DATASET_ID_2", null, JwtToken(Access.ORG_WRITE).toString(), "GET")
+            assertEquals(HttpStatus.OK.value(), rspGet["status"])
+
+            val bodyGet: Dataset = mapper.readValue(rspGet["body"] as String)
+
+            val expectedEuDataTheme = setOf("http://publications.europa.eu/resource/authority/data-theme/AGRI")
+            val expectedLosTheme = setOf("https://psi.norge.no/los/tema/arbeid")
+
+            assertEquals(DATASET_2.copy(lastModified = bodyGet.lastModified, uri = bodyGet.uri, publisher = bodyGet.publisher, euDataTheme = expectedEuDataTheme, losTheme = expectedLosTheme), bodyGet)
         }
     }
 }

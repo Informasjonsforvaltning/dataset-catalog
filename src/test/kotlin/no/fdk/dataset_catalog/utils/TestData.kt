@@ -31,6 +31,7 @@ val CATALOG_ID_2 = "111222333"
 
 val DATASET_ID_1 = "ds1"
 val DATASET_ID_2 = "ds2"
+val DATASET_ID_3 = "ds3"
 
 
 val DB_DATASET_ID_1 = "db1"
@@ -61,6 +62,15 @@ val DATASET_2 = TEST_DATASET_0.copy(
     catalogId = DB_CATALOG_ID_1,
     uri = "http://$DATASET_ID_2",
     registrationStatus = REGISTRATION_STATUS.PUBLISH,
+)
+
+val DATASET_3 = Dataset(
+    DATASET_ID_3,
+    DB_CATALOG_ID_1,
+    uri = "http://$DATASET_ID_3",
+    registrationStatus = REGISTRATION_STATUS.PUBLISH,
+    euDataTheme = setOf("http://publications.europa.eu/resource/authority/data-theme/AGRI"),
+    losTheme = setOf("https://psi.norge.no/los/tema/arbeid"),
 )
 
 val DB_DATASET_1 = Dataset(
@@ -199,8 +209,10 @@ val SERIES_DATASET_5 = Dataset(
     uri = "http://localhost:5050/catalogs/$SERIES_CATALOG_ID/datasets/$SERIES_DATASET_ID_5",
 )
 
-fun datasetDbPopulation() = listOf(DB_DATASET_1, DB_DATASET_2, DB_DATASET_3, DB_DATASET_4, DB_DATASET_5, DB_DATASET_6,
-        SERIES_DATASET_0, SERIES_DATASET_1, SERIES_DATASET_2, SERIES_DATASET_5)
+fun datasetDbPopulation() = listOf(
+    DB_DATASET_1, DB_DATASET_2, DB_DATASET_3, DB_DATASET_4, DB_DATASET_5, DB_DATASET_6,
+    SERIES_DATASET_0, SERIES_DATASET_1, SERIES_DATASET_2, SERIES_DATASET_5
+)
     .map { it.mapDBO() }
 
 fun catalogDbPopulation() = listOf(DB_CATALOG_1, DB_CATALOG_2, DB_CATALOG_3, DB_CATALOG_4, DB_CATALOG_5, SERIES_CATALOG)

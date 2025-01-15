@@ -144,6 +144,7 @@ val TEST_DATASET_1 = Dataset(
         SkosCode("http://publications.europa.eu/resource/authority/language/ENG", "ENG", mapOf(Pair("nb", "Engelsk")))),
     landingPage=listOf("http://testetaten.no/landingsside/nr1", "www.this.can.happen/also"),
     theme= THEMES,
+    losTheme = setOf("https://psi.norge.no/los/tema/lov-og-rett"),
     references= listOf(Reference(SkosCode(DCTerms.references.uri, "references", mapOf(Pair("nb", "Referanse"))), SkosConcept("http://mycatalog/${CATALOG_ID}/datasets/1", prefLabel = mapOf(Pair("nb", "Referanse datasett"))))),
     relations=listOf(
             SkosConcept("http://uri-1", mapOf(Pair("nb", "label-1-nb"),Pair("en", "label-1-en"))),
