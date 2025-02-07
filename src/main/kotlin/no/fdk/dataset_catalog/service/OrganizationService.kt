@@ -24,28 +24,33 @@ class OrganizationService(
 
     fun getOrganization(organizationNumber: String?): Organization? {
     if (isOrganizationNumber(organizationNumber)) {
-        URL("${applicationProperties.organizationCatalogHost}/organizations/$organizationNumber")
-            .openConnection()
-            .run {
-                this as HttpURLConnection
-                this.setRequestProperty("Accept", "application/json")
-                if (responseCode != HttpStatus.OK.value()) {
-                    logger.error("Error: $responseCode", Exception("Error: $responseCode"))
-                    return null
+        val url = URL("${applicationProperties.organizationCatalogHost}/organizations/$organizationNumber")
+        if (url.host == URL(applicationProperties.organizationCatalogHost).host) {
+            url.openConnection()
+                .run {
+                    this as HttpURLConnection
+                    this.setRequestProperty("Accept", "application/json")
+                    if (responseCode != HttpStatus.OK.value()) {
+                        logger.error("Error: $responseCode", Exception("Error: $responseCode"))
+                        return null
+                    }
+                    val jsonBody = inputStream.bufferedReader().use(BufferedReader::readText)
+                    return try {
+                        jacksonObjectMapper().readValue(jsonBody)
+                    } catch (t: Throwable) {
+                        logger.error("Unable to parse response from organization catalogue for '$organizationNumber'", t)
+                        null
+                    }
                 }
-                val jsonBody = inputStream.bufferedReader().use(BufferedReader::readText)
-                return try {
-                    jacksonObjectMapper().readValue(jsonBody)
-                } catch (t: Throwable) {
-                    logger.error("Unable to parse response from organization catalogue for '$organizationNumber'", t)
-                    null
-                }
-            }
         } else {
-            logger.warn("'$organizationNumber' is not a valid organization number")
+            logger.error("Invalid host for organization number: $organizationNumber")
             return null
         }
+    } else {
+        logger.warn("'$organizationNumber' is not a valid organization number")
+        return null
     }
+}
 
     private fun isOrganizationNumber(orgnr: String?): Boolean {
         val regex = Regex("""^[0-9]{9}$""")
