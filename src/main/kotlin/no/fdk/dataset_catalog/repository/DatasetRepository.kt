@@ -1,6 +1,6 @@
 package no.fdk.dataset_catalog.repository
 
-import no.fdk.dataset_catalog.model.Dataset
+import no.fdk.dataset_catalog.model.DatasetDBO
 import no.fdk.dataset_catalog.model.SpecializedType
 import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.data.mongodb.repository.Query
@@ -19,19 +19,19 @@ const val matchDescription =
         "\$or : [{'description.nb' : { \$regex: /\\b?1/, \$options: 'i' }}, {'description.nn' : { \$regex: /\\b?1/ , \$options: 'i'}}, {'description.en' : { \$regex: /\\b?1/, \$options: 'i' }}]" +
     "}"
 @Repository
-interface DatasetRepository : MongoRepository<Dataset, String?> {
-    fun findByCatalogId(catalogId: String) : Collection<Dataset>
-    fun findByCatalogIdAndSpecializedType(catalogId: String, specializedType: SpecializedType) : Collection<Dataset>
+interface DatasetRepository : MongoRepository<DatasetDBO, String?> {
+    fun findByCatalogId(catalogId: String) : Collection<DatasetDBO>
+    fun findByCatalogIdAndSpecializedType(catalogId: String, specializedType: SpecializedType) : Collection<DatasetDBO>
 
     @Query(matchTitle)
     fun findByTitleContaining(
         @Param("id") catalogId: List<String>,
         @Param("query") query: String
-    ) : Set<Dataset>
+    ) : Set<DatasetDBO>
 
     @Query(matchDescription)
     fun findByDescriptionContaining(
         @Param("id") catalogId: List<String>,
         @Param("query") query: String
-    ) : Set<Dataset>
+    ) : Set<DatasetDBO>
 }
