@@ -18,10 +18,8 @@ import kotlin.test.assertTrue
 class PingTest: ApiTestContext() {
     @Test
     fun serviceUp() {
-        val response = apiAuthorizedRequest("/ping", null, null, "GET", MediaType.TEXT_PLAIN)
+        val response = apiAuthorizedRequest("/ping", null, null, "GET")
 
         assertTrue { HttpStatus.OK.value() == response["status"] }
     }
-
-
 }
