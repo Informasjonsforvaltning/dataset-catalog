@@ -6,6 +6,8 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import jakarta.json.Json
 import jakarta.json.JsonException
 import no.fdk.dataset_catalog.configuration.ApplicationProperties
+import no.fdk.dataset_catalog.extensions.datasetToDBO
+import no.fdk.dataset_catalog.extensions.toDataset
 import no.fdk.dataset_catalog.model.*
 import no.fdk.dataset_catalog.repository.DatasetRepository
 import no.fdk.dataset_catalog.utils.isValidURI
@@ -27,7 +29,7 @@ class DatasetService(
     private val organizationService: OrganizationService,
     private val publishingService: PublishingService,
     private val applicationProperties: ApplicationProperties,
-    private val mapper: ObjectMapper
+    private val mapper: ObjectMapper,
 ) {
     private var datasetUriPattern: Regex? = null
 
@@ -40,10 +42,14 @@ class DatasetService(
 
     fun getAll(catalogId: String, specializedTypeString: String? = null): List<Dataset> {
         val specializedType = specializedTypeFromString(specializedTypeString)
-        val datasetList = if (specializedType == null) datasetRepository.findByCatalogId(catalogId) as List<Dataset>
-        else datasetRepository.findByCatalogIdAndSpecializedType(catalogId, specializedType) as List<Dataset>
+        val datasetList = if (specializedType == null) datasetRepository.findByCatalogId(catalogId)
+        else datasetRepository.findByCatalogIdAndSpecializedType(catalogId, specializedType)
 
-        return datasetList.map { it.addOldAccessUrisToNewField().addOldThemesToNewFields() }
+        return datasetList.map { dbo ->
+            dbo.toDataset()
+                .addOldAccessUrisToNewField()
+                .addOldThemesToNewFields()
+        }
     }
 
     // Temporary function, remove when refactoring accessService in distribution
@@ -90,18 +96,20 @@ class DatasetService(
 
     fun getByID(catalogId: String, id: String): Dataset? {
         val dataset = datasetRepository.findByIdOrNull(id)
+            ?.toDataset()
             ?.addOldAccessUrisToNewField()?.addOldThemesToNewFields()
         return if (dataset?.catalogId != catalogId) null else dataset
     }
 
     private fun getByID(id: String): Dataset? {
         return datasetRepository.findByIdOrNull(id)
+            ?.toDataset()
             ?.addOldAccessUrisToNewField()?.addOldThemesToNewFields()
     }
 
     fun getListByIDs(catalogId: String, ids: List<String>) =
         datasetRepository.findAllById(ids).filter { it.catalogId == catalogId }
-            .map { it.addOldAccessUrisToNewField().addOldThemesToNewFields() }
+            .map { it.toDataset().addOldAccessUrisToNewField().addOldThemesToNewFields() }
 
     fun create(catalogId: String, dataset: Dataset): Dataset? {
         val catalog = catalogService.getByID(catalogId) ?: throw ResponseStatusException(
@@ -148,7 +156,7 @@ class DatasetService(
 
     fun delete(catalogId: String, id: String) {
         getByID(catalogId, id)
-            ?.also { datasetRepository.delete(it) }
+            ?.also { datasetRepository.delete(it.datasetToDBO()) }
             ?.removeDeletedDatasetFromSeriesFields()
             ?: throw Exception()
     }
@@ -189,7 +197,7 @@ class DatasetService(
         else {
             val addedInSeries = inSeries
                 ?.takeIf { it != dbDataset?.inSeries }
-                ?.let { datasetRepository.findByIdOrNull(it) }
+                ?.let { datasetRepository.findByIdOrNull(it)?.toDataset() }
                 ?.let {
                     val updatedSeriesOrder = if (it.seriesDatasetOrder.isNullOrEmpty()) {
                         mapOf(Pair(id, 0))
@@ -203,14 +211,14 @@ class DatasetService(
             val removedInSeries = dbDataset?.inSeries
                 ?.takeIf { it != inSeries }
                 ?.let { datasetRepository.findByIdOrNull(it) }
-                ?.let { it.copy(seriesDatasetOrder = it.seriesDatasetOrder?.minus(id)) }
+                ?.let { it.toDataset().copy(seriesDatasetOrder = it.seriesDatasetOrder?.minus(id)) }
                 ?.let { listOf(it) } ?: emptyList()
 
             val addedToOrder = if (specializedType == SpecializedType.SERIES) {
                 seriesDatasetOrder?.keys
                     ?.filter { it !in (dbDataset?.seriesDatasetOrder?.keys ?: emptyList()) }
                     ?.let { datasetRepository.findAllById(it) }
-                    ?.map { it.copy(inSeries = id) }
+                    ?.map { it.toDataset().copy(inSeries = id) }
                     ?: emptyList()
             } else emptyList()
 
@@ -218,7 +226,7 @@ class DatasetService(
                 dbDataset?.seriesDatasetOrder?.keys
                     ?.filter { it !in (seriesDatasetOrder?.keys ?: emptyList()) }
                     ?.let { datasetRepository.findAllById(it) }
-                    ?.map { it.copy(inSeries = null) }
+                    ?.map { it.toDataset().copy(inSeries = null) }
                     ?: emptyList()
             } else emptyList()
 
@@ -241,8 +249,9 @@ class DatasetService(
 
     private fun persistAndHarvest(datasets: List<Dataset>, catalog: Catalog?) =
         if (catalog != null) {
+            val datasetDBOs = datasets.map { it.datasetToDBO() }
             datasetRepository
-                .saveAll(datasets)
+                .saveAll(datasetDBOs)
                 .also {
                     addDataSource(datasets, catalog)
                     triggerHarvest(datasets, catalog)
