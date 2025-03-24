@@ -9,8 +9,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
-import org.springframework.data.annotation.Id
-import org.springframework.data.mongodb.core.mapping.Document
+import org.springframework.data.annotation.*
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -18,10 +17,10 @@ data class DatasetEmbeddedWrapperDTO(
     val _embedded: Map<String, List<Dataset>>?
 )
 
-@Document(collection = "datasets")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Dataset(
+
     @Id
     val id: String? = null,
 
@@ -32,6 +31,8 @@ data class Dataset(
     @JsonProperty(value = "_lastModified")
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
+
+    @LastModifiedDate
     val lastModified: LocalDateTime? = null,
 
     val registrationStatus: REGISTRATION_STATUS? = null,
@@ -186,14 +187,10 @@ data class Dataset(
 
     // datasets in this series and their order index
     val seriesDatasetOrder: Map<String, Int>? = null
-    )
+)
 
 enum class REGISTRATION_STATUS {
     DRAFT, APPROVE, PUBLISH
-}
-
-enum class SpecializedType {
-    SERIES
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)

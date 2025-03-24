@@ -1,7 +1,7 @@
 package no.fdk.dataset_catalog.repository
 
 import no.fdk.dataset_catalog.model.CatalogCount
-import no.fdk.dataset_catalog.model.Dataset
+import no.fdk.dataset_catalog.model.DatasetDBO
 import org.springframework.data.mongodb.core.MongoOperations
 import org.springframework.data.mongodb.core.aggregation.Aggregation
 import org.springframework.data.mongodb.core.query.Criteria
@@ -21,7 +21,7 @@ class DatasetOperations(private val mongoOperations: MongoOperations) {
     }
 
     fun getAllCatalogIds(): List<String> =
-        mongoOperations.query(Dataset::class.java)
+        mongoOperations.query(DatasetDBO::class.java)
             .distinct("catalogId")
             .`as`(String::class.java)
             .all()
