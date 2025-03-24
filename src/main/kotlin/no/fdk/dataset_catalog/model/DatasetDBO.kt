@@ -37,8 +37,8 @@ data class DatasetDBO(
 
     val specializedType: SpecializedType? = null,
 
-    val published: Boolean? = false,
-    val approved: Boolean? = false,
+    val published: Boolean = false,
+    val approved: Boolean = false,
     val concepts: Set<String>? = null,
 
 
