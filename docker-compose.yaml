@@ -2,12 +2,13 @@
 
 services:
   mongodb:
-    image: mongo:latest
+    image: 'mongo:latest'
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=admin
+      - 'MONGO_INITDB_DATABASE=mydatabase'
+      - 'MONGO_INITDB_ROOT_PASSWORD=secret'
+      - 'MONGO_INITDB_ROOT_USERNAME=root'
     ports:
-      - 27017:27017
+      - '27017:27017'
 
   rabbitmq:
     image: rabbitmq:3-management
