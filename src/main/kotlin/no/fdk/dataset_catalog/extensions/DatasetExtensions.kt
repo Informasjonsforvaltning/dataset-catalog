@@ -1,6 +1,5 @@
 package no.fdk.dataset_catalog.extensions
 
-import no.fdk.dataset_catalog.configuration.ApplicationProperties
 import no.fdk.dataset_catalog.model.*
 import java.time.LocalDateTime
 
@@ -18,8 +17,8 @@ fun Dataset.datasetToDBO(): DatasetDBO =
         published = registrationStatus == REGISTRATION_STATUS.PUBLISH,
         approved = registrationStatus == REGISTRATION_STATUS.APPROVE || registrationStatus == REGISTRATION_STATUS.PUBLISH,
         concepts = concepts?.mapNotNull { it.uri }?.toSet(),
-        title = title?.let { LocalizedStrings(it["nb"], it["nn"], it["en"]) },
-        description = description?.let { LocalizedStrings(it["nb"], it["nn"], it["en"]) },
+        title = title?.let { LocalizedStrings(it.get("nb"), it.get("nn"), it.get("en")) },
+        description = description?.let { LocalizedStrings(it.get("nb"), it.get("nn"), it.get("en")) },
         contactPoints = contactPoint?.map {
             ContactPoint(
                 name = it.organizationUnit?.let { name -> LocalizedStrings(nb = name) },
@@ -30,9 +29,9 @@ fun Dataset.datasetToDBO(): DatasetDBO =
         },
         keywords = keyword?.let {
             LocalizedStringLists(
-                nb = it.mapNotNull { keyword -> keyword["nb"] },
-                nn = it.mapNotNull { keyword -> keyword["nn"] },
-                en = it.mapNotNull { keyword -> keyword["en"] }
+                nb = it.mapNotNull { keyword -> keyword.get("nb") },
+                nn = it.mapNotNull { keyword -> keyword.get("nn") },
+                en = it.mapNotNull { keyword -> keyword.get("en") }
             )
         },
         issued = issued,
@@ -43,8 +42,8 @@ fun Dataset.datasetToDBO(): DatasetDBO =
         losTheme = losTheme,
         distribution = distribution?.map {
             DistributionDBO(
-                title = it.title?.let { title -> LocalizedStrings(title["nb"], title["nn"], title["en"]) },
-                description = it.description?.let { desc -> LocalizedStrings(desc["nb"], desc["nn"], desc["en"]) },
+                title = it.title?.let { title -> LocalizedStrings(title.get("nb"), title.get("nn"), title.get("en")) },
+                description = it.description?.let { desc -> LocalizedStrings(desc.get("nb"), desc.get("nn"), desc.get("en")) },
                 downloadURL = it.downloadURL,
                 accessURL = it.accessURL,
                 license = it.license?.uri,
@@ -57,8 +56,8 @@ fun Dataset.datasetToDBO(): DatasetDBO =
         },
         sample = sample?.map {
             DistributionDBO(
-                title = it.title?.let { title -> LocalizedStrings(title["nb"], title["nn"], title["en"]) },
-                description = it.description?.let { desc -> LocalizedStrings(desc["nb"], desc["nn"], desc["en"]) },
+                title = it.title?.let { title -> LocalizedStrings(title.get("nb"), title.get("nn"), title.get("en")) },
+                description = it.description?.let { desc -> LocalizedStrings(desc.get("nb"), desc.get("nn"), desc.get("en")) },
                 downloadURL = it.downloadURL,
                 accessURL = it.accessURL,
                 license = it.license?.uri,
@@ -144,8 +143,8 @@ fun DatasetDBO.toDataset(): Dataset {
         originalUri = originalUri,
         lastModified = lastModified,
         registrationStatus = when {
-            published == true -> REGISTRATION_STATUS.PUBLISH
-            approved == true -> REGISTRATION_STATUS.APPROVE
+            published -> REGISTRATION_STATUS.PUBLISH
+            approved -> REGISTRATION_STATUS.APPROVE
             else -> REGISTRATION_STATUS.DRAFT
         },
         concepts = concepts?.map { Concept(uri = it) },
