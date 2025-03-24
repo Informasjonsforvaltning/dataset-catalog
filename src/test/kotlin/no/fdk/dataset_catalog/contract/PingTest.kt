@@ -12,16 +12,15 @@ import kotlin.test.assertTrue
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest(
     properties = ["spring.profiles.active=contract-test"],
-    webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+    webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT
+)
 @ContextConfiguration(initializers = [ApiTestContext.Initializer::class])
 @Tag("contract")
-class PingTest: ApiTestContext() {
+class PingTest : ApiTestContext() {
     @Test
     fun serviceUp() {
         val response = apiAuthorizedRequest("/ping", null, null, "GET", MediaType.TEXT_PLAIN)
 
         assertTrue { HttpStatus.OK.value() == response["status"] }
     }
-
-
 }
