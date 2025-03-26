@@ -16,6 +16,7 @@ fun Dataset.datasetToDBO(): DatasetDBO =
         originalUri = originalUri,
         published = registrationStatus == REGISTRATION_STATUS.PUBLISH,
         approved = registrationStatus == REGISTRATION_STATUS.APPROVE || registrationStatus == REGISTRATION_STATUS.PUBLISH,
+
         concepts = concepts?.mapNotNull { it.uri }?.toSet(),
         title = title?.let { LocalizedStrings(it.get("nb"), it.get("nn"), it.get("en")) },
         description = description?.let { LocalizedStrings(it.get("nb"), it.get("nn"), it.get("en")) },
