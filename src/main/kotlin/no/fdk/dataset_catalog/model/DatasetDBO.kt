@@ -60,15 +60,15 @@ data class DatasetDBO(
 
     //dct:issued
     //Norwegian: Utgivelsesdato
-    @JsonSerialize(using = LocalDateSerializer::class)
-    @JsonDeserialize(using = LocalDateDeserializer::class)
-    val issued: LocalDate? = null,
+    @JsonSerialize(using = LocalDateTimeSerializer::class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
+    val issued: LocalDateTime? = null,
 
     //dct:modified
     //Norwegian: Modifiseringsdato
-    @JsonSerialize(using = LocalDateSerializer::class)
-    @JsonDeserialize(using = LocalDateDeserializer::class)
-    val modified: LocalDate? = null,
+    @JsonSerialize(using = LocalDateTimeSerializer::class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
+    val modified: LocalDateTime? = null,
 
     //dct:language
     //Norwegian: Språk
@@ -199,12 +199,12 @@ data class DistributionDBO(
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class PeriodOfTimeDBO(
-    @JsonSerialize(using = LocalDateSerializer::class)
-    @JsonDeserialize(using = LocalDateDeserializer::class)
-    val startDate: LocalDate? = null,
-    @JsonSerialize(using = LocalDateSerializer::class)
-    @JsonDeserialize(using = LocalDateDeserializer::class)
-    val endDate: LocalDate? = null,
+    @JsonSerialize(using = LocalDateTimeSerializer::class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
+    val startDate: LocalDateTime? = null,
+    @JsonSerialize(using = LocalDateTimeSerializer::class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
+    val endDate: LocalDateTime? = null,
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
