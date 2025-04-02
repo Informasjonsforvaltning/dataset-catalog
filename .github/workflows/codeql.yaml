@@ -9,11 +9,12 @@ on:
     branches:
       - main
   schedule:
-    - cron:  '0 2 * * *'
+    - cron: '0 2 * * *'
 
 jobs:
   codeql:
-    name: Run codeql
+    name: Run codeql scan
+    if: github.event.pull_request.draft == false
     uses: Informasjonsforvaltning/workflows/.github/workflows/codeql.yaml@main
     with:
       language: java
