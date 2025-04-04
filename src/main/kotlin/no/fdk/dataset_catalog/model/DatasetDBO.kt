@@ -22,9 +22,6 @@ data class DatasetDBO(
     val id: String,
     val catalogId: String,
 
-    @CreatedDate
-    val created: LocalDateTime? = null,
-
     @LastModifiedBy
     val modifiedBy: User? = null,
 
