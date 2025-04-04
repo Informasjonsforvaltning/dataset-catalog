@@ -6,11 +6,8 @@ import org.testcontainers.shaded.com.google.common.collect.ImmutableMap
 const val API_TEST_PORT = 5555
 const val LOCAL_SERVER_PORT = 5050
 
-const val API_TEST_URI = "http://localhost:$API_TEST_PORT"
-const val WIREMOCK_TEST_URI = "http://localhost:$LOCAL_SERVER_PORT"
-
-const val MONGO_USER = "testuser"
-const val MONGO_PASSWORD = "testpassword"
+const val MONGO_USER = "root"
+const val MONGO_PASSWORD = "secret"
 const val MONGO_PORT = 27017
 const val MONGO_DB_NAME = "datasetCatalog"
 
@@ -228,7 +225,11 @@ private fun Dataset.mapDBO(): org.bson.Document =
         .append("title", title)
         .append("description", description)
         .append("references", references?.map { it.mapDBO() })
-        .append("registrationStatus", registrationStatus.toString())
+        .append(
+            "approved",
+            registrationStatus === REGISTRATION_STATUS.APPROVE || registrationStatus === REGISTRATION_STATUS.PUBLISH
+        )
+        .append("published", registrationStatus === REGISTRATION_STATUS.PUBLISH)
         .append("specializedType", specializedType)
         .append("inSeries", inSeries)
         .append("seriesDatasetOrder", seriesDatasetOrder)
@@ -240,8 +241,8 @@ private fun Catalog.mapDBO(): org.bson.Document =
 
 private fun Reference.mapDBO(): org.bson.Document =
     org.bson.Document()
-        .append("referenceType", referenceType?.mapDBO())
-        .append("source", source?.mapDBO())
+        .append("referenceType", referenceType?.uri)
+        .append("source", source?.uri)
 
 private fun SkosCode.mapDBO(): org.bson.Document =
     org.bson.Document()
