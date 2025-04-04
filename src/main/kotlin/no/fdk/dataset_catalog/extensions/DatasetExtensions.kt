@@ -35,8 +35,8 @@ fun Dataset.datasetToDBO(): DatasetDBO =
                 en = it.mapNotNull { keyword -> keyword.get("en") }
             )
         },
-        issued = issued?.atTime(0,0,0),
-        modified = modified?.atTime(0,0,0),
+        issued = issued,
+        modified = modified,
         language = language?.mapNotNull { it.uri },
         landingPage = landingPage,
         euDataTheme = euDataTheme,
@@ -71,8 +71,8 @@ fun Dataset.datasetToDBO(): DatasetDBO =
         },
         temporal = temporal?.map {
             PeriodOfTimeDBO(
-                startDate = it.startDate?.atTime(0,0,0),
-                endDate = it.endDate?.atTime(0,0,0)
+                startDate = it.startDate,
+                endDate = it.endDate
             )
         },
         spatial = spatial?.mapNotNull { it.uri },
@@ -160,8 +160,8 @@ fun DatasetDBO.toDataset(): Dataset {
             )
         },
         keyword = keywords?.toKeywordList(),
-        issued = issued?.toLocalDate(),
-        modified = modified?.toLocalDate(),
+        issued = issued,
+        modified = modified,
         language = language?.map { SkosCode(uri = it) },
         landingPage = landingPage,
         losTheme = losTheme,
@@ -189,8 +189,8 @@ fun DatasetDBO.toDataset(): Dataset {
         },
         temporal = temporal?.map {
             PeriodOfTime(
-                startDate = it.startDate?.toLocalDate(),
-                endDate = it.endDate?.toLocalDate()
+                startDate = it.startDate,
+                endDate = it.endDate
             )
         },
         spatial = spatial?.map { SkosCode(uri = it) },
