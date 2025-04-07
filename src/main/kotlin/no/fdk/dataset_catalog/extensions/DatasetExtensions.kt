@@ -163,7 +163,7 @@ fun DatasetDBO.toDataset(): Dataset {
             approved -> REGISTRATION_STATUS.APPROVE
             else -> REGISTRATION_STATUS.DRAFT
         },
-        concepts = concepts?.map { Concept(uri = it) },
+        concepts = concepts?.map { Concept(uri = it, prefLabel = mapOf("nb" to it)) },
         title = title?.toMap(),
         description = description?.toMap(),
         contactPoint = contactPoints?.map {
@@ -177,7 +177,7 @@ fun DatasetDBO.toDataset(): Dataset {
         keyword = keywords?.toKeywordList(),
         issued = issued,
         modified = modified,
-        language = language?.map { SkosCode(uri = it) },
+        language = language?.map { SkosCode( uri = it, code = it) },
         landingPage = landingPage,
         losTheme = losTheme,
         euDataTheme = euDataTheme,
@@ -189,10 +189,12 @@ fun DatasetDBO.toDataset(): Dataset {
                 downloadURL = it.downloadURL,
                 accessURL = it.accessURL,
                 license = SkosConcept(uri = it.license),
-                conformsTo = it.conformsTo?.map { uri -> SkosConcept(uri = uri.uri) },
+                conformsTo = it.conformsTo?.map { uri -> SkosConcept(uri = uri.uri, prefLabel = uri.prefLabel) },
                 format = it.format,
                 mediaType = it.mediaType,
-                accessServiceUris = it.accessServices
+                accessServiceUris = it.accessServices,
+                page = it.page?.map { uri -> SkosConcept(uri = uri) }
+
             )
         },
         sample = sample?.map {
@@ -200,7 +202,10 @@ fun DatasetDBO.toDataset(): Dataset {
                 title = it.title?.toMap(),
                 description = it.description?.toMap(),
                 downloadURL = it.downloadURL,
-                accessURL = it.accessURL
+                accessURL = it.accessURL,
+                format = it.format,
+                mediaType = it.mediaType,
+                page = it.page?.map { uri -> SkosConcept(uri = uri) }
             )
         },
         temporal = temporal?.map {
@@ -233,7 +238,7 @@ fun DatasetDBO.toDataset(): Dataset {
         relations = relatedResources?.map { SkosConcept(uri = it.uri, prefLabel = it.prefLabel) },
         provenance = provenance?.let { SkosCode(uri = it) },
         accrualPeriodicity = frequency?.let { SkosCode(uri = it) },
-        conformsTo = conformsTo?.map { SkosConcept(uri = it.uri) },
+        conformsTo = conformsTo?.map { SkosConcept(uri = it.uri, prefLabel = it.prefLabel) },
         informationModelsFromFDK = informationModelsFromFDK,
         informationModel = informationModelsFromOtherSources?.map { model ->
             SkosConcept(
