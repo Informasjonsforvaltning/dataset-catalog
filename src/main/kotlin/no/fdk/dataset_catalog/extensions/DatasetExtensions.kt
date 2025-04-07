@@ -44,7 +44,13 @@ fun Dataset.datasetToDBO(): DatasetDBO =
         distribution = distribution?.map {
             DistributionDBO(
                 title = it.title?.let { title -> LocalizedStrings(title.get("nb"), title.get("nn"), title.get("en")) },
-                description = it.description?.let { desc -> LocalizedStrings(desc.get("nb"), desc.get("nn"), desc.get("en")) },
+                description = it.description?.let { desc ->
+                    LocalizedStrings(
+                        desc.get("nb"),
+                        desc.get("nn"),
+                        desc.get("en")
+                    )
+                },
                 downloadURL = it.downloadURL,
                 accessURL = it.accessURL,
                 license = it.license?.uri,
@@ -58,7 +64,13 @@ fun Dataset.datasetToDBO(): DatasetDBO =
         sample = sample?.map {
             DistributionDBO(
                 title = it.title?.let { title -> LocalizedStrings(title.get("nb"), title.get("nn"), title.get("en")) },
-                description = it.description?.let { desc -> LocalizedStrings(desc.get("nb"), desc.get("nn"), desc.get("en")) },
+                description = it.description?.let { desc ->
+                    LocalizedStrings(
+                        desc.get("nb"),
+                        desc.get("nn"),
+                        desc.get("en")
+                    )
+                },
                 downloadURL = it.downloadURL,
                 accessURL = it.accessURL,
                 license = it.license?.uri,
@@ -133,6 +145,8 @@ fun Dataset.datasetToDBO(): DatasetDBO =
         seriesDatasetOrder = seriesDatasetOrder
     )
 
+fun QualityAnnotationDBO.toQualityAnnotation(): QualityAnnotation =
+    QualityAnnotation(hasBody = hasBody, inDimension = inDimension, motivatedBy = motivatedBy)
 
 fun DatasetDBO.toDataset(): Dataset {
     return Dataset(
@@ -195,21 +209,26 @@ fun DatasetDBO.toDataset(): Dataset {
         },
         spatial = spatial?.map { SkosCode(uri = it) },
         accessRights = accessRight?.let { SkosCode(uri = it) },
-        legalBasisForRestriction = legalBasisForRestriction?.map { SkosConcept(uri = it.uri) },
-        legalBasisForProcessing = legalBasisForProcessing?.map { SkosConcept(uri = it.uri) },
-        legalBasisForAccess = legalBasisForAccess?.map { SkosConcept(uri = it.uri) },
-        hasAccuracyAnnotation = accuracy?.let { QualityAnnotation(hasBody = it.hasBody) },
-        hasCompletenessAnnotation = completeness?.let { QualityAnnotation(hasBody = it.hasBody) },
-        hasCurrentnessAnnotation = currentness?.let { QualityAnnotation(hasBody = it.hasBody) },
-        hasAvailabilityAnnotation = availability?.let { QualityAnnotation(hasBody = it.hasBody) },
-        hasRelevanceAnnotation = relevance?.let { QualityAnnotation(hasBody = it.hasBody) },
+        legalBasisForRestriction = legalBasisForRestriction?.map {
+            SkosConcept(
+                uri = it.uri,
+                prefLabel = it.prefLabel
+            )
+        },
+        legalBasisForProcessing = legalBasisForProcessing?.map { SkosConcept(uri = it.uri, prefLabel = it.prefLabel) },
+        legalBasisForAccess = legalBasisForAccess?.map { SkosConcept(uri = it.uri, prefLabel = it.prefLabel) },
+        hasAccuracyAnnotation = accuracy?.toQualityAnnotation(),
+        hasCompletenessAnnotation = completeness?.toQualityAnnotation(),
+        hasCurrentnessAnnotation = currentness?.toQualityAnnotation(),
+        hasAvailabilityAnnotation = availability?.toQualityAnnotation(),
+        hasRelevanceAnnotation = relevance?.toQualityAnnotation(),
         references = references?.map {
             Reference(
                 referenceType = SkosCode(code = it.referenceType),
                 source = SkosConcept(uri = it.source)
             )
         },
-        relations = relatedResources?.map { SkosConcept(uri = it.uri) },
+        relations = relatedResources?.map { SkosConcept(uri = it.uri, prefLabel = it.prefLabel) },
         provenance = provenance?.let { SkosCode(uri = it) },
         accrualPeriodicity = frequency?.let { SkosCode(uri = it) },
         conformsTo = conformsTo?.map { SkosConcept(uri = it.uri) },
