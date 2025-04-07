@@ -2,6 +2,7 @@ package no.fdk.dataset_catalog.extensions
 
 import no.fdk.dataset_catalog.model.*
 import java.time.LocalDateTime
+import javax.xml.crypto.Data
 
 fun List<Dataset>.toDTO(): DatasetEmbeddedWrapperDTO = DatasetEmbeddedWrapperDTO(mapOf(Pair("datasets", this)))
 
@@ -180,6 +181,7 @@ fun DatasetDBO.toDataset(): Dataset {
         landingPage = landingPage,
         losTheme = losTheme,
         euDataTheme = euDataTheme,
+        theme = oldThemeList(),
         distribution = distribution?.map {
             Distribution(
                 title = it.title?.toMap(),
@@ -274,4 +276,12 @@ fun LocalizedStringLists.toKeywordList(): List<Map<String, String>> {
     }
 
     return keywordList
+}
+
+fun DatasetDBO.oldThemeList(): List<DataTheme> {
+    val result: MutableList<DataTheme> = mutableListOf()
+    losTheme?.forEach { theme -> result.add(DataTheme(uri = theme)) }
+    euDataTheme?.forEach { theme -> result.add(DataTheme(uri = theme)) }
+
+    return result
 }
