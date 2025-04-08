@@ -40,8 +40,8 @@ fun Dataset.datasetToDBO(): DatasetDBO =
         modified = modified,
         language = language?.mapNotNull { it.uri },
         landingPage = landingPage,
-        euDataTheme = euDataTheme,
-        losTheme = losTheme,
+        euDataTheme = allEuDataThemes(),
+        losTheme = allLosThemes(),
         distribution = distribution?.map {
             DistributionDBO(
                 title = it.title?.let { title -> LocalizedStrings(title.get("nb"), title.get("nn"), title.get("en")) },
@@ -291,6 +291,23 @@ fun DatasetDBO.oldThemeList(): List<DataTheme>? {
 
     return if (result.size > 0) result else null
 }
+
+fun Dataset.allLosThemes(): Set<String>? {
+    val result: MutableSet<String> = losTheme?.toMutableSet() ?: mutableSetOf()
+    theme?.forEach { item -> if (item.uri != null && item.uri.startsWith("https://psi.norge.no/los")) result.add(item.uri) }
+    return if (result.size > 0) result else null
+}
+
+fun Dataset.allEuDataThemes(): Set<String>? {
+    val result: MutableSet<String> = euDataTheme?.toMutableSet() ?: mutableSetOf()
+    theme?.forEach { item ->
+        if (item.uri != null && item.uri.startsWith("http://publications.europa.eu/resource/authority/data-theme")) result.add(
+            item.uri
+        )
+    }
+    return if (result.size > 0) result else null
+}
+
 
 fun Distribution.allAccessServiceUris(): Set<String>? {
     val result: MutableSet<String> = accessServiceUris?.toMutableSet() ?: mutableSetOf()
