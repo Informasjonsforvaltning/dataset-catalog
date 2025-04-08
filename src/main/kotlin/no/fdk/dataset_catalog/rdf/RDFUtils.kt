@@ -196,21 +196,21 @@ fun Resource.addDistribution(property: Property, distributions: Collection<Distr
 private fun Distribution.hasNonNullOrEmptyProperty(): Boolean =
     title?.all { entry -> entry.value.isNullOrEmpty() } == false ||
 
-        description?.all { entry -> entry.value.isNullOrEmpty() } == false ||
+    description?.all { entry -> entry.value.isNullOrEmpty() } == false ||
 
-        accessURL?.all { entry -> entry.isNullOrEmpty() } == false ||
+    accessURL?.all { entry -> entry.isNullOrEmpty() } == false ||
 
-        !license?.uri.isNullOrEmpty() ||
+    !license?.uri.isNullOrEmpty() ||
 
-        conformsTo?.all { entry -> entry.uri.isNullOrEmpty() } == false ||
+    conformsTo?.all { entry -> entry.uri.isNullOrEmpty() } == false ||
 
-        page?.all { entry -> entry.uri.isNullOrEmpty() } == false ||
+    page?.all { entry -> entry.uri.isNullOrEmpty() } == false ||
 
-        format?.all { entry -> entry.isNullOrEmpty() } == false ||
+    format?.all { entry -> entry.isNullOrEmpty() } == false ||
 
-        mediaType?.all { entry -> entry.isNullOrEmpty() } == false ||
+    mediaType?.all { entry -> entry.isNullOrEmpty() } == false ||
 
-        !accessService.isNullOrEmpty()
+    !accessService.isNullOrEmpty()
 
 // TODO: add dcat:endpointURLs and make sure front-end sends necessary data (https://doc.difi.no/review/dcat-ap-no/#_obligatoriske_egenskaper_for_datatjeneste)
 
@@ -356,9 +356,9 @@ fun Resource.addReferences(references: Collection<Reference>?): Resource {
 
 private fun Reference.isValidReference(): Boolean =
     referenceType != null &&
-        source != null &&
-        (!referenceType.uri.isNullOrEmpty() || !referenceType.code.isNullOrEmpty()) &&
-        !source.uri.isNullOrEmpty()
+    source != null &&
+    (!referenceType.uri.isNullOrEmpty() || !referenceType.code.isNullOrEmpty()) &&
+    !source.uri.isNullOrEmpty()
 
 fun Resource.addRelations(relations: Collection<SkosConcept>?): Resource {
     relations?.forEach {
