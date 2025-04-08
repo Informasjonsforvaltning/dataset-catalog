@@ -232,8 +232,11 @@ fun DatasetDBO.toDataset(): Dataset {
         hasRelevanceAnnotation = relevance?.toQualityAnnotation(),
         references = references?.map {
             Reference(
-                referenceType = SkosCode(code = it.referenceType),
-                source = SkosConcept(uri = it.source)
+                referenceType = SkosCode(
+                    code = it.referenceType,
+                    prefLabel = it.createLabel()
+                ),
+                source = SkosConcept(uri = it.source),
             )
         },
         relations = relatedResources?.map { SkosConcept(uri = it.uri, prefLabel = it.prefLabel) },
@@ -314,3 +317,8 @@ fun Distribution.allAccessServiceUris(): Set<String>? {
     accessService?.forEach { item -> if (item.uri != null) result.add(item.uri) }
     return if (result.size > 0) result else null
 }
+
+fun ReferenceDBO.createLabel(): Map<String, String>? =
+    if (referenceType != null) {
+        mapOf("en" to referenceType)
+    } else null

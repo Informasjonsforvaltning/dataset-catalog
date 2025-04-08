@@ -20,7 +20,8 @@ val SKOSCODE_EX = SkosCode(
 )
 
 val REFERENCETYPE_EX = SkosCode(
-    code = "https://ref.code"
+    code = "isReplacedBy",
+    prefLabel = mapOf(Pair("en", "isReplacedBy")),
 )
 
 val DISTRIBUTION_EX = Distribution(
