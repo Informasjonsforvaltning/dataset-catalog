@@ -161,8 +161,6 @@ data class DatasetDBO(
 
     // datasets in this series and their order index
     val seriesDatasetOrder: Map<String, Int>? = null
-
-
 )
 
 enum class SpecializedType {
