@@ -163,7 +163,7 @@ fun DatasetDBO.toDataset(): Dataset {
             approved -> REGISTRATION_STATUS.APPROVE
             else -> REGISTRATION_STATUS.DRAFT
         },
-        concepts = concepts?.map { Concept(uri = it, prefLabel = mapOf("nb" to it)) },
+        concepts = concepts?.map { Concept(uri = it) },
         title = title?.toMap(),
         description = description?.toMap(),
         contactPoint = contactPoints?.map {
@@ -177,7 +177,7 @@ fun DatasetDBO.toDataset(): Dataset {
         keyword = keywords?.toKeywordList(),
         issued = issued,
         modified = modified,
-        language = language?.map { SkosCode( uri = it, code = it) },
+        language = language?.map { SkosCode(uri = it, code = it.split("/").last()) },
         landingPage = landingPage,
         losTheme = losTheme,
         euDataTheme = euDataTheme,
@@ -193,6 +193,7 @@ fun DatasetDBO.toDataset(): Dataset {
                 format = it.format,
                 mediaType = it.mediaType,
                 accessServiceUris = it.accessServices,
+                accessService = it.accessServices?.map { uri -> DataDistributionService(uri = uri) },
                 page = it.page?.map { uri -> SkosConcept(uri = uri) }
 
             )
@@ -283,10 +284,10 @@ fun LocalizedStringLists.toKeywordList(): List<Map<String, String>> {
     return keywordList
 }
 
-fun DatasetDBO.oldThemeList(): List<DataTheme> {
+fun DatasetDBO.oldThemeList(): List<DataTheme>? {
     val result: MutableList<DataTheme> = mutableListOf()
     losTheme?.forEach { theme -> result.add(DataTheme(uri = theme)) }
     euDataTheme?.forEach { theme -> result.add(DataTheme(uri = theme)) }
 
-    return result
+    return if (result.size > 0) result else null
 }
