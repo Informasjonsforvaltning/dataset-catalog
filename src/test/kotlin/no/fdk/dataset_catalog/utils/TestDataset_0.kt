@@ -32,7 +32,9 @@ val DISTRIBUTION_EX = Distribution(
     conformsTo = listOf(SkosConcept("http://test.uri")),
     format = listOf("Formats"),
     mediaType = listOf("MediaTypes"),
-    accessServiceUris = setOf("http://test.uri")
+    accessServiceUris = setOf("http://test.uri"),
+    accessService = listOf(DataDistributionService(uri = "http://test.uri"))
+
 )
 
 val SAMPLE_EX = Distribution(
@@ -69,7 +71,7 @@ val TEST_DATASET_0 = Dataset(
     keyword = listOf(mapOf(Pair("nb", "Nøkkelord"))),
     issued = LocalDate.now(),
     modified = LocalDate.now(),
-    language = listOf(SKOSCODE_EX),
+    language = listOf(SkosCode(uri = "http://publications.europa.eu/resource/authority/language/NNO", code = "NNO")),
     landingPage = listOf("www.hjemmeside.no"),
     losTheme = setOf("https://psi.norge.no/los/tema/arbeid"),
     euDataTheme = setOf("http://publications.europa.eu/resource/authority/data-theme/AGRI"),
