@@ -59,7 +59,7 @@ fun Dataset.datasetToDBO(): DatasetDBO =
                 page = it.page?.mapNotNull { page -> page.uri },
                 format = it.format,
                 mediaType = it.mediaType,
-                accessServices = it.accessServiceUris
+                accessServices = it.allAccessServiceUris()
             )
         },
         sample = sample?.map {
@@ -79,7 +79,7 @@ fun Dataset.datasetToDBO(): DatasetDBO =
                 page = it.page?.mapNotNull { page -> page.uri },
                 format = it.format,
                 mediaType = it.mediaType,
-                accessServices = it.accessServiceUris
+                accessServices = it.allAccessServiceUris()
             )
         },
         temporal = temporal?.map {
@@ -289,5 +289,11 @@ fun DatasetDBO.oldThemeList(): List<DataTheme>? {
     losTheme?.forEach { theme -> result.add(DataTheme(uri = theme)) }
     euDataTheme?.forEach { theme -> result.add(DataTheme(uri = theme)) }
 
+    return if (result.size > 0) result else null
+}
+
+fun Distribution.allAccessServiceUris(): Set<String>? {
+    val result: MutableSet<String> = accessServiceUris?.toMutableSet() ?: mutableSetOf()
+    accessService?.forEach { item -> if (item.uri != null) result.add(item.uri) }
     return if (result.size > 0) result else null
 }
