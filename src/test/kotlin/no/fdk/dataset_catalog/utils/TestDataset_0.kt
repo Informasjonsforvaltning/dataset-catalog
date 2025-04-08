@@ -73,8 +73,6 @@ val TEST_DATASET_0 = Dataset(
     modified = LocalDate.now(),
     language = listOf(SkosCode(uri = "http://publications.europa.eu/resource/authority/language/NNO", code = "NNO")),
     landingPage = listOf("www.hjemmeside.no"),
-    losTheme = setOf("https://psi.norge.no/los/tema/arbeid"),
-    euDataTheme = setOf("http://publications.europa.eu/resource/authority/data-theme/AGRI"),
     distribution = listOf(DISTRIBUTION_EX),
     sample = listOf(SAMPLE_EX),
     temporal = listOf(PERIODOFTIME_EX),
