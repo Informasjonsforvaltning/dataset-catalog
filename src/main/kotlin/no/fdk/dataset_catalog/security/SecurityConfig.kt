@@ -1,5 +1,6 @@
 package no.fdk.dataset_catalog.security
 
+import jakarta.servlet.http.HttpServletRequest
 import no.fdk.dataset_catalog.configuration.SecurityProperties
 import org.apache.jena.riot.Lang
 import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties
@@ -11,7 +12,6 @@ import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator
 import org.springframework.security.oauth2.jwt.*
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.util.matcher.RequestMatcher
-import jakarta.servlet.http.HttpServletRequest
 import org.springframework.web.cors.CorsConfiguration
 
 @Configuration
@@ -34,12 +34,12 @@ open class SecurityConfig(
                     config
                 }
             }
-            .authorizeHttpRequests{ authorize ->
+            .authorizeHttpRequests { authorize ->
                 authorize.requestMatchers(RDFMatcher()).permitAll()
                     .requestMatchers(HttpMethod.OPTIONS).permitAll()
-                    .requestMatchers(HttpMethod.GET,"/ping").permitAll()
-                    .requestMatchers(HttpMethod.GET,"/ready").permitAll()
-                    .anyRequest().authenticated() }
+                    .requestMatchers(HttpMethod.GET, "/ping", "/ready", "/swagger-ui/**", "/v3/**").permitAll()
+                    .anyRequest().authenticated()
+            }
             .oauth2ResourceServer { resourceServer -> resourceServer.jwt { } }
         return http.build()
     }
@@ -59,7 +59,7 @@ open class SecurityConfig(
     }
 }
 
-private class RDFMatcher: RequestMatcher{
+private class RDFMatcher : RequestMatcher {
     override fun matches(request: HttpServletRequest?): Boolean =
         request?.method == "GET" && acceptHeaderIsRDF(request.getHeader("Accept"))
 }

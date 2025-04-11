@@ -1,55 +1,48 @@
-# dataset-catalog
-A back end service for creating dataset catalogues and datasets. Exposes a dcat-ap-no endpoint.
+# Dataset Catalog
 
+This application provides an API for the management of datasets. A dataset is defined according to
+the [DCAT-AP-NO](https://data.norge.no/specification/dcat-ap-no) specification.
 
-## Requirements
-- maven
-- java 21
-- docker
-- docker-compose
+For a broader understanding of the system’s context, refer to
+the [architecture documentation](https://github.com/Informasjonsforvaltning/architecture-documentation) wiki. For more
+specific context on this application, see the **Registration** subsystem section.
 
-## Environment Variables
+## Getting Started
 
+These instructions will give you a copy of the project up and running on your local machine for development and testing
+purposes.
+
+### Prerequisites
+
+Ensure you have the following installed:
+
+- Java 21
+- Maven
+- Docker
+
+### Running locally
+
+Clone the repository
+
+```sh
+git clone https://github.com/Informasjonsforvaltning/dataset-catalog.git
+cd dataset-catalog
 ```
-export FDK_BASE_HOST
-export LOG_LEVEL
-export MONGO_HOST
-export MONGO_PORT
-export MONGO_USERNAME
-export MONGO_PASSWORD
-export ORGANIZATION_CATALOGUE_HOST
-export OIDC_ISSUER
-export OIDC_JWKS
-export RABBIT_HOST
-export RABBIT_USERNAME
-export RABBIT_PASSWORD
-export SEARCH_FULLTEXT_HOST
+
+Start MongoDB, RabbitMQ and the application (either through your IDE using the dev profile, or via CLI):
+
+```sh
+docker compose up -d
+mvn spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
-## Run tests
-Run tests with maven:
-```
+### API Documentation (OpenAPI)
+
+Once the application is running locally, the API documentation can be accessed
+at http://localhost:8080/swagger-ui/index.html
+
+### Running tests
+
+```sh
 mvn verify
-```
-
-## Run locally
-```
-docker-compose up -d
-mvn spring-boot:run -Dspring-boot.run.profiles=develop
-```
-
-Then in another terminal e.g.
-```
-curl http://localhost:8080/ping
-curl http://localhost:8080/ready
-```
-
-## Datastore
-To inspect local MongoDB:
-```
-% docker-compose exec mongodb mongo
-% use admin
-% db.auth("admin","admin")
-% use datasetCatalog
-% db.datasets.find()
 ```
