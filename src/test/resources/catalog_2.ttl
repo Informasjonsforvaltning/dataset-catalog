@@ -17,25 +17,6 @@
 @prefix cpsv:  <http://purl.org/vocab/cpsv#> .
 @prefix cpsvno:  <https://data.norge.no/vocabulary/cpsvno#> .
 
-<http://contact/someContactURI/123>
-        a                        vcard:Organization ;
-        vcard:hasEmail           <mailto:digitalisering@kartverket.no> ;
-        vcard:hasTelephone       <tel:22306022> ;
-        vcard:hasURL             <http://testetaten.no/url> ;
-        vcard:organization-unit  "Avdeling for digitalisering" .
-
-<http://publications.europa.eu/resource/authority/language/NOR>
-        a               dct:LinguisticSystem ;
-        <http://publications.europa.eu/ontology/authority/authority-code>
-                "NOR" ;
-        skos:prefLabel  "Norsk"@nb .
-
-<http://localhost:5050/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d/samples/d2>
-        a                dcat:Distribution ;
-        dct:description  "Dette er beskrivelsen av eksempeldataene. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor."@nb ;
-        dct:format       <http://publications.europa.eu/resource/authority/file-type/RDF> ;
-        dcat:mediaType   <https://www.iana.org/assignments/media-types/application/rdf+xml> ;
-        dcat:accessURL   <http://www.detteerenlenke.no/til-nedlasting> .
 
 <http://localhost:5050/catalogs/987654321>
         a                dcat:Catalog ;
@@ -43,16 +24,7 @@
         dct:title        "Dataset catalog belonging to 987654321"@en ;
         dcat:dataset     <http://localhost:5050/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d> .
 
-<http://uri-2>  a   rdfs:Resource ;
-        rdfs:label  "label-2-en"@en , "label-2-nb"@nb .
-
-<http://publications.europa.eu/resource/authority/language/ENG>
-        a               dct:LinguisticSystem ;
-        <http://publications.europa.eu/ontology/authority/authority-code>
-                "ENG" ;
-        skos:prefLabel  "Engelsk"@nb .
-
-<http://uri-1>  a   rdfs:Resource ;
+<http://uri-1>  a   rdfs:Resource;
         rdfs:label  "label-1-en"@en , "label-1-nb"@nb .
 
 <http://localhost:5050/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d/distributions/d1>
@@ -72,7 +44,6 @@
 
 <http://localhost:5050/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d>
         a                               dcat:Dataset ;
-        dct:identifier   "http://localhost:5050/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d" ;
         cpsv:follows [ a cpsv:Rule ;
             dct:type cpsvno:ruleForDisclosure ;
             cpsv:implements [ a eli:LegalResource ;
@@ -83,7 +54,7 @@
             ] ;
         ] , [
             a cpsv:Rule ;
-            dct:type cpsvno:ruleForDataProcessing ; # NB! Denne har vi ikke ennå
+            dct:type cpsvno:ruleForDataProcessing ;
             cpsv:implements [
                 a eli:LegalResource ;
                 rdfs:seeAlso <http://lovdata/paragraph/2> ;
@@ -135,7 +106,6 @@
         dct:language                    <http://publications.europa.eu/resource/authority/language/ENG> , <http://publications.europa.eu/resource/authority/language/NOR> ;
         dct:modified                    "2016-09-21"^^xsd:date ;
         dct:provenance                  <http://data.brreg.no/datakatalog/provenance/vedtak> ;
-        dct:publisher                   <http://data.brreg.no/enhetsregisteret/enhet/987654321> ;
         dct:references                  <http://referenced/dataset/resolved> ;
         dct:relation                    <http://uri-2> , <http://uri-1> ;
         dct:spatial                     <http://www.geonames.org/3162656/asker.html> , <http://www.geonames.org/3141104/royken.html> , <http://www.geonames.org/3162212/baerum.html> , <http://www.geonames.org/3151404/hurum.html> ;
@@ -149,13 +119,30 @@
                                         ] ;
         dct:title                       "Markagrensen Oslo Kommune og nærliggende kommuner"@nb ;
         dct:type                        "Kodeliste" ;
-        adms:identifier                 <http://adms.identifier.no/scheme/42> ;
-        adms:sample                     <http://localhost:5050/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d/samples/d2> ;
-        dcat:contactPoint               <http://contact/someContactURI/123> ;
+        adms:sample                     [ a                dcat:Distribution ;
+                                          dct:description  "Dette er beskrivelsen av eksempeldataene. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor."@nb ;
+                                          dct:format       <http://publications.europa.eu/resource/authority/file-type/RDF> ;
+                                          dcat:accessURL   <http://www.detteerenlenke.no/til-nedlasting> ;
+                                          dcat:mediaType   <https://www.iana.org/assignments/media-types/application/rdf+xml>
+                                        ];
+        dcat:contactPoint         [ rdf:type            vcard:Organization;
+                                    vcard:fn            "Avdeling for digitalisering"@nb;
+                                    vcard:hasEmail      <mailto:digitalisering@kartverket.no>;
+                                    vcard:hasTelephone  <tel:22306022>;
+                                    vcard:hasURL        <http://testetaten.no/url>
+                                  ];
         dcat:contactPoint               [ a               vcard:Organization ;
                                           vcard:hasEmail  <mailto:anonymous@anonym.org.no>
                                         ] ;
-        dcat:distribution               <http://localhost:5050/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d/distributions/d1> ;
+        dcat:distribution               [ a                      dcat:Distribution ;
+                                          dct:conformsTo         <https://www.kartverket.no/geodataarbeid/standarder/sosi/> ;
+                                          dct:description        "Dette er beskrivelsen av distribusjonen. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Vestibulum id ligula porta felis euismod semper con desbit arum. Se dokumentasjon for denne distribusjonen."@nb ;
+                                          dct:format             <http://publications.europa.eu/resource/authority/file-type/JSON> ;
+                                          dct:license            <https://data.norge.no/nlod/no/2.0> ;
+                                          dcat:accessService  <http://www.hjem.no/> ;
+                                          dcat:accessURL         <http://www.detteerentredjelenke.no/til-en-tredje-nedlasting> , <http://www.detteerenannenlenke.no/til-en-annen-nedlasting> , <http://www.detteerenlenke.no/til-nedlasting> ;
+                                          dcat:mediaType         <https://www.iana.org/assignments/media-types/application/json> ;
+                                        ];
         dcat:keyword                    "Bestemmelse"@nb , "statlig bestemmelse"@nb , "regulering"@nb , "jord"@nb ;
         dcat:landingPage                <http://testetaten.no/landingsside/nr1> ;
         dcat:theme                      <http://publications.europa.eu/resource/authority/data-theme/ENVI> , <http://publications.europa.eu/resource/authority/data-theme/GOVE> , <https://psi.norge.no/los/tema/lov-og-rett>;
@@ -193,8 +180,7 @@
                                             rdf:value       "Denne teksten sier noe om relevansen. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras mattis consectetur purus sit amet fermentum. Cum sociis natoque penatibus et magnis dis parturient montes." ;
                                             dct:language     <http://publications.europa.eu/resource/authority/language/NOR> ;
                                             dct:format       <http://publications.europa.eu/resource/authority/file-type/TXT> ]
-                                        ] ;
-        foaf:page                       <http://uri1> .
+                                        ] .
 
 <https://data-david.github.io/Begrep/begrep/Enhet>
         a                skos:Concept ;
