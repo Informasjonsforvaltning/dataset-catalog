@@ -26,15 +26,6 @@ fun Resource.safeAddLinkListProperty(property: Property, value: List<String>?): 
     return this
 }
 
-fun Resource.safeAddStringListLiteral(property: Property, value: List<String>?): Resource {
-    value?.forEach { safeAddStringLiteral(property, it) }
-    return this
-}
-
-fun Resource.safeAddLangListProperty(property: Property, langMapList: List<Map<String, String>>?): Resource {
-    langMapList?.forEach { safeAddPropertyByLang(property, it) }
-    return this
-}
 
 fun Resource.safeAddLangListLiteral(property: Property, langMapList: List<Map<String, String>>?): Resource {
     langMapList?.forEach { safeAddLiteralByLang(property, it) }
@@ -178,7 +169,7 @@ fun Resource.addDistributionConformsTo(conformsTo: Collection<UriWithLabel>?): R
                 model.safeCreateResource(it.uri)
                     .addProperty(RDF.type, DCTerms.Standard)
                     .safeAddLinkedProperty(RDFS.seeAlso, it.uri)
-                    .safeAddLiteralByLang(DCTerms.title, it.prefLabel)
+                    .safeAddLocalizedString(DCTerms.title, it.prefLabel)
             )
         }
     }
@@ -283,22 +274,6 @@ private fun DistributionDBO.hasNonNullOrEmptyProperty(): Boolean =
 
         !accessServices.isNullOrEmpty()
 
-fun Resource.addThemes(ds: Dataset): Resource {
-    val uniqueThemes = mutableSetOf<String>()
-
-    ds.theme?.mapNotNull { it.uri }
-        ?.filter { it.isValidURI() }
-        ?.let { uniqueThemes.addAll(it) }
-
-    ds.losTheme?.filter { it.isValidURI() }
-        ?.let { uniqueThemes.addAll(it) }
-
-    ds.euDataTheme?.filter { it.isValidURI() }
-        ?.let { uniqueThemes.addAll(it) }
-    safeAddLinkListProperty(DCAT.theme, uniqueThemes.toList())
-
-    return this
-}
 
 fun Resource.addDatasetThemes(ds: DatasetDBO): Resource {
     val uniqueThemes = mutableSetOf<String>()
@@ -356,7 +331,7 @@ fun Resource.addLegalBasis(ds: DatasetDBO): Resource {
 
 
 private fun Resource.addRule(rule: UriWithLabel, ruleType: Resource): Resource {
-    if (rule.uri.isValidURL() && !rule.prefLabel.isNullOrEmpty()) {
+    if (rule.uri.isValidURL() && rule.prefLabel.isValidLangField()) {
         addProperty(
             CPSV.follows,
             model.createResource()
@@ -371,7 +346,7 @@ private fun Resource.addRule(rule: UriWithLabel, ruleType: Resource): Resource {
                             DCTerms.type,
                             model.createResource()
                                 .addProperty(RDF.type, SKOS.Concept)
-                                .safeAddLiteralByLang(SKOS.prefLabel, rule.prefLabel)
+                                .safeAddLocalizedString(SKOS.prefLabel, rule.prefLabel)
                         )
                 )
         )
@@ -416,7 +391,7 @@ fun Resource.addQualityAnnotationDimension(property: Property, dimension: String
     return this
 }
 
-fun Resource.addQualityAnnotationBody(body: Map<String, String>?): Resource {
+fun Resource.addQualityAnnotationBody2(body: Map<String, String>?): Resource {
     body?.forEach { (key, value) ->
         addProperty(
             OA.hasBody,
@@ -430,15 +405,28 @@ fun Resource.addQualityAnnotationBody(body: Map<String, String>?): Resource {
     return this
 }
 
-private fun getReferencePropertyURI(code: String?, uri: String?): String {
-    return if (!code.isNullOrEmpty()) {
-        val newCode = code.replaceFirst("dct:", "")
-        if (newCode.startsWith(DCTerms.NS)) {
-            newCode
-        } else {
-            DCTerms.getURI() + newCode
-        }
-    } else uri!!
+fun Resource.addQualityAnnotationBody(body: LocalizedStrings?): Resource {
+    body?.nb?.let { nb ->
+        addQualityAnnotationBody(nb, LinguisticSystem.NOB.uri)
+    }
+    body?.nn?.let { nn ->
+        addQualityAnnotationBody(nn, LinguisticSystem.NNO.uri)
+    }
+    body?.en?.let { en ->
+        addQualityAnnotationBody(en, LinguisticSystem.ENG.uri)
+    }
+    return this
+}
+
+fun Resource.addQualityAnnotationBody(text: String, lang: String) {
+    addProperty(
+        OA.hasBody,
+        model.safeCreateResource()
+            .addProperty(RDF.type, OA.TextualBody)
+            .safeAddStringLiteral(RDF.value, text)
+            .safeAddLinkedProperty(DCTerms.language, lang)
+            .safeAddLinkedProperty(DCTerms.format, "http://publications.europa.eu/resource/authority/file-type/TXT")
+    )
 }
 
 private fun referenceTypeToProperty(referenceTypeString: String?): Property? {
@@ -488,7 +476,7 @@ fun Resource.addRelatedResources(relations: List<UriWithLabel>?): Resource {
                 DCTerms.relation,
                 model.safeCreateResource(it.uri)
                     .addProperty(RDF.type, RDFS.Resource)
-                    .safeAddLiteralByLang(RDFS.label, it.prefLabel)
+                    .safeAddLocalizedString(RDFS.label, it.prefLabel)
             )
         }
     }
@@ -507,6 +495,13 @@ private fun Map<String, String>?.isValidLangField(): Boolean =
         getOrDefault("no", "").isNotBlank() -> true
         else -> false
     }
+
+private fun LocalizedStrings?.isValidLangField(): Boolean =
+    this != null &&
+        (nb?.isNotBlank() == true ||
+            nn?.isNotBlank() == true ||
+            en?.isNotBlank() == true ||
+            nb?.isNotBlank() == true)
 
 fun Resource.addQualifiedAttributions(qualifiedAttributions: Collection<String>?): Resource {
     qualifiedAttributions?.forEach {
@@ -544,21 +539,6 @@ fun Resource.addPublisher(publisher: Publisher?): Resource {
 }
 
 
-fun Resource.addSubjects(subjects: Collection<Concept>?): Resource {
-    subjects?.forEach {
-        addProperty(
-            DCTerms.subject,
-            model.safeCreateResource(it.uri)
-                .addProperty(RDF.type, SKOS.Concept)
-                .safeAddProperty(DCTerms.identifier, it.identifier)
-                .safeAddLangListLiteral(SKOS.altLabel, it.altLabel)
-                .safeAddPropertyByLang(SKOS.prefLabel, it.prefLabel)
-                .safeAddLiteralByLang(SKOS.definition, it.definition?.text)
-        )
-    }
-    return this
-}
-
 fun Resource.addConcepts(subjects: Set<String>?): Resource {
     subjects?.forEach {
         addProperty(
@@ -569,9 +549,6 @@ fun Resource.addConcepts(subjects: Set<String>?): Resource {
     return this
 }
 
-fun Resource.addInSeries(inSeries: String?, inSeriesIsPublished: Boolean): Resource =
-    if (inSeriesIsPublished) safeAddLinkedProperty(ResourceFactory.createProperty("${DCAT.getURI()}inSeries"), inSeries)
-    else this
 
 fun Resource.addLanguages(language: List<String>?): Resource {
     language?.forEach {
@@ -633,11 +610,6 @@ fun Model.safeCreateLinkedResource(value: String? = null): Resource? =
 
 // -------- Utils --------
 
-enum class JenaType(val value: String) {
-    TURTLE("TURTLE"),
-    NOT_ACCEPTABLE("")
-}
-
 fun String?.isValidURL(): Boolean =
     try {
         URL(this)
@@ -661,9 +633,6 @@ fun keywordToLinguisticSystem(keyword: String): LinguisticSystem =
         else -> LinguisticSystem.NOR
     }
 
-fun Dataset.dctIdentifier(): List<String>? =
-    originalUri?.let { listOf(it) }
-        ?: uri?.let { listOf(it) }
 
 class SeriesData(
     val inSeries: String?,

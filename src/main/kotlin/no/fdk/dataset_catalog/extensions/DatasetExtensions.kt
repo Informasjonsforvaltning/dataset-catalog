@@ -55,7 +55,7 @@ fun Dataset.datasetToDBO(): DatasetDBO =
                 downloadURL = it.downloadURL,
                 accessURL = it.accessURL,
                 license = it.license?.uri,
-                conformsTo = it.conformsTo?.map { concept -> UriWithLabel(concept.uri, concept.prefLabel) },
+                conformsTo = it.conformsTo?.map { concept -> UriWithLabel(concept.uri, concept.prefLabel?.toLocalizedStrings()) },
                 page = it.page?.mapNotNull { page -> page.uri },
                 format = it.format,
                 mediaType = it.mediaType,
@@ -75,7 +75,7 @@ fun Dataset.datasetToDBO(): DatasetDBO =
                 downloadURL = it.downloadURL,
                 accessURL = it.accessURL,
                 license = it.license?.uri,
-                conformsTo = it.conformsTo?.map { standard -> UriWithLabel(standard.uri, standard.prefLabel) },
+                conformsTo = it.conformsTo?.map { standard -> UriWithLabel(standard.uri, standard.prefLabel?.toLocalizedStrings()) },
                 page = it.page?.mapNotNull { page -> page.uri },
                 format = it.format,
                 mediaType = it.mediaType,
@@ -90,42 +90,42 @@ fun Dataset.datasetToDBO(): DatasetDBO =
         },
         spatial = spatial?.mapNotNull { it.uri },
         accessRight = accessRights?.uri,
-        legalBasisForRestriction = legalBasisForRestriction?.map { UriWithLabel(it.uri, it.prefLabel) },
-        legalBasisForProcessing = legalBasisForProcessing?.map { UriWithLabel(it.uri, it.prefLabel) },
-        legalBasisForAccess = legalBasisForAccess?.map { UriWithLabel(it.uri, it.prefLabel) },
+        legalBasisForRestriction = legalBasisForRestriction?.map { UriWithLabel(it.uri, it.prefLabel?.toLocalizedStrings()) },
+        legalBasisForProcessing = legalBasisForProcessing?.map { UriWithLabel(it.uri, it.prefLabel?.toLocalizedStrings()) },
+        legalBasisForAccess = legalBasisForAccess?.map { UriWithLabel(it.uri, it.prefLabel?.toLocalizedStrings()) },
         accuracy = hasAccuracyAnnotation?.let {
             QualityAnnotationDBO(
                 inDimension = it.inDimension,
                 motivatedBy = it.motivatedBy,
-                hasBody = it.hasBody
+                hasBody = it.hasBody?.toLocalizedStrings()
             )
         },
         completeness = hasCompletenessAnnotation?.let {
             QualityAnnotationDBO(
                 inDimension = it.inDimension,
                 motivatedBy = it.motivatedBy,
-                hasBody = it.hasBody
+                hasBody = it.hasBody?.toLocalizedStrings()
             )
         },
         currentness = hasCurrentnessAnnotation?.let {
             QualityAnnotationDBO(
                 inDimension = it.inDimension,
                 motivatedBy = it.motivatedBy,
-                hasBody = it.hasBody
+                hasBody = it.hasBody?.toLocalizedStrings()
             )
         },
         availability = hasAvailabilityAnnotation?.let {
             QualityAnnotationDBO(
                 inDimension = it.inDimension,
                 motivatedBy = it.motivatedBy,
-                hasBody = it.hasBody
+                hasBody = it.hasBody?.toLocalizedStrings()
             )
         },
         relevance = hasRelevanceAnnotation?.let {
             QualityAnnotationDBO(
                 inDimension = it.inDimension,
                 motivatedBy = it.motivatedBy,
-                hasBody = it.hasBody
+                hasBody = it.hasBody?.toLocalizedStrings()
             )
         },
         references = references?.map {
@@ -134,11 +134,11 @@ fun Dataset.datasetToDBO(): DatasetDBO =
                 source = it.source?.uri
             )
         },
-        relatedResources = relations?.map { UriWithLabel(it.uri, it.prefLabel) },
+        relatedResources = relations?.map { UriWithLabel(it.uri, it.prefLabel?.toLocalizedStrings()) },
         provenance = provenance?.uri,
         frequency = accrualPeriodicity?.uri,
-        conformsTo = conformsTo?.map { UriWithLabel(it.uri, it.prefLabel) },
-        informationModelsFromOtherSources = informationModel?.map { UriWithLabel(it.uri, it.prefLabel) },
+        conformsTo = conformsTo?.map { UriWithLabel(it.uri, it.prefLabel?.toLocalizedStrings()) },
+        informationModelsFromOtherSources = informationModel?.map { UriWithLabel(it.uri, it.prefLabel?.toLocalizedStrings()) },
         informationModelsFromFDK = informationModelsFromFDK,
         qualifiedAttributions = qualifiedAttributions,
         type = type,
@@ -147,7 +147,7 @@ fun Dataset.datasetToDBO(): DatasetDBO =
     )
 
 fun QualityAnnotationDBO.toQualityAnnotation(): QualityAnnotation =
-    QualityAnnotation(hasBody = hasBody, inDimension = inDimension, motivatedBy = motivatedBy)
+    QualityAnnotation(hasBody = hasBody?.toMap(), inDimension = inDimension, motivatedBy = motivatedBy)
 
 fun DatasetDBO.toDataset(): Dataset {
     return Dataset(
@@ -189,7 +189,7 @@ fun DatasetDBO.toDataset(): Dataset {
                 downloadURL = it.downloadURL,
                 accessURL = it.accessURL,
                 license = SkosConcept(uri = it.license),
-                conformsTo = it.conformsTo?.map { uri -> SkosConcept(uri = uri.uri, prefLabel = uri.prefLabel) },
+                conformsTo = it.conformsTo?.map { uri -> SkosConcept(uri = uri.uri, prefLabel = uri.prefLabel?.toMap()) },
                 format = it.format,
                 mediaType = it.mediaType,
                 accessServiceUris = it.accessServices,
@@ -220,11 +220,11 @@ fun DatasetDBO.toDataset(): Dataset {
         legalBasisForRestriction = legalBasisForRestriction?.map {
             SkosConcept(
                 uri = it.uri,
-                prefLabel = it.prefLabel
+                prefLabel = it.prefLabel?.toMap()
             )
         },
-        legalBasisForProcessing = legalBasisForProcessing?.map { SkosConcept(uri = it.uri, prefLabel = it.prefLabel) },
-        legalBasisForAccess = legalBasisForAccess?.map { SkosConcept(uri = it.uri, prefLabel = it.prefLabel) },
+        legalBasisForProcessing = legalBasisForProcessing?.map { SkosConcept(uri = it.uri, prefLabel = it.prefLabel?.toMap()) },
+        legalBasisForAccess = legalBasisForAccess?.map { SkosConcept(uri = it.uri, prefLabel = it.prefLabel?.toMap()) },
         hasAccuracyAnnotation = accuracy?.toQualityAnnotation(),
         hasCompletenessAnnotation = completeness?.toQualityAnnotation(),
         hasCurrentnessAnnotation = currentness?.toQualityAnnotation(),
@@ -239,15 +239,15 @@ fun DatasetDBO.toDataset(): Dataset {
                 source = SkosConcept(uri = it.source),
             )
         },
-        relations = relatedResources?.map { SkosConcept(uri = it.uri, prefLabel = it.prefLabel) },
+        relations = relatedResources?.map { SkosConcept(uri = it.uri, prefLabel = it.prefLabel?.toMap()) },
         provenance = provenance?.let { SkosCode(uri = it) },
         accrualPeriodicity = frequency?.let { SkosCode(uri = it) },
-        conformsTo = conformsTo?.map { SkosConcept(uri = it.uri, prefLabel = it.prefLabel) },
+        conformsTo = conformsTo?.map { SkosConcept(uri = it.uri, prefLabel = it.prefLabel?.toMap()) },
         informationModelsFromFDK = informationModelsFromFDK,
         informationModel = informationModelsFromOtherSources?.map { model ->
             SkosConcept(
                 uri = model.uri,
-                prefLabel = model.prefLabel
+                prefLabel = model.prefLabel?.toMap()
             )
         },
         qualifiedAttributions = qualifiedAttributions,
@@ -263,6 +263,14 @@ fun LocalizedStrings.toMap(): Map<String, String> {
     nn?.let { map["nn"] = it }
     en?.let { map["en"] = it }
     return map
+}
+
+fun Map<String, String>.toLocalizedStrings(): LocalizedStrings {
+    return LocalizedStrings(
+        nb = this["nb"],
+        nn = this["nn"],
+        en = this["en"]
+    )
 }
 
 fun LocalizedStringLists.toKeywordList(): List<Map<String, String>> {

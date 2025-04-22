@@ -207,7 +207,7 @@ data class PeriodOfTimeDBO(
 data class QualityAnnotationDBO(
     val inDimension: String? = null,
     val motivatedBy: String? = null,
-    val hasBody: Map<String, String>? = null
+    val hasBody: LocalizedStrings? = null
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -217,12 +217,16 @@ data class ReferenceDBO(
     val source: String? = null // referenced dataset uri
 )
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class LocalizedStrings(
     val nb: String? = null,
     val nn: String? = null,
     val en: String? = null,
 )
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class LocalizedStringLists(
     val nb: List<String>? = null,
     val nn: List<String>? = null,
@@ -239,5 +243,5 @@ data class User(
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class UriWithLabel(
     val uri: String? = null,
-    val prefLabel: Map<String, String>? = null,
+    val prefLabel: LocalizedStrings? = null,
 )
