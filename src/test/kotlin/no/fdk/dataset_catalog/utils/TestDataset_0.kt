@@ -20,8 +20,9 @@ val SKOSCODE_EX = SkosCode(
 )
 
 val REFERENCETYPE_EX = SkosCode(
+    uri = "http://purl.org/dc/terms/isReplacedBy",
     code = "isReplacedBy",
-    prefLabel = mapOf(Pair("en", "isReplacedBy")),
+    prefLabel = mapOf(Pair("en", "isReplacedBy"))
 )
 
 val DISTRIBUTION_EX = Distribution(

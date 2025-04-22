@@ -34,6 +34,7 @@
         dct:identifier   "http://db2" ;
         dct:type         <http://publications.europa.eu/resource/authority/dataset-type/TEST_DATA> ;
         dct:description  "test words"@en ;
+        dct:isReplacedBy     <http://test.uri>;
         dct:title        "enda en"@nb .
 
 <http://554433221>  a  dcat:Catalog .
