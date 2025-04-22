@@ -141,34 +141,34 @@
                                           dqv:inDimension  <http://iso.org/25012/2008/dataquality/Currentness> ;
                                           oa:hasBody     [ a    oa:TextualBody ;
                                             rdf:value       "Denne teksten sier noe om aktualiteten. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras mattis consectetur purus sit amet fermentum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus." ;
-                                            dct:language     <http://publications.europa.eu/resource/authority/language/NOR> ;
+                                            dct:language     <http://publications.europa.eu/resource/authority/language/NOB> ;
                                             dct:format       <http://publications.europa.eu/resource/authority/file-type/TXT> ]
                                         ] ;
         dqv:hasQualityAnnotation        [ a                dqv:QualityAnnotation ;
                                           dqv:inDimension  <http://iso.org/25012/2008/dataquality/Completeness> ;
                                           oa:hasBody     [ a    oa:TextualBody ;
                                             rdf:value       "Denne teksten sier noe om komplettheten. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras mattis consectetur purus sit amet fermentum." ;
-                                            dct:language     <http://publications.europa.eu/resource/authority/language/NOR> ;
+                                            dct:language     <http://publications.europa.eu/resource/authority/language/NOB> ;
                                             dct:format       <http://publications.europa.eu/resource/authority/file-type/TXT> ]
                                         ] ;
         dqv:hasQualityAnnotation        [ a                dqv:QualityAnnotation ;
                                           dqv:inDimension  <http://iso.org/25012/2008/dataquality/Accuracy> ;
                                           oa:hasBody     [ a    oa:TextualBody ;
                                             rdf:value       "Denne teksten sier noe om nøyaktigheten. Cras mattis consectetur purus sit." ;
-                                            dct:language     <http://publications.europa.eu/resource/authority/language/NOR> ;
+                                            dct:language     <http://publications.europa.eu/resource/authority/language/NOB> ;
                                             dct:format       <http://publications.europa.eu/resource/authority/file-type/TXT> ]
                                         ] ;
         dqv:hasQualityAnnotation        [ a                dqv:QualityAnnotation ;
                                           dqv:inDimension  <http://iso.org/25012/2008/dataquality/Availability> ;
                                           oa:hasBody     [ a    oa:TextualBody ;
                                             rdf:value       "Denne teksten sier noe om tilgjengeligheten. Vestibulum id ligula porta felis euismod semper. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras mattis consectetur purus sit amet fermentum." ;
-                                            dct:language     <http://publications.europa.eu/resource/authority/language/NOR> ;
+                                            dct:language     <http://publications.europa.eu/resource/authority/language/NOB> ;
                                             dct:format       <http://publications.europa.eu/resource/authority/file-type/TXT> ]
                                         ] ;
         dqv:hasQualityAnnotation        [ a                dqv:QualityAnnotation ;
                                           dqv:inDimension  <http://iso.org/25012/2008/dataquality/Relevance> ;
                                           oa:hasBody     [ a    oa:TextualBody ;
                                             rdf:value       "Denne teksten sier noe om relevansen. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras mattis consectetur purus sit amet fermentum. Cum sociis natoque penatibus et magnis dis parturient montes." ;
-                                            dct:language     <http://publications.europa.eu/resource/authority/language/NOR> ;
+                                            dct:language     <http://publications.europa.eu/resource/authority/language/NOB> ;
                                             dct:format       <http://publications.europa.eu/resource/authority/file-type/TXT> ]
                                         ] .

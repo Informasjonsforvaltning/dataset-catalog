@@ -25,14 +25,6 @@ fun Resource.safeAddLinkListProperty(property: Property, value: List<String>?): 
     return this
 }
 
-fun Resource.safeAddLiteralByLang(property: Property, langMap: Map<String, String>?): Resource {
-    if (langMap?.get("no") != null) safeAddLangLiteral(property, langMap["no"], "no")
-    if (langMap?.get("nb") != null) safeAddLangLiteral(property, langMap["nb"], "nb")
-    if (langMap?.get("nn") != null) safeAddLangLiteral(property, langMap["nn"], "nn")
-    if (langMap?.get("en") != null) safeAddLangLiteral(property, langMap["en"], "en")
-    return this
-}
-
 fun Resource.safeAddLocalizedString(property: Property, langMap: LocalizedStrings?): Resource {
     langMap?.nb?.let { safeAddLangLiteral(property, it, "nb") }
     langMap?.nn?.let { safeAddLangLiteral(property, it, "nn") }
@@ -126,7 +118,7 @@ fun Resource.addConformsTo(conformsTo: Collection<UriWithLabel>?): Resource {
                 model.safeCreateResource()
                     .addProperty(RDF.type, DCTerms.Standard)
                     .safeAddLinkedProperty(RDFS.seeAlso, it.uri)
-                    .safeAddLiteralByLang(DCTerms.title, it.prefLabel)
+                    .safeAddLocalizedString(DCTerms.title, it.prefLabel)
             )
         }
     }
@@ -213,7 +205,7 @@ fun Resource.addLegalBasis(ds: DatasetDBO): Resource {
 }
 
 private fun Resource.addRule(rule: UriWithLabel, ruleType: Resource): Resource {
-    if (rule.uri.isValidURL() || !rule.prefLabel.isNullOrEmpty()) {
+    if (rule.uri.isValidURL() || rule.prefLabel.isValidLangField()) {
         addProperty(
             CPSV.follows,
             model.createResource()
@@ -228,7 +220,7 @@ private fun Resource.addRule(rule: UriWithLabel, ruleType: Resource): Resource {
                             DCTerms.type,
                             model.createResource()
                                 .addProperty(RDF.type, SKOS.Concept)
-                                .safeAddLiteralByLang(SKOS.prefLabel, rule.prefLabel)
+                                .safeAddLocalizedString(SKOS.prefLabel, rule.prefLabel)
                         )
                 )
         )
@@ -264,18 +256,28 @@ fun Resource.addQualityAnnotation(qualityAnnotation: QualityAnnotationDBO?, dime
     return this
 }
 
-fun Resource.addQualityAnnotationBody(body: Map<String, String>?): Resource {
-    body?.forEach { (key, value) ->
-        addProperty(
-            OA.hasBody,
-            model.safeCreateResource()
-                .addProperty(RDF.type, OA.TextualBody)
-                .safeAddStringLiteral(RDF.value, value)
-                .safeAddLinkedProperty(DCTerms.language, keywordToLinguisticSystem(key).uri)
-                .safeAddLinkedProperty(DCTerms.format, "http://publications.europa.eu/resource/authority/file-type/TXT")
-        )
+fun Resource.addQualityAnnotationBody(body: LocalizedStrings?): Resource {
+    body?.nb?.let { nb ->
+        addQualityAnnotationBody(nb, LinguisticSystem.NOB.uri)
+    }
+    body?.nn?.let { nn ->
+        addQualityAnnotationBody(nn, LinguisticSystem.NNO.uri)
+    }
+    body?.en?.let { en ->
+        addQualityAnnotationBody(en, LinguisticSystem.ENG.uri)
     }
     return this
+}
+
+fun Resource.addQualityAnnotationBody(text: String, lang: String) {
+    addProperty(
+        OA.hasBody,
+        model.safeCreateResource()
+            .addProperty(RDF.type, OA.TextualBody)
+            .safeAddStringLiteral(RDF.value, text)
+            .safeAddLinkedProperty(DCTerms.language, lang)
+            .safeAddLinkedProperty(DCTerms.format, "http://publications.europa.eu/resource/authority/file-type/TXT")
+    )
 }
 
 private fun referenceTypeToProperty(referenceTypeString: String?): Property? {
@@ -325,7 +327,7 @@ fun Resource.addRelatedResources(relations: List<UriWithLabel>?): Resource {
                 DCTerms.relation,
                 model.safeCreateResource(it.uri)
                     .addProperty(RDF.type, RDFS.Resource)
-                    .safeAddLiteralByLang(RDFS.label, it.prefLabel)
+                    .safeAddLocalizedString(RDFS.label, it.prefLabel)
             )
         }
     }
@@ -342,6 +344,15 @@ private fun Map<String, String>?.isValidLangField(): Boolean =
         getOrDefault("nn", "").isNotBlank() -> true
         getOrDefault("en", "").isNotBlank() -> true
         getOrDefault("no", "").isNotBlank() -> true
+        else -> false
+    }
+
+private fun LocalizedStrings?.isValidLangField(): Boolean =
+    when {
+        this == null -> false
+        !nb.isNullOrBlank() -> true
+        !nn.isNullOrBlank() -> true
+        !en.isNullOrBlank() -> true
         else -> false
     }
 
@@ -443,19 +454,10 @@ fun String?.isValidURL(): Boolean =
     }
 
 enum class LinguisticSystem(val uri: String) {
-    NOR("http://publications.europa.eu/resource/authority/language/NOR"),
     NOB("http://publications.europa.eu/resource/authority/language/NOB"),
     NNO("http://publications.europa.eu/resource/authority/language/NNO"),
     ENG("http://publications.europa.eu/resource/authority/language/ENG")
 }
-
-fun keywordToLinguisticSystem(keyword: String): LinguisticSystem =
-    when (keyword) {
-        "en" -> LinguisticSystem.ENG
-        "nb" -> LinguisticSystem.NOB
-        "nn" -> LinguisticSystem.NNO
-        else -> LinguisticSystem.NOR
-    }
 
 class SeriesData(
     val inSeries: String?,
