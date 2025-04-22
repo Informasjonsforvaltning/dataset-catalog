@@ -50,11 +50,11 @@ class RdfServiceTest {
                 relatedResources = listOf(
                     UriWithLabel(
                         uri = "http://uri-1",
-                        prefLabel = mapOf(Pair("nb", "label-1-nb"), Pair("en", "label-1-en"))
+                        prefLabel = LocalizedStrings(nb = "label-1-nb", en = "label-1-en")
                     ),
                     UriWithLabel(
                         uri = "http://uri-2",
-                        prefLabel = mapOf(Pair("nb", "label-2-nb"), Pair("en", "label-2-en"))
+                        prefLabel = LocalizedStrings(nb = "label-2-nb", en = "label-2-en")
                     )
                 )
             )

@@ -31,7 +31,7 @@ class RDFDatasetUtilsTest {
                 title = LocalizedStrings(nb = ""),
                 description = LocalizedStrings(nb = ""),
                 accessURL = listOf(""),
-                conformsTo = listOf(UriWithLabel(uri = "", prefLabel = mapOf("nb" to ""))),
+                conformsTo = listOf(UriWithLabel(uri = "", prefLabel = LocalizedStrings(nb = ""))),
                 format = listOf(""),
                 license = "",
                 page = listOf("")
