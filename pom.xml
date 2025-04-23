@@ -93,7 +93,7 @@
         <dependency>
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
-            <version>8.0</version>
+            <version>8.1</version>
         </dependency>
 
         <!-- Kotlin dependencies -->
@@ -241,7 +241,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.12</version>
+                <version>0.8.13</version>
                 <executions>
                     <execution>
                         <id>before-unit-test-execution</id>
@@ -299,7 +299,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.5.2</version>
+                <version>3.5.3</version>
                 <configuration>
                     <useSystemClassLoader>false</useSystemClassLoader>
                     <argLine>${surefire.jacoco.args}</argLine>
@@ -313,7 +313,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>3.5.2</version>
+                <version>3.5.3</version>
                 <configuration>
                     <argLine>${failsafe.jacoco.args}</argLine>
                     <groups>contract</groups>
