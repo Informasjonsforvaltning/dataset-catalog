@@ -264,8 +264,6 @@ private fun Distribution.hasNonNullOrEmptyProperty(): Boolean =
 
         !accessService.isNullOrEmpty()
 
-// TODO: add dcat:endpointURLs and make sure front-end sends necessary data (https://doc.difi.no/review/dcat-ap-no/#_obligatoriske_egenskaper_for_datatjeneste)
-
 
 private fun DistributionDBO.hasNonNullOrEmptyProperty(): Boolean =
     title?.run { listOf(nb, nn, en).any { !it.isNullOrEmpty() } } == true ||
