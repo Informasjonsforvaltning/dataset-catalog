@@ -1,6 +1,7 @@
 package no.fdk.dataset_catalog.service
 
 import no.fdk.dataset_catalog.exception.NotPermittedException
+import no.fdk.dataset_catalog.extensions.toDataset
 import no.fdk.dataset_catalog.model.Dataset
 import no.fdk.dataset_catalog.model.SearchRequest
 import no.fdk.dataset_catalog.model.SearchResult
@@ -14,10 +15,11 @@ import java.util.*
 private val logger = LoggerFactory.getLogger(SearchService::class.java)
 
 @Service
-class SearchService (
+class SearchService(
     private val datasetRepository: DatasetRepository,
     private val datasetService: DatasetService,
-    private val endpointPermissions: EndpointPermissions) {
+    private val endpointPermissions: EndpointPermissions
+) {
 
     fun datasetByQuery(jwt: Jwt, searchRequest: SearchRequest): SearchResult =
         if (searchRequest.catalogIDs.all { endpointPermissions.hasOrgReadPermission(jwt, it) }) {
@@ -33,7 +35,10 @@ class SearchService (
 
                 val queryString = searchRequest.query.lowercase()
                 val titleHits = datasetRepository.findByTitleContaining(searchRequest.catalogIDs, queryString)
-                val descriptionHits = datasetRepository.findByDescriptionContaining(searchRequest.catalogIDs, queryString)
+                    .map { it.toDataset() }
+                val descriptionHits =
+                    datasetRepository.findByDescriptionContaining(searchRequest.catalogIDs, queryString)
+                        .map { it.toDataset() }
                 SearchResult(
                     datasets = orderDatasetSearch(titleHits.union(descriptionHits), searchRequest.query)
                 )
@@ -49,7 +54,8 @@ class SearchService (
         results.map {
             if (queryLC == it.title?.get("nb")?.lowercase() ||
                 queryLC == it.title?.get("nn")?.lowercase() ||
-                queryLC == it.title?.get("en")?.lowercase()) {
+                queryLC == it.title?.get("en")?.lowercase()
+            ) {
                 orderedResults.addFirst(it)
             } else orderedResults.addLast(it)
         }
