@@ -1,5 +1,6 @@
 package no.fdk.dataset_catalog.service
 
+import no.fdk.dataset_catalog.configuration.ApplicationProperties
 import no.fdk.dataset_catalog.model.Catalog
 import no.fdk.dataset_catalog.model.Dataset
 import no.fdk.dataset_catalog.model.REGISTRATION_STATUS
@@ -16,7 +17,8 @@ import org.springframework.stereotype.Service
 @Service
 class RDFService(
     private val catalogService: CatalogService,
-    private val datasetService: DatasetService
+    private val datasetService: DatasetService,
+    private val applicationProperties: ApplicationProperties
 ) {
 
     fun getAll(): Model = catalogService.getAll().createCatalogModel()
@@ -60,8 +62,8 @@ class RDFService(
             val seriesData = dataset.seriesData()
             val isPublished = dataset.registrationStatus == REGISTRATION_STATUS.PUBLISH
             when {
-                seriesData.inSeries != null && isPublished -> model.addDatasetResource(dataset, seriesData) // A dataset in a series shouldn't be associated with a catalog through dcat:dataset, only indirectly from a series in the catalog
-                isPublished -> addProperty(DCAT.dataset, model.addDatasetResource(dataset, seriesData))
+                seriesData.inSeries != null && isPublished -> model.addDatasetResource(dataset, seriesData, applicationProperties.catalogUriHost) // A dataset in a series shouldn't be associated with a catalog through dcat:dataset, only indirectly from a series in the catalog
+                isPublished -> addProperty(DCAT.dataset, model.addDatasetResource(dataset, seriesData, applicationProperties.catalogUriHost))
             }
         }
         return this
@@ -70,7 +72,7 @@ class RDFService(
     private fun Dataset.createModel(): Model {
         val model = ModelFactory.createDefaultModel()
         model.setDefaultPrefixes()
-        model.addDatasetResource(this, seriesData())
+        model.addDatasetResource(this, seriesData(), applicationProperties.catalogUriHost)
         return model
     }
 

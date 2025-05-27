@@ -11,8 +11,13 @@ import org.apache.jena.vocabulary.DCAT
 import org.apache.jena.vocabulary.DCTerms
 import org.apache.jena.vocabulary.RDF
 
-fun Model.addDatasetResource(dataset: Dataset, seriesData: SeriesData): Resource {
-    val datasetResource = safeCreateResource(dataset.originalUri ?: dataset.uri)
+fun Model.addDatasetResource(dataset: Dataset, seriesData: SeriesData, baseCatalogURI: String): Resource {
+    val datasetURI = when {
+        dataset.originalUri.isValidURL() -> dataset.originalUri
+        dataset.uri.isValidURL() -> dataset.uri
+        else -> "${baseCatalogURI}/${dataset.catalogId}/datasets/${dataset.id}"
+    }
+    val datasetResource = safeCreateResource(datasetURI)
         .safeAddLiteralByLang(DCTerms.title, dataset.title)
         .safeAddLiteralByLang(DCTerms.description, dataset.description)
         .safeAddStringListLiteral(DCTerms.identifier, dataset.dctIdentifier())
