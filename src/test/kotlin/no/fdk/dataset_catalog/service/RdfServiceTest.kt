@@ -1,11 +1,13 @@
 package no.fdk.dataset_catalog.service
 
+import no.fdk.dataset_catalog.configuration.ApplicationProperties
 import no.fdk.dataset_catalog.model.*
 import no.fdk.dataset_catalog.utils.TEST_CATALOG_1
 import no.fdk.dataset_catalog.utils.TEST_DATASET_1
 import no.fdk.dataset_catalog.utils.TestResponseReader
 import no.fdk.dataset_catalog.utils.checkIfIsomorphicAndPrintDiff
 import org.apache.jena.vocabulary.DCTerms
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -21,8 +23,14 @@ private val logger = LoggerFactory.getLogger(RdfServiceTest::class.java)
 class RdfServiceTest {
     private val catalogService: CatalogService = mock()
     private val datasetService: DatasetService = mock()
-    private val rdfService = RDFService(catalogService, datasetService)
+    private val applicationProperties: ApplicationProperties = mock()
+    private val rdfService = RDFService(catalogService, datasetService, applicationProperties)
     private val responseReader = TestResponseReader()
+
+    @BeforeEach
+    fun setUp() {
+        whenever(applicationProperties.catalogUriHost).thenReturn("http://localhost:5050/catalogs")
+    }
 
     @Nested
     internal inner class Serialize {
