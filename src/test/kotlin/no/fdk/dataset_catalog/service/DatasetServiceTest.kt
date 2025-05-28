@@ -7,6 +7,7 @@ import no.fdk.dataset_catalog.repository.DatasetRepository
 import no.fdk.dataset_catalog.utils.TEST_DATASET_1
 import org.junit.jupiter.api.*
 import org.mockito.kotlin.*
+import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDate
 import java.util.*
 import kotlin.test.assertEquals
@@ -106,10 +107,10 @@ class DatasetServiceTest {
         @Test
         fun `update dataset with add operation`() {
             val ds = Dataset("dsId", "catId")
-            val expected = Dataset("dsId", "catId", uri = "test")
+            val expected = Dataset("dsId", "catId", source = "test")
             whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
             whenever(catalogService.getByID("catId")).thenReturn(Catalog())
-            datasetService.updateDataset("catId", "dsId", listOf(JsonPatchOperation(OpEnum.ADD, "/uri", "test")))
+            datasetService.updateDataset("catId", "dsId", listOf(JsonPatchOperation(OpEnum.ADD, "/source", "test")))
 
             argumentCaptor<List<Dataset>>().apply {
                 verify(datasetRepository, times(1)).saveAll(capture())
@@ -217,12 +218,15 @@ class DatasetServiceTest {
             val ds = Dataset("dsId", "catId")
             whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
             whenever(catalogService.getByID("catId")).thenReturn(Catalog())
-            datasetService.updateDataset("catId", "dsId", listOf(JsonPatchOperation(OpEnum.ADD, "/specializedType", "SERIES")))
-
+            assertThrows<ResponseStatusException> {
+                datasetService.updateDataset(
+                    "catId",
+                    "dsId",
+                    listOf(JsonPatchOperation(OpEnum.ADD, "/specializedType", "SERIES"))
+                )
+            }
             argumentCaptor<List<Dataset>>().apply {
-                verify(datasetRepository, times(1)).saveAll(capture())
-                assertTrue(firstValue.size == 1)
-                assertEquals(ds.copy(lastModified = firstValue.first().lastModified), firstValue.first())
+                verify(datasetRepository, times(0)).saveAll(capture())
             }
         }
     }
