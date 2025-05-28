@@ -262,8 +262,9 @@ class DatasetService(
         }
     }
 
-    private fun Dataset.update(operations: List<JsonPatchOperation>): Dataset =
-        try {
+    private fun Dataset.update(operations: List<JsonPatchOperation>): Dataset {
+        validateOperations(operations)
+        return try {
             patchDataset(this, operations)
         } catch (ex: Exception) {
             logger.error("PATCH failed for $id", ex)
@@ -275,6 +276,7 @@ class DatasetService(
                 else -> throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.message)
             }
         }
+    }
 
     private fun patchDataset(dataset: Dataset, operations: List<JsonPatchOperation>): Dataset {
         if (operations.isNotEmpty()) {
@@ -287,6 +289,19 @@ class DatasetService(
             }
         }
         return dataset
+    }
+
+    fun validateOperations(operations: List<JsonPatchOperation>) {
+        val invalidPaths = listOf(
+            "/id",
+            "/catalogId",
+            "/specializedType",
+            "/uri",
+            "/originalUri"
+        )
+        if (operations.any { it.path in invalidPaths }) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Patch of paths $invalidPaths is not permitted")
+        }
     }
 
     private fun specializedTypeFromString(string: String?): SpecializedType? =
