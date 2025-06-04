@@ -95,7 +95,8 @@ val DISTRIBUTION = Distribution(
     page= listOf(SkosConcept("http://lenke/til/mer/info",  mapOf(Pair("nb", "Dokumentasjon av distribusjonen")), extraType =  FOAF.Document.uri)),
     format=listOf("http://publications.europa.eu/resource/authority/file-type/JSON"),
     mediaType=listOf("https://www.iana.org/assignments/media-types/application/json"),
-    accessService=listOf(SAMPLE_DESCRIPTION)
+    accessService=listOf(SAMPLE_DESCRIPTION),
+    accessServiceUris = setOf("http://www.hjem2.no/")
 )
 
 val SAMPLE = Distribution(

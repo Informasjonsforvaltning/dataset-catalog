@@ -182,6 +182,7 @@ fun Resource.addDistribution(property: Property, distributions: Collection<Distr
                     .safeAddURLs(DCTerms.format, it.format)
                     .safeAddURLs(DCAT.mediaType, it.mediaType)
                     .addDataDistributionServices(it.accessService)
+                    .addDataDistributionServices(it.accessServiceUris)
             )
         }
     }
@@ -226,9 +227,20 @@ fun Resource.addThemes(ds: Dataset): Resource {
 
     return this
 }
+
 fun Resource.addDataDistributionServices(dataDistributionServices: Collection<DataDistributionService>?): Resource {
     dataDistributionServices?.forEach {
         val accessServiceResource = model.safeCreateResource(it.uri)
+        if (accessServiceResource.isURIResource) {
+            addProperty(DCAT.accessService, accessServiceResource)
+        }
+    }
+    return this
+}
+
+fun Resource.addDataDistributionServices(uris: Set<String>?): Resource {
+    uris?.forEach {
+        val accessServiceResource = model.safeCreateResource(it)
         if (accessServiceResource.isURIResource) {
             addProperty(DCAT.accessService, accessServiceResource)
         }
