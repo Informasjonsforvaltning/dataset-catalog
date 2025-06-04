@@ -58,7 +58,7 @@
 
 <http://localhost:5050/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d/distributions/d1>
         a                      dcat:Distribution ;
-        dcat:accessService  <http://www.hjem.no/> ;
+        dcat:accessService     <http://www.hjem.no/> , <http://www.hjem2.no/> ;
         dct:conformsTo         <https://www.kartverket.no/geodataarbeid/standarder/sosi/> ;
         dct:description        "Dette er beskrivelsen av distribusjonen. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Vestibulum id ligula porta felis euismod semper con desbit arum. Se dokumentasjon for denne distribusjonen."@nb ;
         dct:format             <http://publications.europa.eu/resource/authority/file-type/JSON> ;
