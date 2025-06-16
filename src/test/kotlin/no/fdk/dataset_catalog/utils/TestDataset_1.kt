@@ -157,7 +157,7 @@ val TEST_DATASET_1 = Dataset(
     legalBasisForRestriction= listOf(
         SkosConcept("https://lovdata.no/dokument/NL/lov/1992-12-04-126", mapOf(Pair("nb","Lov om arkiv [arkivlova]"))),
         SkosConcept("http://lovdata/paragraph/20", mapOf(Pair("nb","Den spesifikke loven § 20"))),
-        SkosConcept("http://lovdata/paragraph/26", mapOf(Pair("nb","Den mindre spesifikke loven § 26")))
+        SkosConcept(prefLabel = mapOf(Pair("nb","Den mindre spesifikke loven, som ikke har tilhørende uri")))
     ),
     legalBasisForProcessing= listOf(SkosConcept("http://lovdata/paragraph/2", mapOf(Pair("nb","Den andre loven med lenger tittel § 2")))),
     legalBasisForAccess= listOf(SkosConcept("http://lovdata/paragraph/10", mapOf(Pair("nb","Den siste loven med den lengste tittelen § 10")))),

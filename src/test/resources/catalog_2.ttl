@@ -112,9 +112,8 @@
         ] , [ a cpsv:Rule ;
             dct:type cpsvno:ruleForNonDisclosure ;
             cpsv:implements [ a eli:LegalResource ;
-                rdfs:seeAlso <http://lovdata/paragraph/26> ;
                 dct:type [ a    skos:Concept ;
-                    skos:prefLabel     "Den mindre spesifikke loven § 26"@nb ;
+                    skos:prefLabel     "Den mindre spesifikke loven, som ikke har tilhørende uri"@nb ;
                 ]
             ] ;
         ] ;
