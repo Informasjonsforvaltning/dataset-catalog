@@ -257,7 +257,7 @@ fun Resource.addCPSVNORules(ds: Dataset): Resource {
 }
 
 private fun Resource.addRule(rule: SkosConcept, ruleType: Resource): Resource {
-    if (rule.uri.isValidURL() && !rule.prefLabel.isNullOrEmpty()) {
+    if (rule.uri.isValidURL() || !rule.prefLabel.isNullOrEmpty()) {
         addProperty(
             CPSV.follows,
             model.createResource()
