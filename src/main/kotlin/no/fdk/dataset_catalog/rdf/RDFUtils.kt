@@ -294,23 +294,14 @@ fun Resource.addTemporal(temporal: List<PeriodOfTime>?): Resource {
     return this
 }
 
-
-fun Resource.addQualityAnnotation(qualityAnnotation: QualityAnnotation?): Resource {
-    qualityAnnotation?.let {
+fun Resource.addQualityAnnotation(body: Map<String, String>?, dimension: Resource): Resource {
+    if (body?.isNotEmpty() == true) {
         addProperty(DQV.hasQualityAnnotation,
             model.safeCreateResource()
                 .addProperty(RDF.type, DQV.QualityAnnotation)
-                .addQualityAnnotationDimension(DQV.inDimension, it.inDimension)
-                .addQualityAnnotationBody(it.hasBody))
+                .safeAddLinkedProperty(DQV.inDimension, dimension.uri)
+                .addQualityAnnotationBody(body))
     }
-    return this
-}
-
-fun Resource.addQualityAnnotationDimension(property: Property, dimension: String?): Resource {
-    DQV.resolveDimensionResource(dimension)
-        ?.let {
-            safeAddLinkedProperty(property, it.uri)
-        }
     return this
 }
 
