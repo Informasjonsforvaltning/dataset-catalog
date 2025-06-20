@@ -59,18 +59,17 @@
 <http://localhost:5050/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d/distributions/d1>
         a                      dcat:Distribution ;
         dcat:accessService     <http://www.hjem.no/> , <http://www.hjem2.no/> ;
-        dct:conformsTo         <https://www.kartverket.no/geodataarbeid/standarder/sosi/> ;
+        dct:conformsTo         [
+            a              dct:Standard ;
+            rdfs:seeAlso   <https://www.kartverket.no/geodataarbeid/standarder/sosi/> ;
+            dct:title      "SOSI"@nb
+        ] ;
         dct:description        "Dette er beskrivelsen av distribusjonen. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Vestibulum id ligula porta felis euismod semper con desbit arum. Se dokumentasjon for denne distribusjonen."@nb ;
         dct:format             <http://publications.europa.eu/resource/authority/file-type/JSON> ;
         dcat:mediaType         <https://www.iana.org/assignments/media-types/application/json> ;
         dct:license            <https://data.norge.no/nlod/no/2.0> ;
         dcat:accessURL         <http://www.detteerentredjelenke.no/til-en-tredje-nedlasting> , <http://www.detteerenannenlenke.no/til-en-annen-nedlasting> , <http://www.detteerenlenke.no/til-nedlasting> ;
         foaf:page              <http://lenke/til/mer/info> .
-
-<https://www.kartverket.no/geodataarbeid/standarder/sosi/>
-    a              dct:Standard ;
-    rdfs:seeAlso   <https://www.kartverket.no/geodataarbeid/standarder/sosi/> ;
-    dct:title      "SOSI"@nb .
 
 <http://localhost:5050/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d>
         a                               dcat:Dataset ;
@@ -119,12 +118,19 @@
         ] ;
         dct:accessRights                <http://publications.europa.eu/resource/authority/access-right/RESTRICTED> ;
         dct:accrualPeriodicity          <http://publications.europa.eu/resource/authority/frequency/ANNUAL> ;
-        dct:conformsTo                  <https://www.kartverket.no/geodataarbeid/standarder/sosi/> ;
-        dct:conformsTo                  [ a               dct:Standard ;
+        dct:conformsTo                  [ a              dct:Standard ;
+                                          rdfs:seeAlso   <https://www.kartverket.no/geodataarbeid/standarder/sosi/> ;
+                                          dct:title      "SOSI"@nb
+                                        ] ,
+                                        [ a          dct:Standard ;
                                           dct:title  "SKOS"@nb
+                                        ] ,
+                                        [ a              dct:Standard ;
+                                          rdfs:seeAlso   <https://raw.githubusercontent.com/Informasjonsforvaltning/fdk-testdata/master/testdata/SkatvalModellkatalog.ttl#AdresseModell>
+                                        ] ,
+                                        [ a               dct:Standard ;
+                                          rdfs:seeAlso    <https://raw.githubusercontent.com/Informasjonsforvaltning/model-publisher/master/src/model/catalog-of-models-for-specifications.ttl#dqv-ap-no-model>
                                         ] ;
-        dct:conformsTo                 <https://raw.githubusercontent.com/Informasjonsforvaltning/fdk-testdata/master/testdata/SkatvalModellkatalog.ttl#AdresseModell> ,
-                                       <https://raw.githubusercontent.com/Informasjonsforvaltning/model-publisher/master/src/model/catalog-of-models-for-specifications.ttl#dqv-ap-no-model> ;
         dct:description                 "Datasettet avgrenser område for virkeområdet til lov 6. juni 2009 nr. 35 om naturområder i Oslo og nærliggende kommuner (markaloven) som trådte i kraft 1. september 2009. Markalovens virkeområde er fastsatt i forskrift 4. september 2015 nr. 1032 om justering av markagrensen fastlegger markalovens geografiske virkeområde med tilhørende kart."@nb ;
         dct:issued                      "2012-01-01"^^xsd:date ;
         dct:language                    <http://publications.europa.eu/resource/authority/language/ENG> , <http://publications.europa.eu/resource/authority/language/NOR> ;
@@ -190,21 +196,6 @@
                                             dct:format       <http://publications.europa.eu/resource/authority/file-type/TXT> ]
                                         ] ;
         foaf:page                       <http://uri1> .
-
-<https://raw.githubusercontent.com/Informasjonsforvaltning/fdk-testdata/master/testdata/SkatvalModellkatalog.ttl#AdresseModell>
-     a              dct:Standard ;
-     dct:source    <https://raw.githubusercontent.com/Informasjonsforvaltning/fdk-testdata/master/testdata/SkatvalModellkatalog.ttl#AdresseModell> ;
-     .
-
-<https://raw.githubusercontent.com/Informasjonsforvaltning/model-publisher/master/src/model/catalog-of-models-for-specifications.ttl#dqv-ap-no-model>
-    a               dct:Standard ;
-    dct:source      <https://raw.githubusercontent.com/Informasjonsforvaltning/model-publisher/master/src/model/catalog-of-models-for-specifications.ttl#dqv-ap-no-model> ;
-    .
-
-<https://www.kartverket.no/geodataarbeid/standarder/sosi/>
-    a             dct:Standard ;
-    rdfs:seeAlso  <https://www.kartverket.no/geodataarbeid/standarder/sosi/> ;
-    dct:title     "SOSI"@nb .
 
 <https://data-david.github.io/Begrep/begrep/Enhet>
         a                skos:Concept ;

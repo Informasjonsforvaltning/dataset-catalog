@@ -144,7 +144,7 @@ fun Resource.addConformsTo(conformsTo: Collection<SkosConcept>?): Resource {
     conformsTo?.forEach {
         if (!it.uri.isNullOrEmpty() || it.prefLabel.isValidLangField()) {
             addProperty(DCTerms.conformsTo,
-                model.safeCreateResource(it.uri)
+                model.safeCreateResource()
                     .addProperty(RDF.type, DCTerms.Standard)
                     .safeAddLinkedProperty(RDFS.seeAlso, it.uri)
                     .safeAddLiteralByLang(DCTerms.title, it.prefLabel)
@@ -157,9 +157,9 @@ fun Resource.addConformsTo(conformsTo: Collection<SkosConcept>?): Resource {
 fun Resource.addConformsToFromListOfUris(conformsTo: Collection<String>?): Resource {
     conformsTo?.forEach {
         addProperty(DCTerms.conformsTo,
-            model.safeCreateResource(it)
+            model.safeCreateResource()
                 .addProperty(RDF.type, DCTerms.Standard)
-                .safeAddLinkedProperty(DCTerms.source, it)
+                .safeAddLinkedProperty(RDFS.seeAlso, it)
             )
         }
     return this
