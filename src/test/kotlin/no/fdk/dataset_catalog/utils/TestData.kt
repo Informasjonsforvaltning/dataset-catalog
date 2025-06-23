@@ -2,15 +2,13 @@ package no.fdk.dataset_catalog.utils
 
 import no.fdk.dataset_catalog.model.*
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap
+import javax.xml.crypto.Data
 
 const val API_TEST_PORT = 5555
 const val LOCAL_SERVER_PORT = 5050
 
-const val API_TEST_URI = "http://localhost:$API_TEST_PORT"
-const val WIREMOCK_TEST_URI = "http://localhost:$LOCAL_SERVER_PORT"
-
-const val MONGO_USER = "testuser"
-const val MONGO_PASSWORD = "testpassword"
+const val MONGO_USER = "root"
+const val MONGO_PASSWORD = "secret"
 const val MONGO_PORT = 27017
 const val MONGO_DB_NAME = "datasetCatalog"
 
@@ -62,6 +60,10 @@ val DATASET_2 = TEST_DATASET_0.copy(
     catalogId = DB_CATALOG_ID_1,
     uri = "http://$DATASET_ID_2",
     registrationStatus = REGISTRATION_STATUS.PUBLISH,
+    theme = listOf(
+        DataTheme(uri = "https://psi.norge.no/los/tema/arbeid"),
+        DataTheme(uri = "http://publications.europa.eu/resource/authority/data-theme/AGRI")
+    )
 )
 
 val DATASET_3 = Dataset(
@@ -228,7 +230,11 @@ private fun Dataset.mapDBO(): org.bson.Document =
         .append("title", title)
         .append("description", description)
         .append("references", references?.map { it.mapDBO() })
-        .append("registrationStatus", registrationStatus.toString())
+        .append(
+            "approved",
+            registrationStatus === REGISTRATION_STATUS.APPROVE || registrationStatus === REGISTRATION_STATUS.PUBLISH
+        )
+        .append("published", registrationStatus === REGISTRATION_STATUS.PUBLISH)
         .append("specializedType", specializedType)
         .append("inSeries", inSeries)
         .append("seriesDatasetOrder", seriesDatasetOrder)
@@ -240,8 +246,8 @@ private fun Catalog.mapDBO(): org.bson.Document =
 
 private fun Reference.mapDBO(): org.bson.Document =
     org.bson.Document()
-        .append("referenceType", referenceType?.mapDBO())
-        .append("source", source?.mapDBO())
+        .append("referenceType", referenceType?.uri)
+        .append("source", source?.uri)
 
 private fun SkosCode.mapDBO(): org.bson.Document =
     org.bson.Document()
