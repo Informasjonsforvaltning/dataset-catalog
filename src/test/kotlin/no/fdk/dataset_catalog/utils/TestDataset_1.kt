@@ -1,7 +1,6 @@
 package no.fdk.dataset_catalog.utils
 
 import no.fdk.dataset_catalog.model.*
-import no.fdk.dataset_catalog.rdf.DQV
 import org.apache.jena.sparql.vocabulary.FOAF
 import org.apache.jena.vocabulary.DCTerms
 import java.time.LocalDate
@@ -165,12 +164,9 @@ val TEST_DATASET_1 = Dataset(
     sample = listOf(SAMPLE)
 )
 
-val TEST_CATALOG_1 = Catalog(
-    id=CATALOG_ID,
-    title=mapOf(Pair("nb", "Tittel")),
-    description=mapOf(Pair("nb", "Beskrivelse")),
-    uri= CATALOG_URI,
-    publisher = PUBLISHER,
+val TEST_CATALOG_1 = CatalogCount(
+    id = CATALOG_ID,
+    datasetCount = 0,
 )
 
 

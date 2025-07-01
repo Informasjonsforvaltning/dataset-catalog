@@ -18,13 +18,10 @@ import kotlin.test.assertTrue
 @Tag("unit")
 class DatasetServiceTest {
     private val datasetRepository: DatasetRepository = mock()
-    private val catalogService: CatalogService = mock()
-    private val organizationService: OrganizationService = mock()
     private val publishingService: PublishingService = mock()
     private val applicationProperties: ApplicationProperties = mock()
     private val datasetService = DatasetService(
-        datasetRepository, catalogService, organizationService,
-        publishingService, applicationProperties, jacksonObjectMapper()
+        datasetRepository, publishingService, applicationProperties, jacksonObjectMapper()
     )
 
     @Nested
@@ -37,7 +34,6 @@ class DatasetServiceTest {
                 specializedType = SpecializedType.SERIES,
                 registrationStatus = REGISTRATION_STATUS.DRAFT
             )
-            whenever(catalogService.getByID("catId")).thenReturn(Catalog("catId"))
             datasetService.create("catId", ds)
             argumentCaptor<List<Dataset>>().apply {
                 verify(datasetRepository, times(1)).saveAll(capture())
@@ -109,7 +105,6 @@ class DatasetServiceTest {
             val ds = Dataset("dsId", "catId")
             val expected = Dataset("dsId", "catId", source = "test")
             whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
-            whenever(catalogService.getByID("catId")).thenReturn(Catalog())
             datasetService.updateDataset("catId", "dsId", listOf(JsonPatchOperation(OpEnum.ADD, "/source", "test")))
 
             argumentCaptor<List<Dataset>>().apply {
@@ -146,7 +141,6 @@ class DatasetServiceTest {
                 )
             )
             whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
-            whenever(catalogService.getByID("catId")).thenReturn(Catalog())
             datasetService.updateDataset(
                 "catId",
                 "dsId",
@@ -165,7 +159,6 @@ class DatasetServiceTest {
             val ds = Dataset("dsId", "catId", title = mapOf(Pair("nb", "tittel")))
             val expected = Dataset("dsId", "catId", title = mapOf(Pair("nb", "tittel"), Pair("nn", "tittel")))
             whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
-            whenever(catalogService.getByID("catId")).thenReturn(Catalog())
             datasetService.updateDataset(
                 "catId",
                 "dsId",
@@ -184,7 +177,6 @@ class DatasetServiceTest {
             val ds = Dataset("dsId", "catId", title = mapOf(Pair("nb", "beskrivelse")), description = null)
             val expected = Dataset("dsId", "catId", title = null, description = mapOf(Pair("nb", "beskrivelse")))
             whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
-            whenever(catalogService.getByID("catId")).thenReturn(Catalog())
             datasetService.updateDataset(
                 "catId",
                 "dsId",
@@ -203,7 +195,6 @@ class DatasetServiceTest {
             val ds = Dataset("dsId", "catId", source = "test")
             val expected = Dataset("dsId", "catId")
             whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
-            whenever(catalogService.getByID("catId")).thenReturn(Catalog())
             datasetService.updateDataset("catId", "dsId", listOf(JsonPatchOperation(OpEnum.REMOVE, "/source")))
 
             argumentCaptor<List<Dataset>>().apply {
@@ -217,7 +208,6 @@ class DatasetServiceTest {
         fun `update of specialized type is ignored`() {
             val ds = Dataset("dsId", "catId")
             whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
-            whenever(catalogService.getByID("catId")).thenReturn(Catalog())
             assertThrows<ResponseStatusException> {
                 datasetService.updateDataset(
                     "catId",
@@ -235,40 +225,35 @@ class DatasetServiceTest {
     internal inner class TriggerHarvest {
         @Test
         fun `triggers harvest on update to published dataset`() {
-            val cat = Catalog("catId", publisher = Publisher(id = "pubId"), hasPublishedDataSource = true)
             val ds = Dataset("dsId", "catId", registrationStatus = REGISTRATION_STATUS.PUBLISH)
 
             whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
             whenever(datasetRepository.save(any())).thenReturn(ds)
-            whenever(catalogService.getByID("catId")).thenReturn(cat)
 
             datasetService.updateDataset("catId", "dsId", emptyList())
 
-            verify(publishingService, times(1)).triggerHarvest("catId", "pubId")
+            verify(publishingService, times(1)).triggerHarvest("catId")
         }
 
         @Test
         fun `does not trigger harvest on update to draft dataset`() {
-            val cat = Catalog("catId", publisher = Publisher(id = "pubId"), hasPublishedDataSource = true)
             val ds = Dataset("dsId", "catId", registrationStatus = REGISTRATION_STATUS.DRAFT)
 
             whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
             whenever(datasetRepository.save(any())).thenReturn(ds)
-            whenever(catalogService.getByID("catId")).thenReturn(cat)
 
             datasetService.updateDataset("catId", "dsId", listOf(JsonPatchOperation(OpEnum.ADD, "/source", "hei")))
 
-            verify(publishingService, times(0)).triggerHarvest("catId", "pubId")
+            verify(publishingService, times(0)).triggerHarvest("catId")
         }
 
         @Test
         fun `adds datasource on first published dataset in catalog`() {
-            val cat = Catalog("catId", publisher = Publisher(id = "pubId"), hasPublishedDataSource = false)
             val ds = Dataset("dsId", "catId", registrationStatus = REGISTRATION_STATUS.DRAFT)
 
             whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
             whenever(datasetRepository.save(any())).thenReturn(ds)
-            whenever(catalogService.getByID("catId")).thenReturn(cat)
+            whenever(applicationProperties.datasetCatalogUriHost).thenReturn("http://mycatalog")
 
             datasetService.create("catId", ds)
             datasetService.updateDataset(
@@ -277,41 +262,35 @@ class DatasetServiceTest {
                 listOf(JsonPatchOperation(OpEnum.REPLACE, "/registrationStatus", REGISTRATION_STATUS.PUBLISH))
             )
 
-            verify(catalogService, times(1)).addDataSource(cat)
+            verify(publishingService, times(1)).sendNewDataSourceMessage("catId", "http://mycatalog/catId")
         }
 
         @Test
         fun `does not add datasource on already added catalog`() {
-            val cat = Catalog("catId", publisher = Publisher(id = "pubId"), hasPublishedDataSource = true)
-            val ds = Dataset("dsId", "catId", registrationStatus = REGISTRATION_STATUS.DRAFT)
+            val ds0 = Dataset("dsId0", "catId", registrationStatus = REGISTRATION_STATUS.PUBLISH)
+            val ds1 = Dataset("dsId1", "catId", registrationStatus = REGISTRATION_STATUS.PUBLISH)
 
-            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
-            whenever(datasetRepository.save(any())).thenReturn(ds)
-            whenever(catalogService.getByID("catId")).thenReturn(cat)
+            whenever(datasetRepository.findById("dsId1")).thenReturn(Optional.of(ds1))
+            whenever(datasetRepository.save(any())).thenReturn(ds1)
+            whenever(datasetRepository.findByCatalogId("catId")).thenReturn(listOf(ds0))
 
-            datasetService.create("catId", ds)
-            datasetService.updateDataset(
-                "catId",
-                "dsId",
-                listOf(JsonPatchOperation(OpEnum.REPLACE, "/registrationStatus", REGISTRATION_STATUS.PUBLISH))
-            )
+            datasetService.create("catId", ds1)
 
-            verify(catalogService, times(0)).addDataSource(cat)
+            verify(publishingService, times(0)).sendNewDataSourceMessage(any(), any())
         }
 
         @Test
         fun `triggers harvest and adds datasource on first published dataset in catalog`() {
-            val cat = Catalog("catId", publisher = Publisher(id = "pubId"), hasPublishedDataSource = false)
             val ds = Dataset("dsId", "catId", registrationStatus = REGISTRATION_STATUS.PUBLISH)
 
             whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
             whenever(datasetRepository.save(any())).thenReturn(ds)
-            whenever(catalogService.getByID("catId")).thenReturn(cat)
+            whenever(applicationProperties.datasetCatalogUriHost).thenReturn("http://mycatalog")
 
             datasetService.updateDataset("catId", "dsId", emptyList())
 
-            verify(publishingService, times(1)).triggerHarvest("catId", "pubId")
-            verify(catalogService, times(1)).addDataSource(cat)
+            verify(publishingService, times(1)).triggerHarvest("catId")
+            verify(publishingService, times(1)).sendNewDataSourceMessage("catId", "http://mycatalog/catId")
         }
     }
 

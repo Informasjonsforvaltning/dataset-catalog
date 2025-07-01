@@ -2,7 +2,7 @@ package no.fdk.dataset_catalog.utils
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
-import no.fdk.dataset_catalog.model.Catalog
+import no.fdk.dataset_catalog.model.CatalogCount
 import no.fdk.dataset_catalog.model.Organization
 import no.fdk.dataset_catalog.utils.jwk.JwkStore
 
@@ -18,8 +18,9 @@ fun startMockServer() {
             .willReturn(aResponse()
                 .withBody(
                     listOf(
-                        Catalog(
-                            id = "123456789"
+                        CatalogCount(
+                            id = "123456789",
+                            datasetCount = 1,
                         )
                     ).toString()
                 ).withStatus(200))

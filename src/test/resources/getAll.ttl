@@ -17,10 +17,6 @@
         dct:identifier   "http://db3" ;
         dct:description  "the description"@en .
 
-<http://111111111>  a  dcat:Catalog .
-
-<http://192837465>  a  dcat:Catalog .
-
 <http://db1>  a    dcat:Dataset ;
         dct:identifier   "http://db1" ;
         dct:title  "test tittel"@nb .
@@ -28,7 +24,9 @@
 <http://db4>  a  dcat:Dataset ;
         dct:identifier   "http://db4" .
 
-<http://987456321>  a  dcat:Catalog ;
+<http://localhost:5050/catalogs/987456321>  a  dcat:Catalog ;
+        dct:publisher  <http://localhost:5050/organizations/987456321> ;
+        dct:title        "Dataset catalog belonging to 987456321"@en ;
         dcat:dataset  <http://db5> , <http://db4> .
 
 <http://db2>  a          dcat:Dataset ;
@@ -38,16 +36,18 @@
         dct:SkosCode     <http://test.uri>;
         dct:title        "enda en"@nb .
 
-<http://554433221>  a  dcat:Catalog .
-
 <http://db5>  a  dcat:Dataset ;
         dct:identifier   "http://db5" .
 
-<http://123456789>  a  dcat:Catalog ;
+<http://localhost:5050/catalogs/123456789>  a  dcat:Catalog ;
+        dct:publisher  <http://localhost:5050/organizations/123456789> ;
+        dct:title        "Dataset catalog belonging to 123456789"@en ;
         dcat:dataset  <http://db3> , <http://db2> , <http://db1> .
 
 <http://localhost:5050/catalogs/123123123>
         rdf:type      dcat:Catalog ;
+        dct:title        "Dataset catalog belonging to 123123123"@en ;
+        dct:publisher  <http://localhost:5050/organizations/123123123> ;
         dcat:dataset  <http://localhost:5050/catalogs/123123123/datasets/series0> .
 
 <http://localhost:5050/catalogs/123123123/datasets/series0>

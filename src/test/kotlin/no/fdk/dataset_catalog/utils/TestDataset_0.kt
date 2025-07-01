@@ -125,15 +125,9 @@ val REFERENCE_EX = Reference(
     source = SKOSCONCEPT_EX()
 )
 
-val CATALOG_EX = Catalog(
+val CATALOG_EX = CatalogCount(
     id = UUID.randomUUID().toString(),
-    uri = "http://test.uri",
-    title = mapOf(Pair("nb", "Katalognavn")),
-    description = mapOf(Pair("nb", "Beskrivelse")),
-    publisher = PUBLISHER_EX,
-    issued = LocalDate.now(),
-    modified = LocalDate.now(),
-    language = "nb",
+    datasetCount = 0,
 )
 
 val TEST_DATASET_0 = Dataset(
@@ -178,5 +172,4 @@ val TEST_DATASET_0 = Dataset(
     informationModel = listOf(SKOSCONCEPT_EX("dct:informationModel")),
     qualifiedAttributions = setOf("910244132"),
     type = "type",
-    catalog = CATALOG_EX,
 )

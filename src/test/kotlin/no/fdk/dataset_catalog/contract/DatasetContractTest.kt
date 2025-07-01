@@ -42,10 +42,8 @@ class DatasetContractTest: ApiTestContext() {
         @Test
         fun `Invalid create`() {
             val emptyBody = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets", "", JwtToken(Access.ORG_WRITE).toString(), "POST")
-            val nonExistingCatalog = apiAuthorizedRequest("/catalogs/$CATALOG_ID_2/datasets", mapper.writeValueAsString(DATASET_2), JwtToken(Access.ORG_WRITE).toString(), "POST")
 
             assertEquals(HttpStatus.BAD_REQUEST.value(), emptyBody["status"])
-            assertEquals(HttpStatus.BAD_REQUEST.value(), nonExistingCatalog["status"])
         }
 
         @Test

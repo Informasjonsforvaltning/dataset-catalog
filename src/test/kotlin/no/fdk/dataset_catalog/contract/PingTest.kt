@@ -5,7 +5,6 @@ import no.fdk.dataset_catalog.utils.apiAuthorizedRequest
 import org.junit.jupiter.api.*
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
-import org.springframework.http.MediaType
 import org.springframework.test.context.ContextConfiguration
 import kotlin.test.assertTrue
 

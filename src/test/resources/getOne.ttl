@@ -28,5 +28,7 @@
         dct:identifier   "http://db3" ;
         dct:description  "the description"@en .
 
-<http://123456789>  a  dcat:Catalog ;
+<http://localhost:5050/catalogs/123456789>  a  dcat:Catalog ;
+        dct:publisher  <http://localhost:5050/organizations/123456789> ;
+        dct:title        "Dataset catalog belonging to 123456789"@en ;
         dcat:dataset  <http://db3> , <http://db2> , <http://db1> .

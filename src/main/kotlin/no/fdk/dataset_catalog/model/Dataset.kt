@@ -181,9 +181,6 @@ data class Dataset(
     //Norwegian: type
     val type: String? = null,
 
-//    dcat:catalogue
-    val catalog: Catalog? = null,
-
     // all series that this dataset is a part of
     val inSeries: String? = null,
 
