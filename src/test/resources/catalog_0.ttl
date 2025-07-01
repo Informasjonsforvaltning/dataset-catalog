@@ -14,15 +14,17 @@
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 
 <http://uri-2>  a   rdfs:Resource ;
-                rdfs:label  "label-2-en"@en , "label-2-nb"@nb .
+    rdfs:label  "label-2-en"@en , "label-2-nb"@nb .
 
 <http://uri-1>  a   rdfs:Resource ;
-                rdfs:label  "label-1-en"@en , "label-1-nb"@nb .
+    rdfs:label  "label-1-en"@en , "label-1-nb"@nb .
 
 <http://catalog/1/dataset/1>
     a             dcat:Dataset ;
     dct:identifier   "http://catalog/1/dataset/1" ;
     dct:relation  <http://uri-2> , <http://uri-1> .
 
-<http://catalog/1>  a  dcat:Catalog ;
-                    dcat:dataset  <http://catalog/1/dataset/1> .
+<http://localhost:5050/catalogs/1>  a  dcat:Catalog ;
+    dct:publisher  <http://localhost:5050/organizations/1> ;
+        dct:title        "Dataset catalog belonging to 1"@en ;
+    dcat:dataset  <http://catalog/1/dataset/1> .

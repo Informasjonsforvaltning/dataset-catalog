@@ -15,5 +15,7 @@
                                  prov:agent    <https://data.brreg.no/enhetsregisteret/api/enheter/987654321>
                                ] .
 
-<http://catalog/1>  a  dcat:Catalog ;
-                    dcat:dataset  <http://catalog/1/dataset/1> .
+<http://localhost:5050/catalogs/1>  a  dcat:Catalog ;
+    dct:publisher  <http://localhost:5050/organizations/1> ;
+        dct:title        "Dataset catalog belonging to 1"@en ;
+    dcat:dataset  <http://catalog/1/dataset/1> .
