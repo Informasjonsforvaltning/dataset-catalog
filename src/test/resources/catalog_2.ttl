@@ -39,9 +39,8 @@
 
 <http://localhost:5050/catalogs/987654321>
         a                dcat:Catalog ;
-        dct:description  "Beskrivelse"@nb ;
-        dct:publisher    <http://data.brreg.no/enhetsregisteret/enhet/987654321> ;
-        dct:title        "Tittel"@nb ;
+        dct:publisher    <http://localhost:5050/organizations/987654321> ;
+        dct:title        "Dataset catalog belonging to 987654321"@en ;
         dcat:dataset     <http://localhost:5050/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d> .
 
 <http://uri-2>  a   rdfs:Resource ;

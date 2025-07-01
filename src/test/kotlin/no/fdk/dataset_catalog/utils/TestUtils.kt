@@ -18,11 +18,6 @@ import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
 import java.io.StringReader
 
-
-private fun isOK(response: Int?): Boolean =
-    if(response == null) false
-    else HttpStatus.resolve(response)?.is2xxSuccessful == true
-
 fun apiAuthorizedRequest(path: String, body: String? = null, token: String? = null, method: String, accept: MediaType = MediaType.APPLICATION_JSON): Map<String, Any> {
     val request = RestTemplate()
     request.requestFactory = HttpComponentsClientHttpRequestFactory()
@@ -71,10 +66,6 @@ fun resetDB() {
 
     val client: MongoClient = MongoClients.create(connectionString)
     val mongoDatabase = client.getDatabase(MONGO_DB_NAME).withCodecRegistry(pojoCodecRegistry)
-
-    val catalogCollection = mongoDatabase.getCollection("catalogs")
-    catalogCollection.deleteMany(org.bson.Document())
-    catalogCollection.insertMany(catalogDbPopulation())
 
     val datasetCollection = mongoDatabase.getCollection("datasets")
     datasetCollection.deleteMany(org.bson.Document())

@@ -2,7 +2,7 @@ package no.fdk.dataset_catalog.model
 
 data class SearchResult(
     val datasets: List<Dataset> = emptyList(),
-    val catalogs: List<Catalog> = emptyList()
+    val catalogs: List<CatalogCount> = emptyList()
 )
 
 enum class SEARCH_TYPE {

@@ -20,29 +20,28 @@ class PublishingService(
     private val toHarvest = mutableMapOf<String, TimerTask>()
 
     @Synchronized
-    fun triggerHarvest(catalogId: String?, publisherId: String?) {
+    fun triggerHarvest(catalogId: String) {
         logger.info("Scheduling harvest for ${LocalDateTime.now().plusSeconds(applicationProperties.harvestDelay/1000)} on catalog $catalogId")
-        if (!catalogId.isNullOrEmpty() && !publisherId.isNullOrEmpty()) {
-            if (toHarvest.containsKey(catalogId)) {
-                toHarvest[catalogId]?.cancel()
-            }
 
-            toHarvest[catalogId] = Timer(catalogId, false).schedule(applicationProperties.harvestDelay) {
-                sendHarvestMessage(catalogId, publisherId)
-            }
+        if (toHarvest.containsKey(catalogId)) {
+            toHarvest[catalogId]?.cancel()
+        }
+
+        toHarvest[catalogId] = Timer(catalogId, false).schedule(applicationProperties.harvestDelay) {
+            sendHarvestMessage(catalogId)
         }
     }
 
-    private fun sendHarvestMessage(catalogId: String, publisherId: String) {
+    private fun sendHarvestMessage(catalogId: String) {
         logger.info("Sending harvest message to queue for catalog with ID $catalogId")
         val payload = JsonNodeFactory.instance.objectNode()
-        payload.put("publisherId", publisherId)
+        payload.put("publisherId", catalogId)
         try {
             rabbitTemplate.convertAndSend(applicationProperties.catalogHarvestRoute, payload)
-            logger.info("Successfully sent harvest message for publisher $publisherId")
+            logger.info("Successfully sent harvest message for publisher $catalogId")
             toHarvest.remove(catalogId)
         } catch (e: Exception) {
-            logger.error("Failed to send harvest message for publisher $publisherId", e)
+            logger.error("Failed to send harvest message for publisher $catalogId", e)
         }
     }
 
