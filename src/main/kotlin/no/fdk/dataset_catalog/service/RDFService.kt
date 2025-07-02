@@ -1,7 +1,7 @@
 package no.fdk.dataset_catalog.service
 
 import no.fdk.dataset_catalog.configuration.ApplicationProperties
-import no.fdk.dataset_catalog.model.Catalog
+import no.fdk.dataset_catalog.model.CatalogCount
 import no.fdk.dataset_catalog.model.Dataset
 import no.fdk.dataset_catalog.model.REGISTRATION_STATUS
 import no.fdk.dataset_catalog.model.SpecializedType
@@ -33,25 +33,23 @@ class RDFService(
             ?.let { it.copy(references = datasetService.resolveReferences(it)) }
             ?.createModel()
 
-    private fun List<Catalog>.createCatalogModel(): Model {
+    private fun List<CatalogCount>.createCatalogModel(): Model {
         val model = ModelFactory.createDefaultModel()
         model.setDefaultPrefixes()
 
         forEach { catalog ->
-            model.createResource(catalog.uri)
+            model.createResource("${applicationProperties.catalogUriHost}/${catalog.id}")
                 .addProperty(RDF.type, DCAT.Catalog)
-                .safeAddPropertyByLang(DCTerms.title, catalog.title)
-                .safeAddPropertyByLang(DCTerms.description, catalog.description)
-                .safeAddDateTimeLiteral(DCTerms.issued, catalog.issued)
-                .safeAddDateTimeLiteral(DCTerms.modified, catalog.modified)
-                .safeAddProperty(DCTerms.language, catalog.language)
-                .addPublisher(catalog.publisher)
+                .addProperty(DCTerms.title, "Dataset catalog belonging to ${catalog.id}", "en")
+                .addProperty(
+                    DCTerms.publisher,
+                    model.safeCreateResource(organizationCatalogURI(catalog.id))
+                )
                 .addDatasets(
-                    catalog.id?.let { catId ->
-                        datasetService.getAll(catId).map {
-                            it.copy(references = datasetService.resolveReferences(it))
-                        }
-                    })
+                    datasetService.getAll(catalog.id).map {
+                        it.copy(references = datasetService.resolveReferences(it))
+                    }
+                )
         }
 
         return model
@@ -150,4 +148,7 @@ class RDFService(
         setNsPrefix("cpsvno", CPSVNO.uri)
         setNsPrefix("eli", ELI.uri)
     }
+
+    private fun organizationCatalogURI(organizationNumber: String) =
+        "${applicationProperties.organizationCatalogHost}/organizations/$organizationNumber"
 }

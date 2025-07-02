@@ -6,6 +6,8 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import jakarta.json.Json
 import jakarta.json.JsonException
 import no.fdk.dataset_catalog.configuration.ApplicationProperties
+import no.fdk.dataset_catalog.extensions.datasetToDBO
+import no.fdk.dataset_catalog.extensions.toDataset
 import no.fdk.dataset_catalog.model.*
 import no.fdk.dataset_catalog.repository.DatasetRepository
 import no.fdk.dataset_catalog.utils.isValidURI
@@ -23,11 +25,9 @@ private val logger = LoggerFactory.getLogger(DatasetService::class.java)
 @Service
 class DatasetService(
     private val datasetRepository: DatasetRepository,
-    private val catalogService: CatalogService,
-    private val organizationService: OrganizationService,
     private val publishingService: PublishingService,
     private val applicationProperties: ApplicationProperties,
-    private val mapper: ObjectMapper
+    private val mapper: ObjectMapper,
 ) {
     private var datasetUriPattern: Regex? = null
 
@@ -40,10 +40,14 @@ class DatasetService(
 
     fun getAll(catalogId: String, specializedTypeString: String? = null): List<Dataset> {
         val specializedType = specializedTypeFromString(specializedTypeString)
-        val datasetList = if (specializedType == null) datasetRepository.findByCatalogId(catalogId) as List<Dataset>
-        else datasetRepository.findByCatalogIdAndSpecializedType(catalogId, specializedType) as List<Dataset>
+        val datasetList = if (specializedType == null) datasetRepository.findByCatalogId(catalogId)
+        else datasetRepository.findByCatalogIdAndSpecializedType(catalogId, specializedType)
 
-        return datasetList.map { it.addOldAccessUrisToNewField().addOldThemesToNewFields() }
+        return datasetList.map { dbo ->
+            dbo.toDataset()
+                .addOldAccessUrisToNewField()
+                .addOldThemesToNewFields()
+        }
     }
 
     // Temporary function, remove when refactoring accessService in distribution
@@ -90,45 +94,36 @@ class DatasetService(
 
     fun getByID(catalogId: String, id: String): Dataset? {
         val dataset = datasetRepository.findByIdOrNull(id)
+            ?.toDataset()
             ?.addOldAccessUrisToNewField()?.addOldThemesToNewFields()
         return if (dataset?.catalogId != catalogId) null else dataset
     }
 
     private fun getByID(id: String): Dataset? {
         return datasetRepository.findByIdOrNull(id)
+            ?.toDataset()
             ?.addOldAccessUrisToNewField()?.addOldThemesToNewFields()
     }
 
     fun getListByIDs(catalogId: String, ids: List<String>) =
         datasetRepository.findAllById(ids).filter { it.catalogId == catalogId }
-            .map { it.addOldAccessUrisToNewField().addOldThemesToNewFields() }
+            .map { it.toDataset().addOldAccessUrisToNewField().addOldThemesToNewFields() }
 
     fun create(catalogId: String, dataset: Dataset): Dataset? {
-        val catalog = catalogService.getByID(catalogId) ?: throw ResponseStatusException(
-            HttpStatus.BAD_REQUEST,
-            "Catalog not found"
-        )
         val datasetId = dataset.id ?: UUID.randomUUID().toString()
-
-        if (dataset.publisher != null) {
-            validateDatasetPublisher(catalog.publisher, dataset.publisher)
-        }
 
         dataset.copy(
             id = datasetId,
             catalogId = catalogId,
             lastModified = LocalDateTime.now(),
             uri = "${applicationProperties.catalogUriHost}/$catalogId/datasets/$datasetId",
-            publisher = dataset.publisher ?: catalog.publisher,
             registrationStatus = dataset.registrationStatus ?: REGISTRATION_STATUS.DRAFT,
         )
             .allAffectedSeriesDatasets(null)
-            .let { persistAndHarvest(it, catalog) }
+            .let { persistAndHarvest(it, catalogId) }
 
         return getByID(catalogId, datasetId)
     }
-
-    fun count() = datasetRepository.count()
 
     fun updateDataset(catalogId: String, id: String, operations: List<JsonPatchOperation>): Dataset? {
         val dataset = getByID(catalogId, id)
@@ -141,14 +136,14 @@ class DatasetService(
                 lastModified = LocalDateTime.now()
             )
             ?.allAffectedSeriesDatasets(dataset)
-            ?.let { persistAndHarvest(it, catalogService.getByID(catalogId)) }
+            ?.let { persistAndHarvest(it, catalogId) }
 
         return getByID(catalogId, id)
     }
 
     fun delete(catalogId: String, id: String) {
         getByID(catalogId, id)
-            ?.also { datasetRepository.delete(it) }
+            ?.also { datasetRepository.delete(it.datasetToDBO()) }
             ?.removeDeletedDatasetFromSeriesFields()
             ?: throw Exception()
     }
@@ -189,7 +184,7 @@ class DatasetService(
         else {
             val addedInSeries = inSeries
                 ?.takeIf { it != dbDataset?.inSeries }
-                ?.let { datasetRepository.findByIdOrNull(it) }
+                ?.let { datasetRepository.findByIdOrNull(it)?.toDataset() }
                 ?.let {
                     val updatedSeriesOrder = if (it.seriesDatasetOrder.isNullOrEmpty()) {
                         mapOf(Pair(id, 0))
@@ -203,14 +198,14 @@ class DatasetService(
             val removedInSeries = dbDataset?.inSeries
                 ?.takeIf { it != inSeries }
                 ?.let { datasetRepository.findByIdOrNull(it) }
-                ?.let { it.copy(seriesDatasetOrder = it.seriesDatasetOrder?.minus(id)) }
+                ?.let { it.toDataset().copy(seriesDatasetOrder = it.seriesDatasetOrder?.minus(id)) }
                 ?.let { listOf(it) } ?: emptyList()
 
             val addedToOrder = if (specializedType == SpecializedType.SERIES) {
                 seriesDatasetOrder?.keys
                     ?.filter { it !in (dbDataset?.seriesDatasetOrder?.keys ?: emptyList()) }
                     ?.let { datasetRepository.findAllById(it) }
-                    ?.map { it.copy(inSeries = id) }
+                    ?.map { it.toDataset().copy(inSeries = id) }
                     ?: emptyList()
             } else emptyList()
 
@@ -218,7 +213,7 @@ class DatasetService(
                 dbDataset?.seriesDatasetOrder?.keys
                     ?.filter { it !in (seriesDatasetOrder?.keys ?: emptyList()) }
                     ?.let { datasetRepository.findAllById(it) }
-                    ?.map { it.copy(inSeries = null) }
+                    ?.map { it.toDataset().copy(inSeries = null) }
                     ?: emptyList()
             } else emptyList()
 
@@ -228,39 +223,37 @@ class DatasetService(
     private fun isDatasetReference(ref: Reference?): Boolean =
         ref?.source?.uri?.let { getDatasetUriPattern().containsMatchIn(it) } ?: false
 
-    private fun validateDatasetPublisher(catalogPublisher: Publisher?, datasetPublisher: Publisher) {
-        if (datasetPublisher.id != null && catalogPublisher?.id != null &&
-            datasetPublisher.id != catalogPublisher.id &&
-            !organizationService.hasDelegationPermission(catalogPublisher.id)
-        ) {
-            throw Exception(
-                "Organization with ID ${catalogPublisher.id} has no delegation permission to create datasets on behalf of other organizations"
-            )
-        }
+    private fun persistAndHarvest(datasets: List<Dataset>, catalogId: String) {
+        val isFirstPublished = isFirstPublishedDatasetForCatalog(datasets, catalogId)
+
+        val datasetDBOs = datasets.map { it.datasetToDBO() }
+        datasetRepository
+            .saveAll(datasetDBOs)
+            .also {
+                if (isFirstPublished) addDataSource(catalogId)
+                triggerHarvest(datasets, catalogId)
+            }
     }
 
-    private fun persistAndHarvest(datasets: List<Dataset>, catalog: Catalog?) =
-        if (catalog != null) {
-            datasetRepository
-                .saveAll(datasets)
-                .also {
-                    addDataSource(datasets, catalog)
-                    triggerHarvest(datasets, catalog)
-                }
-        } else null
+    fun addDataSource(catalogId: String) {
+        publishingService.sendNewDataSourceMessage(
+            catalogId,
+            "${applicationProperties.datasetCatalogUriHost}/$catalogId"
+        )
+    }
 
-
-    private fun triggerHarvest(datasets: List<Dataset>, catalog: Catalog) {
+    private fun triggerHarvest(datasets: List<Dataset>, catalogId: String) {
         if (datasets.any { it.registrationStatus == REGISTRATION_STATUS.PUBLISH }) {
-            publishingService.triggerHarvest(catalog.id, catalog.publisher?.id)
+            publishingService.triggerHarvest(catalogId)
         }
     }
 
-    private fun addDataSource(datasets: List<Dataset>, catalog: Catalog) {
-        if (datasets.any { it.registrationStatus == REGISTRATION_STATUS.PUBLISH } && catalog.hasPublishedDataSource == false) {
-            catalogService.addDataSource(catalog)
+    private fun isFirstPublishedDatasetForCatalog(datasets: List<Dataset>, catalogId: String): Boolean =
+        when {
+            datasets.none { it.registrationStatus == REGISTRATION_STATUS.PUBLISH } -> false
+            getAll(catalogId).any { it.registrationStatus == REGISTRATION_STATUS.PUBLISH } -> false
+            else -> true
         }
-    }
 
     private fun Dataset.update(operations: List<JsonPatchOperation>): Dataset {
         validateOperations(operations)

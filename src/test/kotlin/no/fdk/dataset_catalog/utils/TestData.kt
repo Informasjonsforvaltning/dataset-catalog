@@ -2,15 +2,13 @@ package no.fdk.dataset_catalog.utils
 
 import no.fdk.dataset_catalog.model.*
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap
+import javax.xml.crypto.Data
 
 const val API_TEST_PORT = 5555
 const val LOCAL_SERVER_PORT = 5050
 
-const val API_TEST_URI = "http://localhost:$API_TEST_PORT"
-const val WIREMOCK_TEST_URI = "http://localhost:$LOCAL_SERVER_PORT"
-
-const val MONGO_USER = "testuser"
-const val MONGO_PASSWORD = "testpassword"
+const val MONGO_USER = "root"
+const val MONGO_PASSWORD = "secret"
 const val MONGO_PORT = 27017
 const val MONGO_DB_NAME = "datasetCatalog"
 
@@ -62,6 +60,10 @@ val DATASET_2 = TEST_DATASET_0.copy(
     catalogId = DB_CATALOG_ID_1,
     uri = "http://$DATASET_ID_2",
     registrationStatus = REGISTRATION_STATUS.PUBLISH,
+    theme = listOf(
+        DataTheme(uri = "https://psi.norge.no/los/tema/arbeid"),
+        DataTheme(uri = "http://publications.europa.eu/resource/authority/data-theme/AGRI")
+    )
 )
 
 val DATASET_3 = Dataset(
@@ -120,44 +122,44 @@ val DB_DATASET_6 = Dataset(
     registrationStatus = REGISTRATION_STATUS.DRAFT,
 )
 
-val CATALOG_1 = Catalog(
+val CATALOG_1 = CatalogCount(
     CATALOG_ID_1,
-    uri = "http://$CATALOG_ID_1",
+    datasetCount = 0,
 )
 
-val CATALOG_2 = Catalog(
+val CATALOG_2 = CatalogCount(
     CATALOG_ID_2,
-    uri = "http://$CATALOG_ID_2",
+    datasetCount = 0,
 )
 
-val DB_CATALOG_1 = Catalog(
+val DB_CATALOG_1 = CatalogCount(
     DB_CATALOG_ID_1,
-    uri = "http://$DB_CATALOG_ID_1",
+    datasetCount = 3,
 )
 
-val DB_CATALOG_2 = Catalog(
+val DB_CATALOG_2 = CatalogCount(
     DB_CATALOG_ID_2,
-    uri = "http://$DB_CATALOG_ID_2",
+    datasetCount = 0,
 )
 
-val DB_CATALOG_3 = Catalog(
+val DB_CATALOG_3 = CatalogCount(
     DB_CATALOG_ID_3,
-    uri = "http://$DB_CATALOG_ID_3",
+    datasetCount = 0,
 )
 
-val DB_CATALOG_4 = Catalog(
+val DB_CATALOG_4 = CatalogCount(
     DB_CATALOG_ID_4,
-    uri = "http://$DB_CATALOG_ID_4",
+    datasetCount = 0,
 )
 
-val DB_CATALOG_5 = Catalog(
+val DB_CATALOG_5 = CatalogCount(
     DB_CATALOG_ID_5,
-    uri = "http://$DB_CATALOG_ID_5",
+    datasetCount = 0,
 )
 
-val SERIES_CATALOG = Catalog(
+val SERIES_CATALOG = CatalogCount(
     SERIES_CATALOG_ID,
-    uri = "http://localhost:5050/catalogs/$SERIES_CATALOG_ID",
+    datasetCount = 0,
 )
 
 val SERIES_DATASET_0 = Dataset(
@@ -215,9 +217,6 @@ fun datasetDbPopulation() = listOf(
 )
     .map { it.mapDBO() }
 
-fun catalogDbPopulation() = listOf(DB_CATALOG_1, DB_CATALOG_2, DB_CATALOG_3, DB_CATALOG_4, DB_CATALOG_5, SERIES_CATALOG)
-    .map { it.mapDBO() }
-
 
 private fun Dataset.mapDBO(): org.bson.Document =
     org.bson.Document()
@@ -228,20 +227,19 @@ private fun Dataset.mapDBO(): org.bson.Document =
         .append("title", title)
         .append("description", description)
         .append("references", references?.map { it.mapDBO() })
-        .append("registrationStatus", registrationStatus.toString())
+        .append(
+            "approved",
+            registrationStatus === REGISTRATION_STATUS.APPROVE || registrationStatus === REGISTRATION_STATUS.PUBLISH
+        )
+        .append("published", registrationStatus === REGISTRATION_STATUS.PUBLISH)
         .append("specializedType", specializedType)
         .append("inSeries", inSeries)
         .append("seriesDatasetOrder", seriesDatasetOrder)
 
-private fun Catalog.mapDBO(): org.bson.Document =
-    org.bson.Document()
-        .append("_id", id)
-        .append("uri", uri)
-
 private fun Reference.mapDBO(): org.bson.Document =
     org.bson.Document()
-        .append("referenceType", referenceType?.mapDBO())
-        .append("source", source?.mapDBO())
+        .append("referenceType", referenceType?.uri)
+        .append("source", source?.uri)
 
 private fun SkosCode.mapDBO(): org.bson.Document =
     org.bson.Document()

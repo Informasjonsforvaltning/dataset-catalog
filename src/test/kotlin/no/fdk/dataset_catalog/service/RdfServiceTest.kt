@@ -37,7 +37,7 @@ class RdfServiceTest {
 
         @Test
         fun `Empty catalog serializes correctly`() {
-            whenever(catalogService.getByID("1")).thenReturn(Catalog())
+            whenever(catalogService.getByID("1")).thenReturn(CatalogCount(id = "1", datasetCount = 0))
 
             assertNotNull(rdfService.getCatalogById("1"))
         }
@@ -48,6 +48,7 @@ class RdfServiceTest {
                 registrationStatus = REGISTRATION_STATUS.PUBLISH,
                 id = "http://catalog/1/dataset/1",
                 uri = "http://catalog/1/dataset/1",
+                catalogId = "1",
                 relations = listOf(
                     SkosConcept(
                         uri = "http://uri-1",
@@ -60,14 +61,14 @@ class RdfServiceTest {
                 )
             )
 
-            val catalog = Catalog(id = "http://catalog/1",
-                uri = "http://catalog/1")
+            val catalog = CatalogCount(id = "1", datasetCount = 0)
 
-            whenever(catalogService.getByID("http://catalog/1")).thenReturn(catalog)
-            whenever(datasetService.getAll("http://catalog/1")).thenReturn(listOf(dataset))
+            whenever(catalogService.getByID("1")).thenReturn(catalog)
+            whenever(datasetService.getAll("1")).thenReturn(listOf(dataset))
+            whenever(applicationProperties.organizationCatalogHost).thenReturn("http://localhost:5050")
 
             val expected = responseReader.parseFile("catalog_0.ttl", "TURTLE")
-            val responseModel = rdfService.getCatalogById("http://catalog/1")
+            val responseModel = rdfService.getCatalogById("1")
 
             assertTrue(checkIfIsomorphicAndPrintDiff(responseModel!!, expected, "Serializing dataset relations", logger))
 
@@ -76,13 +77,14 @@ class RdfServiceTest {
         @Test
         fun `Serializes dataset qualified attributions`() {
             val dataset = Dataset(registrationStatus = REGISTRATION_STATUS.PUBLISH, id = "http://catalog/1/dataset/1", uri = "http://catalog/1/dataset/1", qualifiedAttributions = setOf("123456789", "987654321"))
-            val catalog = Catalog(id = "http://catalog/1", uri = "http://catalog/1")
+            val catalog = CatalogCount(id = "1", datasetCount = 1)
 
-            whenever(catalogService.getByID("http://catalog/1")).thenReturn(catalog)
-            whenever(datasetService.getAll("http://catalog/1")).thenReturn(listOf(dataset))
+            whenever(catalogService.getByID("1")).thenReturn(catalog)
+            whenever(datasetService.getAll("1")).thenReturn(listOf(dataset))
+            whenever(applicationProperties.organizationCatalogHost).thenReturn("http://localhost:5050")
 
             val expected = responseReader.parseFile("catalog_1.ttl", "TURTLE")
-            val responseModel = rdfService.getCatalogById("http://catalog/1")
+            val responseModel = rdfService.getCatalogById("1")
 
             assertTrue(checkIfIsomorphicAndPrintDiff(responseModel!!, expected, "Serializing qualified attributions", logger))
         }
@@ -98,6 +100,7 @@ class RdfServiceTest {
             whenever(catalogService.getByID(catalog.id!!)).thenReturn(catalog)
             whenever(datasetService.getAll("${catalog.id}")).thenReturn(listOf(dataset))
             whenever(datasetService.resolveReferences(dataset)).thenReturn(references)
+            whenever(applicationProperties.organizationCatalogHost).thenReturn("http://localhost:5050")
 
             val expected = responseReader.parseFile("catalog_2.ttl", "TURTLE")
             val responseModel = rdfService.getCatalogById("${catalog.id}")!!

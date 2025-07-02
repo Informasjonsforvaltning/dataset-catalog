@@ -29,13 +29,12 @@ class PublishingServiceTest {
         @Test
         fun`triggers harvest only once`() {
             val catalogId = "cat1"
-            val publisherId = "ps1"
 
             val payload = JsonNodeFactory.instance.objectNode()
-            payload.put("publisherId", publisherId)
+            payload.put("publisherId", catalogId)
 
             for (i in 1..100) {
-                publishingService.triggerHarvest(catalogId, publisherId)
+                publishingService.triggerHarvest(catalogId)
             }
 
             Thread.sleep(applicationProperties.harvestDelay*2)
@@ -46,13 +45,12 @@ class PublishingServiceTest {
         @Test
         fun`triggers harvest after delay`() {
             val catalogId = "cat1"
-            val publisherId = "ps1"
 
             val payload = JsonNodeFactory.instance.objectNode()
-            payload.put("publisherId", publisherId)
+            payload.put("publisherId", catalogId)
 
             for (i in 1..3) {
-                publishingService.triggerHarvest(catalogId, publisherId)
+                publishingService.triggerHarvest(catalogId)
                 Thread.sleep(applicationProperties.harvestDelay*2)
 
             }
