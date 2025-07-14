@@ -9,7 +9,6 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
-import org.springframework.data.annotation.*
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -20,8 +19,6 @@ data class DatasetEmbeddedWrapperDTO(
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Dataset(
-
-    @Id
     val id: String? = null,
 
     val catalogId: String? = null,
@@ -31,8 +28,6 @@ data class Dataset(
     @JsonProperty(value = "_lastModified")
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
-
-    @LastModifiedDate
     val lastModified: LocalDateTime? = null,
 
     val registrationStatus: REGISTRATION_STATUS? = null,

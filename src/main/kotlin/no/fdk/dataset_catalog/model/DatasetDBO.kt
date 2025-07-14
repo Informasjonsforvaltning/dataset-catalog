@@ -10,7 +10,6 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
 import org.springframework.data.annotation.*
 import org.springframework.data.mongodb.core.mapping.Document
-import org.springframework.data.mongodb.core.mapping.MongoId
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -18,16 +17,12 @@ import java.time.LocalDateTime
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class DatasetDBO(
-    @MongoId
+    @Id
     val id: String,
     val catalogId: String,
 
-    @LastModifiedBy
-    val modifiedBy: User? = null,
-
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
-    @LastModifiedDate
     val lastModified: LocalDateTime? = null,
     val originalUri: String? = null,
     val uri: String? = null,
