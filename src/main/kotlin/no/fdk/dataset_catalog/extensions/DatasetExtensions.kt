@@ -1,6 +1,7 @@
 package no.fdk.dataset_catalog.extensions
 
 import no.fdk.dataset_catalog.model.*
+import org.apache.jena.vocabulary.DCTerms
 
 fun List<Dataset>.toDTO(): DatasetEmbeddedWrapperDTO = DatasetEmbeddedWrapperDTO(mapOf(Pair("datasets", this)))
 
@@ -128,7 +129,7 @@ fun Dataset.datasetToDBO(): DatasetDBO =
         },
         references = references?.map {
             ReferenceDBO(
-                referenceType = it.referenceType?.uri,
+                referenceType = it.referenceType?.code,
                 source = it.source?.uri
             )
         },
@@ -315,11 +316,10 @@ fun Distribution.allAccessServiceUris(): Set<String>? {
 
 private fun ReferenceDBO.asSkosCode(): SkosCode? {
     if (referenceType != null) {
-        val code = referenceType.split("/").last()
         return SkosCode(
-            uri = referenceType,
-            code = code,
-            prefLabel = mapOf(Pair("en", code))
+            uri = DCTerms.getURI() + referenceType,
+            code = referenceType,
+            prefLabel = mapOf(Pair("en", referenceType))
         )
     } else return null
 }
