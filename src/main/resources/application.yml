@@ -1,5 +1,13 @@
 spring:
-  data.mongodb.uri: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST:mongodb}:${MONGO_PORT:27017}/datasetCatalog?authSource=admin&authMechanism=SCRAM-SHA-1
+  data.mongodb:
+    host: ${MONGODB_HOST}
+    username: ${MONGODB_USER}
+    password: ${MONGODB_PASSWORD}
+    authentication-database: ${MONGODB_AUTH}
+    replica-set-name: ${MONGODB_REPLICASET}
+    port: 27017
+    database: datasetCatalog
+    auto-index-creation: true
   security.oauth2.resourceserver.jwt.jwk-set-uri: ${OIDC_JWKS:https://sso.staging.fellesdatakatalog.digdir.no/auth/realms/fdk/protocol/openid-connect/certs}
   rabbitmq:
     host: ${RABBIT_HOST}
@@ -72,3 +80,36 @@ application:
   newDataSourceRoute: dataset.publisher.NewDataSource
   exchangeName: harvests
 security.corsOriginPatterns: "*"
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  data:
+    mongodb:
+      host: localhost
+      username: root
+      password: secret
+      authentication-database: admin
+      replica-set-name: null
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${SSO_HOST}/auth/realms/fdk
+          jwk-set-uri: ${SSO_HOST}/auth/realms/fdk/protocol/openid-connect/certs
+          audiences: dataset-catalog
+          authorities-claim-name: authorities
+          authority-prefix: ""
+          authorities-claim-delimiter: ","
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
+  mvc:
+    problemdetails:
+      enabled: true
+application:
+  base-uri: ${BASE_URI:http://localhost}
+  organization-catalog-base-uri: ${ORGANIZATION_CATALOG_BASE_URI:https://organization-catalog.staging.fellesdatakatalog.digdir.no}
+  cors:
+    originPatterns: "${CORS_ORIGIN_PATTERNS}"
