@@ -1,7 +1,8 @@
 package no.fdk.dataset_catalog.rdf
 
-import no.fdk.dataset_catalog.model.Distribution
-import no.fdk.dataset_catalog.model.SkosConcept
+import no.fdk.dataset_catalog.model.DistributionDBO
+import no.fdk.dataset_catalog.model.LocalizedStrings
+import no.fdk.dataset_catalog.model.UriWithLabel
 import org.apache.jena.rdf.model.ModelFactory
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -15,7 +16,7 @@ class RDFDatasetUtilsTest {
         val model = ModelFactory.createDefaultModel()
         val resource = model.createResource("http://my-dataset1")
 
-        resource.addDistribution(ADMS.sample, listOf(Distribution()))
+        resource.addDatasetDistribution(ADMS.sample, listOf(DistributionDBO()))
 
         assertFalse { resource.hasProperty(ADMS.sample) }
     }
@@ -25,21 +26,19 @@ class RDFDatasetUtilsTest {
         val model = ModelFactory.createDefaultModel()
         val resource = model.createResource("http://my-dataset1")
 
-        resource.addDistribution(ADMS.sample, listOf(
-                Distribution(
-                    title = mapOf("nb" to ""),
-                    description = mapOf("nb" to ""),
-                    uri = "",
-                    accessURL = listOf(""),
-                    conformsTo = listOf(SkosConcept(uri = "", prefLabel = mapOf("nb" to ""))),
-                    format = listOf(""),
-                    license = SkosConcept(uri = "", prefLabel = mapOf()),
-                    page = listOf(SkosConcept(uri = "", prefLabel = mapOf("nb" to "")))
-        ),
-                Distribution(
+        resource.addDatasetDistribution(ADMS.sample, listOf(
+            DistributionDBO(
+                title = LocalizedStrings(nb = ""),
+                description = LocalizedStrings(nb = ""),
+                accessURL = listOf(""),
+                conformsTo = listOf(UriWithLabel(uri = "", prefLabel = mapOf("nb" to ""))),
+                format = listOf(""),
+                license = "",
+                page = listOf("")
+            ),
+            DistributionDBO(
                     title = null,
-                    description = mapOf(),
-                    uri = "",
+                    description = LocalizedStrings(),
                     accessURL = listOf(""),
                     conformsTo = null,
                     format = listOf(),
@@ -55,7 +54,7 @@ class RDFDatasetUtilsTest {
         val model = ModelFactory.createDefaultModel()
         val resource = model.createResource("http://my-dataset1")
 
-        resource.addDistribution(ADMS.sample, listOf(Distribution(accessURL = listOf("http://access-url"))))
+        resource.addDatasetDistribution(ADMS.sample, listOf(DistributionDBO(accessURL = listOf("http://access-url"))))
 
         assertTrue { resource.hasProperty(ADMS.sample) }
     }

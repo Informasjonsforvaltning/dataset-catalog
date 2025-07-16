@@ -59,7 +59,7 @@ class RdfServiceTest {
                 )
             )
 
-            val catalog = CatalogCount(id = "http://catalog/1", datasetCount = 0)
+            val catalog = CatalogCount(id = "1", datasetCount = 0)
 
             whenever(catalogService.getByID("1")).thenReturn(catalog)
             whenever(datasetService.getAllDatasets("1")).thenReturn(listOf(dataset))
@@ -118,13 +118,13 @@ class RdfServiceTest {
                 )
             )
 
-            whenever(catalogService.getByID(catalog.id!!)).thenReturn(catalog)
-            whenever(datasetService.getAllDatasets("${catalog.id}")).thenReturn(listOf(dataset))
+            whenever(catalogService.getByID(catalog.id)).thenReturn(catalog)
+            whenever(datasetService.getAllDatasets(catalog.id)).thenReturn(listOf(dataset))
             whenever(datasetService.resolveDatasetReferences(dataset)).thenReturn(references)
             whenever(applicationProperties.organizationCatalogHost).thenReturn("http://localhost:5050")
 
             val expected = responseReader.parseFile("catalog_2.ttl", "TURTLE")
-            val responseModel = rdfService.getCatalogById("${catalog.id}")!!
+            val responseModel = rdfService.getCatalogById(catalog.id)!!
 
             assertTrue(checkIfIsomorphicAndPrintDiff(responseModel, expected, "Serializing complete catalog", logger))
         }

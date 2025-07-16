@@ -200,7 +200,6 @@ data class PeriodOfTimeDBO(
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class QualityAnnotationDBO(
-    val inDimension: String? = null,
     val motivatedBy: String? = null,
     val hasBody: Map<String, String>? = null
 )

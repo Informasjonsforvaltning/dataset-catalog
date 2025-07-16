@@ -31,8 +31,7 @@
         dct:isReplacedBy     <http://test.uri>;
         dct:title        "enda en"@nb .
 
-<http://db5>  a  dcat:Dataset ;
-        dct:identifier   "http://db5" .
+<http://db5>  a  dcat:Dataset .
 
 <http://localhost:5050/catalogs/123456789>  a  dcat:Catalog ;
         dct:publisher  <http://localhost:5050/organizations/123456789> ;

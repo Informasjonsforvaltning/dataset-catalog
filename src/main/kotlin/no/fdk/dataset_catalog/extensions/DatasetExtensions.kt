@@ -94,35 +94,30 @@ fun Dataset.datasetToDBO(): DatasetDBO =
         legalBasisForAccess = legalBasisForAccess?.map { UriWithLabel(it.uri, it.prefLabel) },
         accuracy = hasAccuracyAnnotation?.let {
             QualityAnnotationDBO(
-                inDimension = it.inDimension,
                 motivatedBy = it.motivatedBy,
                 hasBody = it.hasBody
             )
         },
         completeness = hasCompletenessAnnotation?.let {
             QualityAnnotationDBO(
-                inDimension = it.inDimension,
                 motivatedBy = it.motivatedBy,
                 hasBody = it.hasBody
             )
         },
         currentness = hasCurrentnessAnnotation?.let {
             QualityAnnotationDBO(
-                inDimension = it.inDimension,
                 motivatedBy = it.motivatedBy,
                 hasBody = it.hasBody
             )
         },
         availability = hasAvailabilityAnnotation?.let {
             QualityAnnotationDBO(
-                inDimension = it.inDimension,
                 motivatedBy = it.motivatedBy,
                 hasBody = it.hasBody
             )
         },
         relevance = hasRelevanceAnnotation?.let {
             QualityAnnotationDBO(
-                inDimension = it.inDimension,
                 motivatedBy = it.motivatedBy,
                 hasBody = it.hasBody
             )
@@ -146,7 +141,7 @@ fun Dataset.datasetToDBO(): DatasetDBO =
     )
 
 fun QualityAnnotationDBO.toQualityAnnotation(): QualityAnnotation =
-    QualityAnnotation(hasBody = hasBody, inDimension = inDimension, motivatedBy = motivatedBy)
+    QualityAnnotation(hasBody = hasBody, motivatedBy = motivatedBy)
 
 fun DatasetDBO.toDataset(): Dataset {
     return Dataset(
