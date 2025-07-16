@@ -14,18 +14,15 @@
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 
 <http://db2>  a          dcat:Dataset ;
-        dct:identifier   "http://db2" ;
         dct:type         <http://publications.europa.eu/resource/authority/dataset-type/TEST_DATA> ;
         dct:description  "test words"@en ;
         dct:isReplacedBy     <http://test.uri>;
         dct:title        "enda en"@nb .
 
 <http://db1>  a    dcat:Dataset ;
-        dct:identifier   "http://db1" ;
         dct:title  "test tittel"@nb .
 
 <http://db3>  a          dcat:Dataset ;
-        dct:identifier   "http://db3" ;
         dct:description  "the description"@en .
 
 <http://localhost:5050/catalogs/123456789>  a  dcat:Catalog ;

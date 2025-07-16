@@ -1,11 +1,9 @@
 package no.fdk.dataset_catalog.service
 
 import no.fdk.dataset_catalog.configuration.ApplicationProperties
+import no.fdk.dataset_catalog.extensions.datasetToDBO
 import no.fdk.dataset_catalog.model.*
-import no.fdk.dataset_catalog.utils.TEST_CATALOG_1
-import no.fdk.dataset_catalog.utils.TEST_DATASET_1
-import no.fdk.dataset_catalog.utils.TestResponseReader
-import no.fdk.dataset_catalog.utils.checkIfIsomorphicAndPrintDiff
+import no.fdk.dataset_catalog.utils.*
 import org.apache.jena.vocabulary.DCTerms
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -44,66 +42,89 @@ class RdfServiceTest {
 
         @Test
         fun `Serializes dataset relations`() {
-            val dataset = Dataset(
-                registrationStatus = REGISTRATION_STATUS.PUBLISH,
+            val dataset = DatasetDBO(
+                catalogId = "1",
+                published = true,
                 id = "http://catalog/1/dataset/1",
                 uri = "http://catalog/1/dataset/1",
-                catalogId = "1",
-                relations = listOf(
-                    SkosConcept(
+                relatedResources = listOf(
+                    UriWithLabel(
                         uri = "http://uri-1",
                         prefLabel = mapOf(Pair("nb", "label-1-nb"), Pair("en", "label-1-en"))
                     ),
-                    SkosConcept(
+                    UriWithLabel(
                         uri = "http://uri-2",
                         prefLabel = mapOf(Pair("nb", "label-2-nb"), Pair("en", "label-2-en"))
-                    ),
+                    )
                 )
             )
 
             val catalog = CatalogCount(id = "1", datasetCount = 0)
 
             whenever(catalogService.getByID("1")).thenReturn(catalog)
-            whenever(datasetService.getAll("1")).thenReturn(listOf(dataset))
+            whenever(datasetService.getAllDatasets("1")).thenReturn(listOf(dataset))
             whenever(applicationProperties.organizationCatalogHost).thenReturn("http://localhost:5050")
 
             val expected = responseReader.parseFile("catalog_0.ttl", "TURTLE")
             val responseModel = rdfService.getCatalogById("1")
 
-            assertTrue(checkIfIsomorphicAndPrintDiff(responseModel!!, expected, "Serializing dataset relations", logger))
+            assertTrue(
+                checkIfIsomorphicAndPrintDiff(
+                    responseModel!!,
+                    expected,
+                    "Serializing dataset relations",
+                    logger
+                )
+            )
 
         }
 
         @Test
         fun `Serializes dataset qualified attributions`() {
-            val dataset = Dataset(registrationStatus = REGISTRATION_STATUS.PUBLISH, id = "http://catalog/1/dataset/1", uri = "http://catalog/1/dataset/1", qualifiedAttributions = setOf("123456789", "987654321"))
+            val dataset = DatasetDBO(
+                catalogId = "1",
+                published = true,
+                id = "http://catalog/1/dataset/1",
+                uri = "http://catalog/1/dataset/1",
+                qualifiedAttributions = setOf("123456789", "987654321")
+            )
             val catalog = CatalogCount(id = "1", datasetCount = 1)
 
             whenever(catalogService.getByID("1")).thenReturn(catalog)
-            whenever(datasetService.getAll("1")).thenReturn(listOf(dataset))
+            whenever(datasetService.getAllDatasets("1")).thenReturn(listOf(dataset))
             whenever(applicationProperties.organizationCatalogHost).thenReturn("http://localhost:5050")
 
             val expected = responseReader.parseFile("catalog_1.ttl", "TURTLE")
             val responseModel = rdfService.getCatalogById("1")
 
-            assertTrue(checkIfIsomorphicAndPrintDiff(responseModel!!, expected, "Serializing qualified attributions", logger))
+            assertTrue(
+                checkIfIsomorphicAndPrintDiff(
+                    responseModel!!,
+                    expected,
+                    "Serializing qualified attributions",
+                    logger
+                )
+            )
         }
 
         @Test
         fun `Serializes complete catalog`() {
-            val dataset = TEST_DATASET_1
+            val dataset = TEST_DATASET_1.datasetToDBO()
             val catalog = TEST_CATALOG_1
-            val references = listOf(Reference(
-                    SkosCode(DCTerms.references.uri, "references", mapOf(Pair("nb", "Referanse"))),
-                    SkosConcept("http://referenced/dataset/resolved", prefLabel = mapOf(Pair("nb", "Referanse datasett")))))
+            val references = listOf(
+                ReferenceDBO(
+                    referenceType = "references",
+                    source = "http://referenced/dataset/resolved"
+                )
+            )
 
-            whenever(catalogService.getByID(catalog.id!!)).thenReturn(catalog)
-            whenever(datasetService.getAll("${catalog.id}")).thenReturn(listOf(dataset))
-            whenever(datasetService.resolveReferences(dataset)).thenReturn(references)
+            whenever(catalogService.getByID(catalog.id)).thenReturn(catalog)
+            whenever(datasetService.getAllDatasets(catalog.id)).thenReturn(listOf(dataset))
+            whenever(datasetService.resolveDatasetReferences(dataset)).thenReturn(references)
             whenever(applicationProperties.organizationCatalogHost).thenReturn("http://localhost:5050")
 
             val expected = responseReader.parseFile("catalog_2.ttl", "TURTLE")
-            val responseModel = rdfService.getCatalogById("${catalog.id}")!!
+            val responseModel = rdfService.getCatalogById(catalog.id)!!
 
             assertTrue(checkIfIsomorphicAndPrintDiff(responseModel, expected, "Serializing complete catalog", logger))
         }

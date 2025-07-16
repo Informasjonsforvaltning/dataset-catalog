@@ -1,8 +1,8 @@
 package no.fdk.dataset_catalog.utils
 
+import no.fdk.dataset_catalog.extensions.datasetToDBO
 import no.fdk.dataset_catalog.model.*
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap
-import javax.xml.crypto.Data
 
 const val API_TEST_PORT = 5555
 const val LOCAL_SERVER_PORT = 5050
@@ -215,10 +215,10 @@ fun datasetDbPopulation() = listOf(
     DB_DATASET_1, DB_DATASET_2, DB_DATASET_3, DB_DATASET_4, DB_DATASET_5, DB_DATASET_6,
     SERIES_DATASET_0, SERIES_DATASET_1, SERIES_DATASET_2, SERIES_DATASET_5
 )
-    .map { it.mapDBO() }
+    .map { it.datasetToDBO().mapDBO() }
 
 
-private fun Dataset.mapDBO(): org.bson.Document =
+private fun DatasetDBO.mapDBO(): org.bson.Document =
     org.bson.Document()
         .append("_id", id)
         .append("uri", uri)
@@ -227,28 +227,13 @@ private fun Dataset.mapDBO(): org.bson.Document =
         .append("title", title)
         .append("description", description)
         .append("references", references?.map { it.mapDBO() })
-        .append(
-            "approved",
-            registrationStatus === REGISTRATION_STATUS.APPROVE || registrationStatus === REGISTRATION_STATUS.PUBLISH
-        )
-        .append("published", registrationStatus === REGISTRATION_STATUS.PUBLISH)
+        .append("approved", approved)
+        .append("published", published)
         .append("specializedType", specializedType)
         .append("inSeries", inSeries)
         .append("seriesDatasetOrder", seriesDatasetOrder)
 
-private fun Reference.mapDBO(): org.bson.Document =
+private fun ReferenceDBO.mapDBO(): org.bson.Document =
     org.bson.Document()
-        .append("referenceType", referenceType?.uri)
-        .append("source", source?.uri)
-
-private fun SkosCode.mapDBO(): org.bson.Document =
-    org.bson.Document()
-        .append("uri", uri)
-        .append("code", code)
-        .append("prefLabel", prefLabel)
-
-private fun SkosConcept.mapDBO(): org.bson.Document =
-    org.bson.Document()
-        .append("uri", uri)
-        .append("prefLabel", prefLabel)
-        .append("extraType", extraType)
+        .append("referenceType", referenceType)
+        .append("source", source)

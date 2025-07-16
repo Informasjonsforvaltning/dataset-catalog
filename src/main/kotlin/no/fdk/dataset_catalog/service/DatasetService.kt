@@ -50,6 +50,15 @@ class DatasetService(
         }
     }
 
+    fun getAllDatasets(catalogId: String, specializedTypeString: String? = null): List<DatasetDBO> {
+        val specializedType = specializedTypeFromString(specializedTypeString)
+        return if (specializedType == null) {
+            datasetRepository.findByCatalogId(catalogId).toList()
+        } else {
+            datasetRepository.findByCatalogIdAndSpecializedType(catalogId, specializedType).toList()
+        }
+    }
+
     // Temporary function, remove when refactoring accessService in distribution
     private fun Distribution.addOldAccessUrisToNewField(): Distribution {
         val updatedAccessServiceUris: MutableSet<String> =
@@ -99,6 +108,12 @@ class DatasetService(
         return if (dataset?.catalogId != catalogId) null else dataset
     }
 
+    fun getDatasetByID(catalogId: String, id: String): DatasetDBO? {
+        val dataset = datasetRepository.findByIdOrNull(id)
+        return if (dataset?.catalogId != catalogId) null else dataset
+    }
+
+
     private fun getByID(id: String): Dataset? {
         return datasetRepository.findByIdOrNull(id)
             ?.toDataset()
@@ -108,6 +123,9 @@ class DatasetService(
     fun getListByIDs(catalogId: String, ids: List<String>) =
         datasetRepository.findAllById(ids).filter { it.catalogId == catalogId }
             .map { it.toDataset().addOldAccessUrisToNewField().addOldThemesToNewFields() }
+
+    fun getDatasetListByIDs(catalogId: String, ids: List<String>) =
+        datasetRepository.findAllById(ids).filter { it.catalogId == catalogId }
 
     fun create(catalogId: String, dataset: Dataset): Dataset? {
         val datasetId = dataset.id ?: UUID.randomUUID().toString()
@@ -176,6 +194,26 @@ class DatasetService(
                 )
             } else {
                 it
+            }
+        }
+
+    fun resolveDatasetReferences(ds: DatasetDBO): List<ReferenceDBO>? =
+        ds.references?.map { ref ->
+            val originalUri: String? = if (ref?.source?.let { getDatasetUriPattern().containsMatchIn(it) } == true) {
+                ref.source.substringAfterLast("/").let { id ->
+                    getByID(id)?.originalUri
+                }
+            } else {
+                null
+            }
+
+            if (originalUri != null) {
+                ReferenceDBO(
+                    referenceType = ref.referenceType,
+                    source = originalUri
+                )
+            } else {
+                ref
             }
         }
 

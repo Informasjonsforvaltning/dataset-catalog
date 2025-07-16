@@ -2,8 +2,7 @@ package no.fdk.dataset_catalog.service
 
 import no.fdk.dataset_catalog.configuration.ApplicationProperties
 import no.fdk.dataset_catalog.model.CatalogCount
-import no.fdk.dataset_catalog.model.Dataset
-import no.fdk.dataset_catalog.model.REGISTRATION_STATUS
+import no.fdk.dataset_catalog.model.DatasetDBO
 import no.fdk.dataset_catalog.model.SpecializedType
 import no.fdk.dataset_catalog.rdf.*
 import org.apache.jena.rdf.model.Model
@@ -28,9 +27,9 @@ class RDFService(
             ?.let { listOf(it).createCatalogModel() }
 
     fun getDatasetById(catalogId: String, id: String): Model? =
-        datasetService.getByID(catalogId, id)
-            ?.takeIf { it.registrationStatus == REGISTRATION_STATUS.PUBLISH }
-            ?.let { it.copy(references = datasetService.resolveReferences(it)) }
+        datasetService.getDatasetByID(catalogId, id)
+            ?.takeIf { it.published }
+            ?.let { it.copy(references = datasetService.resolveDatasetReferences(it)) }
             ?.createModel()
 
     private fun List<CatalogCount>.createCatalogModel(): Model {
@@ -46,8 +45,8 @@ class RDFService(
                     model.safeCreateResource(organizationCatalogURI(catalog.id))
                 )
                 .addDatasets(
-                    datasetService.getAll(catalog.id).map {
-                        it.copy(references = datasetService.resolveReferences(it))
+                    datasetService.getAllDatasets(catalog.id).map {
+                        it.copy(references = datasetService.resolveDatasetReferences(it))
                     }
                 )
         }
@@ -55,10 +54,10 @@ class RDFService(
         return model
     }
 
-    private fun Resource.addDatasets(datasets: List<Dataset>?): Resource {
+    private fun Resource.addDatasets(datasets: List<DatasetDBO>?): Resource {
         datasets?.forEach { dataset ->
             val seriesData = dataset.seriesData()
-            val isPublished = dataset.registrationStatus == REGISTRATION_STATUS.PUBLISH
+            val isPublished = dataset.published
             when {
                 seriesData.inSeries != null && isPublished -> model.addDatasetResource(dataset, seriesData, applicationProperties.catalogUriHost) // A dataset in a series shouldn't be associated with a catalog through dcat:dataset, only indirectly from a series in the catalog
                 isPublished -> addProperty(DCAT.dataset, model.addDatasetResource(dataset, seriesData, applicationProperties.catalogUriHost))
@@ -67,26 +66,26 @@ class RDFService(
         return this
     }
 
-    private fun Dataset.createModel(): Model {
+    private fun DatasetDBO.createModel(): Model {
         val model = ModelFactory.createDefaultModel()
         model.setDefaultPrefixes()
         model.addDatasetResource(this, seriesData(), applicationProperties.catalogUriHost)
         return model
     }
 
-    private fun Dataset.seriesData(): SeriesData =
+    private fun DatasetDBO.seriesData(): SeriesData =
         if (catalogId == null) SeriesData(null, null, null, null, null)
         else {
-            val seriesDataset = inSeries?.let { datasetService.getByID(catalogId, inSeries) }
-                ?.takeIf { it.registrationStatus == REGISTRATION_STATUS.PUBLISH && it.specializedType == SpecializedType.SERIES }
+            val seriesDataset = inSeries?.let { datasetService.getDatasetByID(catalogId, inSeries) }
+                ?.takeIf { it.published && it.specializedType == SpecializedType.SERIES }
 
             val orderValue = seriesDataset?.seriesDatasetOrder?.get(id)
 
             // next and prev is calculated from the published datasets in the order from the series linked to with inSeries
             val nextAndPrev = if (orderValue == null) null
             else seriesDataset.seriesDatasetOrder.keys
-                .let { datasetService.getListByIDs(catalogId, it.toList()) }
-                .filter { it.registrationStatus == REGISTRATION_STATUS.PUBLISH }
+                .let { datasetService.getDatasetListByIDs(catalogId, it.toList()) }
+                .filter { it.published }
                 .associate { it.getURI() to seriesDataset.seriesDatasetOrder[it.id] }
                 .filterNotNullKeysAndValues()
                 .let { publishedOrder ->
@@ -101,8 +100,8 @@ class RDFService(
             // first and last is calculated from the published datasets in the series order
             val firstAndLast = seriesDatasetOrder?.keys
                 ?.takeIf { specializedType == SpecializedType.SERIES }
-                ?.let { datasetService.getListByIDs(catalogId, it.toList()) }
-                ?.filter { it.registrationStatus == REGISTRATION_STATUS.PUBLISH }
+                ?.let { datasetService.getDatasetListByIDs(catalogId, it.toList()) }
+                ?.filter { it.published }
                 ?.associate { it.getURI() to seriesDatasetOrder[it.id] }
                 ?.filterNotNullKeysAndValues()
                 ?.let { publishedOrder ->
@@ -126,7 +125,7 @@ class RDFService(
             .mapNotNull { (key, value) -> key?.let { it to value } }
             .toMap()
 
-    private fun Dataset.getURI(): String? =
+    private fun DatasetDBO.getURI(): String? =
         originalUri ?: uri
 
     private fun Model.setDefaultPrefixes() {
