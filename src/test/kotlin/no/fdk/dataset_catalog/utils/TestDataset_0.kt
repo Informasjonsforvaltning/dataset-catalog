@@ -10,7 +10,7 @@ val CONCEPT_EX = Concept(
 
 val CONTACT_EX = Contact(
     email = "test@digdir.no",
-    organizationUnit = "Enhet",
+    name = mapOf(Pair("nb","Enhet")),
     hasURL = "http://www.hjemmeside.no",
     hasTelephone = "45678912",
 )
