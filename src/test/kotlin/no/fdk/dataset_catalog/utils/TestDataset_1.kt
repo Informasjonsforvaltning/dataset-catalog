@@ -58,11 +58,10 @@ val THEMES = listOf(
 
 val CONTACTS = listOf(
     Contact(
-        uri="http://contact/someContactURI/123",
         email="digitalisering@kartverket.no",
         hasURL="http://testetaten.no/url",
         hasTelephone="22306022",
-        organizationUnit="Avdeling for digitalisering"
+        name=mapOf(Pair("nb","Avdeling for digitalisering"))
     ),
     Contact(
         email="anonymous@anonym.org.no",

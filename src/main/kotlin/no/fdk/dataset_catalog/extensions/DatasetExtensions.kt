@@ -22,7 +22,7 @@ fun Dataset.datasetToDBO(): DatasetDBO =
         description = description?.let { LocalizedStrings(it.get("nb"), it.get("nn"), it.get("en")) },
         contactPoints = contactPoint?.map {
             ContactPoint(
-                name = it.organizationUnit?.let { name -> LocalizedStrings(nb = name) },
+                name = it.name?.toLocalizedStrings(),
                 email = it.email,
                 url = it.hasURL,
                 phone = it.hasTelephone
@@ -162,7 +162,7 @@ fun DatasetDBO.toDataset(): Dataset {
         description = description?.toMap(),
         contactPoint = contactPoints?.map {
             Contact(
-                organizationUnit = it.name?.nb,
+                name = it.name?.toMap(),
                 email = it.email,
                 hasURL = it.url,
                 hasTelephone = it.phone

@@ -236,6 +236,7 @@ data class Contact(
     val organizationUnit: String? = null,
     val hasURL: String? = null,
     val hasTelephone: String? = null,
+    val name: Map<String, String>? = null,
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
