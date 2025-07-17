@@ -143,6 +143,22 @@ class DatasetService(
         return getByID(catalogId, datasetId)
     }
 
+    fun createDataset(catalogId: String, dataset: DatasetDBO): String {
+        val datasetId = UUID.randomUUID().toString()
+
+        dataset.copy(
+            id = datasetId,
+            catalogId = catalogId,
+            lastModified = LocalDateTime.now(),
+            uri = "${applicationProperties.catalogUriHost}/$catalogId/datasets/$datasetId",
+            published = false,
+        )
+            .allAffectedSeriesDatasets(null)
+            .let { persistAndHarvestDatasets(it, catalogId) }
+
+        return datasetId
+    }
+
     fun updateDataset(catalogId: String, id: String, operations: List<JsonPatchOperation>): Dataset? {
         val dataset = getByID(catalogId, id)
 
@@ -217,6 +233,11 @@ class DatasetService(
             }
         }
 
+    private fun DatasetDBO.allAffectedSeriesDatasets(dbDataset: DatasetDBO?): List<DatasetDBO> =
+        toDataset()
+            .allAffectedSeriesDatasets(dbDataset?.toDataset())
+            .map { it.datasetToDBO() }
+
     private fun Dataset.allAffectedSeriesDatasets(dbDataset: Dataset?): List<Dataset> =
         if (id == null) listOf(this)
         else {
@@ -261,12 +282,14 @@ class DatasetService(
     private fun isDatasetReference(ref: Reference?): Boolean =
         ref?.source?.uri?.let { getDatasetUriPattern().containsMatchIn(it) } ?: false
 
-    private fun persistAndHarvest(datasets: List<Dataset>, catalogId: String) {
+    private fun persistAndHarvest(datasets: List<Dataset>, catalogId: String) =
+        persistAndHarvestDatasets(datasets.map { it.datasetToDBO() }, catalogId)
+
+    private fun persistAndHarvestDatasets(datasets: List<DatasetDBO>, catalogId: String) {
         val isFirstPublished = isFirstPublishedDatasetForCatalog(datasets, catalogId)
 
-        val datasetDBOs = datasets.map { it.datasetToDBO() }
         datasetRepository
-            .saveAll(datasetDBOs)
+            .saveAll(datasets)
             .also {
                 if (isFirstPublished) addDataSource(catalogId)
                 triggerHarvest(datasets, catalogId)
@@ -280,16 +303,16 @@ class DatasetService(
         )
     }
 
-    private fun triggerHarvest(datasets: List<Dataset>, catalogId: String) {
-        if (datasets.any { it.registrationStatus == REGISTRATION_STATUS.PUBLISH }) {
+    private fun triggerHarvest(datasets: List<DatasetDBO>, catalogId: String) {
+        if (datasets.any { it.published }) {
             publishingService.triggerHarvest(catalogId)
         }
     }
 
-    private fun isFirstPublishedDatasetForCatalog(datasets: List<Dataset>, catalogId: String): Boolean =
+    private fun isFirstPublishedDatasetForCatalog(datasets: List<DatasetDBO>, catalogId: String): Boolean =
         when {
-            datasets.none { it.registrationStatus == REGISTRATION_STATUS.PUBLISH } -> false
-            getAll(catalogId).any { it.registrationStatus == REGISTRATION_STATUS.PUBLISH } -> false
+            datasets.none { it.published } -> false
+            getAllDatasets(catalogId).any { it.published } -> false
             else -> true
         }
 

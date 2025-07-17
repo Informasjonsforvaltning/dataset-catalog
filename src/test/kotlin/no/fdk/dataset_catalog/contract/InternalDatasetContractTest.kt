@@ -5,7 +5,10 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import no.fdk.dataset_catalog.extensions.datasetToDBO
 import no.fdk.dataset_catalog.model.DatasetDBO
 import no.fdk.dataset_catalog.utils.ApiTestContext
+import no.fdk.dataset_catalog.utils.DATASET_1
+import no.fdk.dataset_catalog.utils.DATASET_2
 import no.fdk.dataset_catalog.utils.DATASET_ID_1
+import no.fdk.dataset_catalog.utils.DATASET_ID_2
 import no.fdk.dataset_catalog.utils.DB_CATALOG_ID_1
 import no.fdk.dataset_catalog.utils.DB_CATALOG_ID_2
 import no.fdk.dataset_catalog.utils.DB_DATASET_1
@@ -22,6 +25,7 @@ import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.ContextConfiguration
 import kotlin.test.assertEquals
@@ -103,4 +107,113 @@ class InternalDatasetContractTest : ApiTestContext() {
             )
         }
     }
+
+    @Nested
+    internal inner class CreateDataset {
+        @Test
+        fun `Illegal create`() {
+            val notLoggedIn = apiAuthorizedRequest(
+                "/internal/catalogs/$DB_CATALOG_ID_1/datasets",
+                mapper.writeValueAsString(DATASET_1),
+                null,
+                "POST"
+            )
+            val readAccess = apiAuthorizedRequest(
+                "/internal/catalogs/$DB_CATALOG_ID_1/datasets",
+                mapper.writeValueAsString(DATASET_1),
+                JwtToken(Access.ORG_READ).toString(),
+                "POST"
+            )
+            val wrongOrg = apiAuthorizedRequest(
+                "/internal/catalogs/1/datasets",
+                mapper.writeValueAsString(DATASET_1),
+                JwtToken(Access.ORG_WRITE).toString(),
+                "POST"
+            )
+
+            assertEquals(HttpStatus.UNAUTHORIZED.value(), notLoggedIn["status"])
+            assertEquals(HttpStatus.FORBIDDEN.value(), readAccess["status"])
+            assertEquals(HttpStatus.FORBIDDEN.value(), wrongOrg["status"])
+        }
+
+
+        @Test
+        fun `Invalid create`() {
+            val emptyBody = apiAuthorizedRequest(
+                "/internal/catalogs/$DB_CATALOG_ID_1/datasets",
+                "",
+                JwtToken(Access.ORG_WRITE).toString(),
+                "POST"
+            )
+
+            assertEquals(HttpStatus.BAD_REQUEST.value(), emptyBody["status"])
+        }
+
+        @Test
+        fun `Able to get after create`() {
+            val responseCreate = apiAuthorizedRequest(
+                "/internal/catalogs/$DB_CATALOG_ID_1/datasets",
+                mapper.writeValueAsString(DATASET_1.datasetToDBO()),
+                JwtToken(Access.ORG_WRITE).toString(),
+                "POST"
+            )
+            assertTrue(HttpStatus.CREATED.value() == responseCreate["status"])
+
+            val headers = responseCreate["header"] as HttpHeaders
+
+            val responseGet = apiAuthorizedRequest(
+                headers.location.toString(),
+                null,
+                JwtToken(Access.ORG_WRITE).toString(),
+                "GET"
+            )
+            assertTrue(HttpStatus.OK.value() == responseGet["status"])
+
+            val resultGet: DatasetDBO = mapper.readValue(responseGet["body"] as String)
+
+            assertEquals(
+                expected = DATASET_1.datasetToDBO().copy(
+                    id = resultGet.id,
+                    lastModified = resultGet.lastModified,
+                    uri = resultGet.uri,
+                    published = false
+                ),
+                actual = resultGet
+            )
+
+        }
+
+        @Test
+        fun `All fields are persisted`() {
+            val responseCreate = apiAuthorizedRequest(
+                "/internal/catalogs/$DB_CATALOG_ID_1/datasets",
+                mapper.writeValueAsString(DATASET_2.datasetToDBO()),
+                JwtToken(Access.ORG_WRITE).toString(),
+                "POST"
+            )
+            assertTrue(HttpStatus.CREATED.value() == responseCreate["status"])
+            val headers = responseCreate["header"] as HttpHeaders
+
+            val responseGet = apiAuthorizedRequest(
+                headers.location.toString(),
+                null,
+                JwtToken(Access.ORG_WRITE).toString(),
+                "GET"
+            )
+            assertTrue(HttpStatus.OK.value() == responseGet["status"])
+
+            val resultGet: DatasetDBO = mapper.readValue(responseGet["body"] as String)
+
+            assertEquals(
+                expected = DATASET_2.datasetToDBO().copy(
+                    id = resultGet.id,
+                    lastModified = resultGet.lastModified,
+                    uri = resultGet.uri,
+                    published = false,
+                ),
+                actual = resultGet
+            )
+        }
+    }
+
 }
