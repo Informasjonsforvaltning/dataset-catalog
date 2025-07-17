@@ -18,6 +18,9 @@ class CatalogService(
     fun getAllAsDTO(): CatalogDTO =
         getAll().toDTO()
 
+    fun getByIDs(permittedOrgs: List<String>): List<CatalogCount> =
+        datasetOperations.datasetCountForCatalogs(permittedOrgs)
+
     fun getByID(id: String): CatalogCount? =
         datasetOperations.datasetCountForCatalogs(listOf(id))
             .firstOrNull()
