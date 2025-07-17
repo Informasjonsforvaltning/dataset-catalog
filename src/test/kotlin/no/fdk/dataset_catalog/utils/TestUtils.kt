@@ -40,7 +40,7 @@ fun apiAuthorizedRequest(path: String, body: String? = null, token: String? = nu
         val response = request.exchange(url, httpMethod, entity, String::class.java)
         mapOf(
             "body" to response.body,
-            "header" to response.headers.toString(),
+            "header" to response.headers,
             "status" to response.statusCode.value()
         )
 
