@@ -1,7 +1,9 @@
 package no.fdk.dataset_catalog.controller
 
+import no.fdk.dataset_catalog.extensions.datasetToDBO
 import no.fdk.dataset_catalog.model.DatasetDBO
 import no.fdk.dataset_catalog.model.DatasetToCreate
+import no.fdk.dataset_catalog.model.JsonPatchOperation
 import no.fdk.dataset_catalog.security.EndpointPermissions
 import no.fdk.dataset_catalog.service.DatasetService
 import org.springframework.http.HttpStatus
@@ -11,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -72,6 +75,23 @@ open class InternalDatasetController(
         if (endpointPermissions.hasOrgWritePermission(jwt, catalogId)) {
             datasetService.delete(catalogId, id)
             ResponseEntity(HttpStatus.OK)
+        } else ResponseEntity(HttpStatus.FORBIDDEN)
+
+    @PatchMapping(
+        value = ["/{id}"],
+        consumes = [MediaType.APPLICATION_JSON_VALUE],
+        produces = [MediaType.APPLICATION_JSON_VALUE]
+    )
+    fun updateDataset(
+        @AuthenticationPrincipal jwt: Jwt,
+        @PathVariable("catalogId") catalogId: String,
+        @PathVariable id: String,
+        @RequestBody operations: List<JsonPatchOperation>,
+    ): ResponseEntity<DatasetDBO> =
+        if (endpointPermissions.hasOrgWritePermission(jwt, catalogId)) {
+            datasetService.updateDataset(catalogId, id, operations)
+                ?.let {ResponseEntity(it.datasetToDBO(), HttpStatus.OK) }
+                ?: ResponseEntity(HttpStatus.NOT_FOUND)
         } else ResponseEntity(HttpStatus.FORBIDDEN)
 
 }
