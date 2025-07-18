@@ -8,7 +8,6 @@ import no.fdk.dataset_catalog.utils.ApiTestContext
 import no.fdk.dataset_catalog.utils.DATASET_1
 import no.fdk.dataset_catalog.utils.DATASET_2
 import no.fdk.dataset_catalog.utils.DATASET_ID_1
-import no.fdk.dataset_catalog.utils.DATASET_ID_2
 import no.fdk.dataset_catalog.utils.DB_CATALOG_ID_1
 import no.fdk.dataset_catalog.utils.DB_CATALOG_ID_2
 import no.fdk.dataset_catalog.utils.DB_DATASET_1
@@ -209,7 +208,7 @@ class InternalDatasetContractTest : ApiTestContext() {
                     id = resultGet.id,
                     lastModified = resultGet.lastModified,
                     uri = resultGet.uri,
-                    published = false,
+                    published = false
                 ),
                 actual = resultGet
             )

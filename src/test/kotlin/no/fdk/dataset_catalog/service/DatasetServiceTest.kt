@@ -85,8 +85,8 @@ class DatasetServiceTest {
         @Test
         fun `getAll returns all datasets in catalog`() {
             val expected = listOf(
-                DatasetDBO("1", "1", lastModified = LocalDateTime.now()),
-                DatasetDBO("2", "1", lastModified = LocalDateTime.now())
+                DatasetDBO("1", "1", lastModified = LocalDateTime.now(), uri = null, published = false, approved = false),
+                DatasetDBO("2", "1", lastModified = LocalDateTime.now(), uri = null, published = false, approved = false)
             )
             whenever(datasetRepository.findByCatalogId("1")).thenReturn(expected)
             val actual = datasetService.getAll("1").map { dataset -> dataset.datasetToDBO() }

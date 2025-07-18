@@ -1,6 +1,7 @@
 package no.fdk.dataset_catalog.controller
 
 import no.fdk.dataset_catalog.model.DatasetDBO
+import no.fdk.dataset_catalog.model.DatasetToCreate
 import no.fdk.dataset_catalog.security.EndpointPermissions
 import no.fdk.dataset_catalog.service.DatasetService
 import org.springframework.http.HttpStatus
@@ -51,7 +52,7 @@ open class InternalDatasetController(
     fun createDataset(
         @AuthenticationPrincipal jwt: Jwt,
         @PathVariable("catalogId") catalogId: String,
-        @RequestBody dataset: DatasetDBO
+        @RequestBody dataset: DatasetToCreate
     ): ResponseEntity<Void> {
         if (endpointPermissions.hasOrgWritePermission(jwt, catalogId)) {
             val datasetId = datasetService.createDataset(catalogId, dataset)

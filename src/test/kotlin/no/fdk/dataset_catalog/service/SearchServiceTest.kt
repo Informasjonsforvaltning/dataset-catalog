@@ -13,6 +13,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.springframework.security.oauth2.jwt.Jwt
 import java.time.Instant
+import java.time.LocalDateTime
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
@@ -29,8 +30,8 @@ class SearchServiceTest {
     internal inner class DatasetByQuery {
         @Test
         fun `retrieves search results`() {
-            val titleHits = setOf(DatasetDBO(id="1", catalogId = "345", title = LocalizedStrings("nb", "test title")))
-            val descriptionHits = setOf(DatasetDBO(id="1", catalogId = "345", description = LocalizedStrings("nb", "test description")))
+            val titleHits = setOf(DatasetDBO(id="1", catalogId = "345", lastModified = LocalDateTime.now(), title = LocalizedStrings("nb", "test title"), uri = null, published = false, approved = false))
+            val descriptionHits = setOf(DatasetDBO(id="1", catalogId = "345", LocalDateTime.now(), description = LocalizedStrings("nb", "test description"), uri = null, published = false, approved = false))
             val catalogId = "1"
             val query = "test"
 
@@ -72,8 +73,8 @@ class SearchServiceTest {
 
         @Test
         fun `title hits precede description hits`() {
-            val dsTitle = DatasetDBO(id="1", catalogId = "345", title = LocalizedStrings("nb", "test title"))
-            val dsDescription = DatasetDBO(id="1", catalogId = "345", description = LocalizedStrings("nb", "test description"))
+            val dsTitle = DatasetDBO(id="1", catalogId = "345", title = LocalizedStrings("nb", "test title"), lastModified = LocalDateTime.now(), uri = null, published = false, approved = false)
+            val dsDescription = DatasetDBO(id="1", catalogId = "345", description = LocalizedStrings("nb", "test description"), lastModified = LocalDateTime.now(), uri = null, published = false, approved = false)
             val titleHits = setOf(dsTitle)
             val descriptionHits = setOf(dsDescription)
             val catalogId = "1"
@@ -99,10 +100,10 @@ class SearchServiceTest {
         @Test
         fun `exact hits precede partial hits`() {
             val dsTitle = listOf(
-                DatasetDBO(id="1", catalogId = "1234", title = LocalizedStrings("nb", "test1")),
-                DatasetDBO(id="2", catalogId = "1234", title = LocalizedStrings("nn", "test2")),
-                DatasetDBO(id="3", catalogId = "1234", title = LocalizedStrings("nb", "test3")),
-                DatasetDBO(id="4", catalogId = "1234", title = LocalizedStrings("nb", "test")),
+                DatasetDBO(id="1", catalogId = "1234", title = LocalizedStrings("nb", "test1"), lastModified = LocalDateTime.now(), uri = null, published = false, approved = false),
+                DatasetDBO(id="2", catalogId = "1234", title = LocalizedStrings("nn", "test2"), lastModified = LocalDateTime.now(), uri = null, published = false, approved = false),
+                DatasetDBO(id="3", catalogId = "1234", title = LocalizedStrings("nb", "test3"), lastModified = LocalDateTime.now(), uri = null, published = false, approved = false),
+                DatasetDBO(id="4", catalogId = "1234", title = LocalizedStrings("nb", "test"), lastModified = LocalDateTime.now(), uri = null, published = false, approved = false),
             )
             val titleHits = dsTitle.toSet()
             val descriptionHits = emptySet<DatasetDBO>()
@@ -127,9 +128,9 @@ class SearchServiceTest {
         @Test
         fun `matches title on nb, nn, en`() {
             val dsTitle = listOf(
-                DatasetDBO(id="1", catalogId = "1234", title = LocalizedStrings("nb", "test tittel")),
-                DatasetDBO(id="1", catalogId = "1234", title = LocalizedStrings("nn", "test tittel nn")),
-                DatasetDBO(id="1", catalogId = "1234", title = LocalizedStrings("nb", "test title"))
+                DatasetDBO(id="1", catalogId = "1234", title = LocalizedStrings("nb", "test tittel"), lastModified = LocalDateTime.now(), uri = null, published = false, approved = false),
+                DatasetDBO(id="1", catalogId = "1234", title = LocalizedStrings("nn", "test tittel nn"), lastModified = LocalDateTime.now(), uri = null, published = false, approved = false),
+                DatasetDBO(id="1", catalogId = "1234", title = LocalizedStrings("nb", "test title"), lastModified = LocalDateTime.now(), uri = null, published = false, approved = false)
             )
             val titleHits = dsTitle.toSet()
             val descriptionHits = emptySet<DatasetDBO>()
@@ -154,9 +155,9 @@ class SearchServiceTest {
         @Test
         fun `matches description on nb, nn, en`() {
             val dsDescription = listOf(
-                DatasetDBO(id="1", catalogId = "1234", description = LocalizedStrings("nb", "test tittel")),
-                DatasetDBO(id="1", catalogId = "1234",description = LocalizedStrings("nn", "test tittel nn")),
-                DatasetDBO(id="1", catalogId = "1234",description = LocalizedStrings("nb", "test title"))
+                DatasetDBO(id="1", catalogId = "1234", description = LocalizedStrings("nb", "test tittel"), lastModified = LocalDateTime.now(), uri = null, published = false, approved = false),
+                DatasetDBO(id="1", catalogId = "1234",description = LocalizedStrings("nn", "test tittel nn"), lastModified = LocalDateTime.now(), uri = null, published = false, approved = false),
+                DatasetDBO(id="1", catalogId = "1234",description = LocalizedStrings("nb", "test title"), lastModified = LocalDateTime.now(), uri = null, published = false, approved = false)
             )
             val titleHits = emptySet<DatasetDBO>()
             val descriptionHits = dsDescription.toSet()
