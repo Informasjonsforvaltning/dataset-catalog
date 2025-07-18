@@ -183,7 +183,7 @@ class DatasetService(
         getByID(catalogId, id)
             ?.also { datasetRepository.delete(it.datasetToDBO()) }
             ?.removeDeletedDatasetFromSeriesFields()
-            ?: throw Exception()
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
     }
 
     private fun Dataset.removeDeletedDatasetFromSeriesFields() {

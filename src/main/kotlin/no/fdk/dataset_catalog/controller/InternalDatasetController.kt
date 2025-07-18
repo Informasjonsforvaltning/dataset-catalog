@@ -9,6 +9,7 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.jwt.Jwt
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -61,5 +62,16 @@ open class InternalDatasetController(
                 .build()
         } else return ResponseEntity(HttpStatus.FORBIDDEN)
     }
+
+    @DeleteMapping(value = ["/{id}"])
+    fun removeDataset(
+        @AuthenticationPrincipal jwt: Jwt,
+        @PathVariable("catalogId") catalogId: String,
+        @PathVariable("id") id: String
+    ): ResponseEntity<Unit> =
+        if (endpointPermissions.hasOrgWritePermission(jwt, catalogId)) {
+            datasetService.delete(catalogId, id)
+            ResponseEntity(HttpStatus.OK)
+        } else ResponseEntity(HttpStatus.FORBIDDEN)
 
 }
