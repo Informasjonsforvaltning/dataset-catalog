@@ -215,4 +215,65 @@ class InternalDatasetContractTest : ApiTestContext() {
         }
     }
 
+    @Nested
+    internal inner class DeleteDataset {
+        @Test
+        fun `Illegal delete`() {
+            val notLoggedIn = apiAuthorizedRequest(
+                "/internal/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}",
+                mapper.writeValueAsString(DATASET_1),
+                null,
+                "DELETE"
+            )
+            val readAccess = apiAuthorizedRequest(
+                "/internal/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}",
+                mapper.writeValueAsString(DATASET_1),
+                JwtToken(Access.ORG_READ).toString(),
+                "DELETE"
+            )
+            val wrongOrg = apiAuthorizedRequest(
+                "/internal/catalogs/$DB_CATALOG_ID_2/datasets/${DB_DATASET_ID_1}",
+                mapper.writeValueAsString(DATASET_1),
+                JwtToken(Access.ORG_WRITE).toString(),
+                "DELETE"
+            )
+
+            assertEquals(HttpStatus.UNAUTHORIZED.value(), notLoggedIn["status"])
+            assertEquals(HttpStatus.FORBIDDEN.value(), readAccess["status"])
+            assertEquals(HttpStatus.FORBIDDEN.value(), wrongOrg["status"])
+        }
+
+        @Test
+        fun `Invalid delete of non existing dataset`() {
+            val doesNotExist = apiAuthorizedRequest(
+                "/internal/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_4}",
+                mapper.writeValueAsString(DATASET_1),
+                JwtToken(Access.ORG_WRITE).toString(),
+                "DELETE"
+            )
+
+            assertEquals(HttpStatus.NOT_FOUND.value(), doesNotExist["status"])
+        }
+
+        @Test
+        fun `Cannot get after delete`() {
+            val rspDelete = apiAuthorizedRequest(
+                "/internal/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}",
+                null,
+                JwtToken(Access.ORG_WRITE).toString(),
+                "DELETE"
+            )
+            assertEquals(HttpStatus.OK.value(), rspDelete["status"])
+
+            val rspGet = apiAuthorizedRequest(
+                "/internal/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}",
+                null,
+                JwtToken(Access.ORG_WRITE).toString(),
+                "GET"
+            )
+
+            assertEquals(HttpStatus.NOT_FOUND.value(), rspGet["status"])
+        }
+    }
+
 }
