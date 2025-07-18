@@ -23,138 +23,127 @@ data class DatasetDBO(
 
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
-    val lastModified: LocalDateTime? = null,
+    val lastModified: LocalDateTime?,
+    val uri: String?,
+
+    val published: Boolean,
+    val approved: Boolean,
+
     val originalUri: String? = null,
-    val uri: String? = null,
-
     val specializedType: SpecializedType? = null,
-
-    val published: Boolean = false,
-    val approved: Boolean = false,
     val concepts: Set<String>? = null,
 
-
-    // dct:title
-    // Norwegian: Tittel
     val title: LocalizedStrings? = null,
-
-    //dct:description
-    //Norwegian: Beskrivelse
     val description: LocalizedStrings? = null,
 
-    //dcat:contactPoint
-    //Norwegian: Kontaktpunkt
     val contactPoints: List<ContactPoint>? = null,
-
-    //dcat:keyword
-    //Norwegian: Emneord
     val keywords: LocalizedStringLists? = null,
 
-    //dct:issued
-    //Norwegian: Utgivelsesdato
     @JsonSerialize(using = LocalDateSerializer::class)
     @JsonDeserialize(using = LocalDateDeserializer::class)
     val issued: LocalDate? = null,
 
-    //dct:modified
-    //Norwegian: Modifiseringsdato
     @JsonSerialize(using = LocalDateSerializer::class)
     @JsonDeserialize(using = LocalDateDeserializer::class)
     val modified: LocalDate? = null,
 
-    //dct:language
-    //Norwegian: Språk
     val language: List<String>? = null,
-
-    //dcat:landingPage
-    //Norwegian: Landingsside
     val landingPage: List<String>? = null,
 
-
-    // dcat:theme, eu-vocabulary
     val euDataTheme: Set<String>? = null,
-    // dcat:theme, norwegian expansion of the eu-vocabulary
     val losTheme: Set<String>? = null,
 
-
-    //dcat:distribution
-    //Norwegian: Datasett distribusjon
     val distribution: List<DistributionDBO>? = null,
-
-    //adms:sample
-    //Norwegian: Eksempeldata
     val sample: List<DistributionDBO>? = null,
 
-    //dct:temporal
-    //Norwegian: tidsperiode
     val temporal: List<PeriodOfTimeDBO>? = null,
-
-    //dct:spatial
-    //Norwegian: dekningsområde
     val spatial: List<String>? = null,
 
-    //dct:accessRights
-    //Norwegian: tilgangsnivå
     val accessRight: String? = null,
 
-    // dcatno:legalBasisForRestriction
-    //Norwegian: skjermingshjemmel
     val legalBasisForRestriction: List<UriWithLabel>? = null,
-
-    // dcatno:legalBasisForProcessing
-    //Norwegian: behanlingsgrunnlag
     val legalBasisForProcessing: List<UriWithLabel>? = null,
-
-    // dcatno:legalBasisForAccess
-    //Norwegian: utleveringshjemmel
     val legalBasisForAccess: List<UriWithLabel>? = null,
 
-    // dqv:hasXXXXQualityAnnotation
     val accuracy: QualityAnnotationDBO? = null,
     val completeness: QualityAnnotationDBO? = null,
     val currentness: QualityAnnotationDBO? = null,
     val availability: QualityAnnotationDBO? = null,
     val relevance: QualityAnnotationDBO? = null,
 
-    //dct:references
-    //Norwegian: Referer til.
     val references: List<ReferenceDBO>? = null,
-
-    //dct:relation
-    //Generic relations to resources
     val relatedResources: List<UriWithLabel>? = null,
-
-    //dct:provenance
-    //Norwegian: Opphav
     val provenance: String? = null,
-
-    //dct:accrualPeriodicity
-    //Norwegian: frekvens
     val frequency: String? = null,
 
-    //dcat:conformsTo
-    //Norwegian: I samsvar med
     val conformsTo: List<UriWithLabel>? = null,
-
-    // NEW FIELDS DCAT-AP-NO 1.2?
-    // dct: informationModel
-    // Norwegian: informasjonsmodell
-//    a: SkosConcept
     val informationModelsFromOtherSources: List<UriWithLabel>? = null,
     val informationModelsFromFDK: List<String>? = null,
-
-    // prov:qualifiedAttribution
-    // Norwegian: innholdsleverandører
     val qualifiedAttributions: Set<String>? = null,
-
-    //dct:type
-    //Norwegian: type
     val type: String? = null,
 
-    // all series that this dataset is a part of
     val inSeries: String? = null,
+    val seriesDatasetOrder: Map<String, Int>? = null
+)
 
-    // datasets in this series and their order index
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class DatasetToCreate(
+    val approved: Boolean = false,
+    val originalUri: String? = null,
+    val specializedType: SpecializedType? = null,
+    val concepts: Set<String>? = null,
+
+    val title: LocalizedStrings? = null,
+    val description: LocalizedStrings? = null,
+
+    val contactPoints: List<ContactPoint>? = null,
+    val keywords: LocalizedStringLists? = null,
+
+    @JsonSerialize(using = LocalDateSerializer::class)
+    @JsonDeserialize(using = LocalDateDeserializer::class)
+    val issued: LocalDate? = null,
+
+    @JsonSerialize(using = LocalDateSerializer::class)
+    @JsonDeserialize(using = LocalDateDeserializer::class)
+    val modified: LocalDate? = null,
+
+    val language: List<String>? = null,
+    val landingPage: List<String>? = null,
+
+    val euDataTheme: Set<String>? = null,
+    val losTheme: Set<String>? = null,
+
+    val distribution: List<DistributionDBO>? = null,
+    val sample: List<DistributionDBO>? = null,
+
+    val temporal: List<PeriodOfTimeDBO>? = null,
+    val spatial: List<String>? = null,
+
+    val accessRight: String? = null,
+
+    val legalBasisForRestriction: List<UriWithLabel>? = null,
+    val legalBasisForProcessing: List<UriWithLabel>? = null,
+    val legalBasisForAccess: List<UriWithLabel>? = null,
+
+    val accuracy: QualityAnnotationDBO? = null,
+    val completeness: QualityAnnotationDBO? = null,
+    val currentness: QualityAnnotationDBO? = null,
+    val availability: QualityAnnotationDBO? = null,
+    val relevance: QualityAnnotationDBO? = null,
+
+    val references: List<ReferenceDBO>? = null,
+    val relatedResources: List<UriWithLabel>? = null,
+    val provenance: String? = null,
+    val frequency: String? = null,
+
+    val conformsTo: List<UriWithLabel>? = null,
+    val informationModelsFromOtherSources: List<UriWithLabel>? = null,
+    val informationModelsFromFDK: List<String>? = null,
+    val qualifiedAttributions: Set<String>? = null,
+    val type: String? = null,
+
+    val inSeries: String? = null,
     val seriesDatasetOrder: Map<String, Int>? = null
 )
 

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import jakarta.json.Json
 import jakarta.json.JsonException
 import no.fdk.dataset_catalog.configuration.ApplicationProperties
+import no.fdk.dataset_catalog.extensions.addCreateValues
 import no.fdk.dataset_catalog.extensions.datasetToDBO
 import no.fdk.dataset_catalog.extensions.toDataset
 import no.fdk.dataset_catalog.model.*
@@ -143,16 +144,19 @@ class DatasetService(
         return getByID(catalogId, datasetId)
     }
 
-    fun createDataset(catalogId: String, dataset: DatasetDBO): String {
+    fun createDataset(catalogId: String, values: DatasetToCreate): String {
         val datasetId = UUID.randomUUID().toString()
 
-        dataset.copy(
+        val newDataset = DatasetDBO(
             id = datasetId,
             catalogId = catalogId,
             lastModified = LocalDateTime.now(),
             uri = "${applicationProperties.catalogUriHost}/$catalogId/datasets/$datasetId",
             published = false,
+            approved = false
         )
+
+        newDataset.addCreateValues(values)
             .allAffectedSeriesDatasets(null)
             .let { persistAndHarvestDatasets(it, catalogId) }
 

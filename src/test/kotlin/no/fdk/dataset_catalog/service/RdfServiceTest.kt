@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.slf4j.LoggerFactory
+import java.time.LocalDateTime
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
@@ -45,6 +46,8 @@ class RdfServiceTest {
             val dataset = DatasetDBO(
                 catalogId = "1",
                 published = true,
+                approved = true,
+                lastModified = LocalDateTime.now(),
                 id = "http://catalog/1/dataset/1",
                 uri = "http://catalog/1/dataset/1",
                 relatedResources = listOf(
@@ -84,9 +87,11 @@ class RdfServiceTest {
             val dataset = DatasetDBO(
                 catalogId = "1",
                 published = true,
+                approved = true,
                 id = "http://catalog/1/dataset/1",
                 uri = "http://catalog/1/dataset/1",
-                qualifiedAttributions = setOf("123456789", "987654321")
+                qualifiedAttributions = setOf("123456789", "987654321"),
+                lastModified = LocalDateTime.now(),
             )
             val catalog = CatalogCount(id = "1", datasetCount = 1)
 

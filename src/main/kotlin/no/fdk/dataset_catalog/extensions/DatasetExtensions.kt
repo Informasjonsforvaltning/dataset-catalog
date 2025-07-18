@@ -248,6 +248,48 @@ fun DatasetDBO.toDataset(): Dataset {
     )
 }
 
+fun DatasetDBO.addCreateValues(toCreate: DatasetToCreate) =
+    copy(
+        approved = toCreate.approved,
+        originalUri = toCreate.originalUri,
+        specializedType = toCreate.specializedType,
+        concepts = toCreate.concepts,
+        title = toCreate.title,
+        description = toCreate.description,
+        contactPoints = toCreate.contactPoints,
+        keywords = toCreate.keywords,
+        issued = toCreate.issued,
+        modified = toCreate.modified,
+        language = toCreate.language,
+        landingPage = toCreate.landingPage,
+        euDataTheme = toCreate.euDataTheme,
+        losTheme = toCreate.losTheme,
+        distribution = toCreate.distribution,
+        sample = toCreate.sample,
+        temporal = toCreate.temporal,
+        spatial = toCreate.spatial,
+        accessRight = toCreate.accessRight,
+        legalBasisForRestriction = toCreate.legalBasisForRestriction,
+        legalBasisForProcessing = toCreate.legalBasisForProcessing,
+        legalBasisForAccess = toCreate.legalBasisForAccess,
+        accuracy = toCreate.accuracy,
+        completeness = toCreate.completeness,
+        currentness = toCreate.currentness,
+        availability = toCreate.availability,
+        relevance = toCreate.relevance,
+        references = toCreate.references,
+        relatedResources = toCreate.relatedResources,
+        provenance = toCreate.provenance,
+        frequency = toCreate.frequency,
+        conformsTo = toCreate.conformsTo,
+        informationModelsFromFDK = toCreate.informationModelsFromFDK,
+        informationModelsFromOtherSources = toCreate.informationModelsFromOtherSources,
+        qualifiedAttributions = toCreate.qualifiedAttributions,
+        type = toCreate.type,
+        inSeries = toCreate.inSeries,
+        seriesDatasetOrder = toCreate.seriesDatasetOrder,
+    )
+
 fun LocalizedStrings.toMap(): Map<String, String> {
     val map = mutableMapOf<String, String>()
     nb?.let { map["nb"] = it }
