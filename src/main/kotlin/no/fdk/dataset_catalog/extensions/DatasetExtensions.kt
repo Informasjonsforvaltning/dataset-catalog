@@ -153,8 +153,8 @@ fun DatasetDBO.toDataset(): Dataset {
         originalUri = originalUri,
         lastModified = lastModified,
         registrationStatus = when {
-            published -> REGISTRATION_STATUS.PUBLISH
-            approved -> REGISTRATION_STATUS.APPROVE
+            published == true -> REGISTRATION_STATUS.PUBLISH
+            approved == true -> REGISTRATION_STATUS.APPROVE
             else -> REGISTRATION_STATUS.DRAFT
         },
         concepts = concepts?.map { Concept(uri = it) },

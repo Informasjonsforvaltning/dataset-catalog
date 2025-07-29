@@ -28,7 +28,7 @@ class RDFService(
 
     fun getDatasetById(catalogId: String, id: String): Model? =
         datasetService.getDatasetByID(catalogId, id)
-            ?.takeIf { it.published }
+            ?.takeIf { it.published == true }
             ?.let { it.copy(references = datasetService.resolveDatasetReferences(it)) }
             ?.createModel()
 
@@ -57,7 +57,7 @@ class RDFService(
     private fun Resource.addDatasets(datasets: List<DatasetDBO>?): Resource {
         datasets?.forEach { dataset ->
             val seriesData = dataset.seriesData()
-            val isPublished = dataset.published
+            val isPublished = dataset.published == true
             when {
                 seriesData.inSeries != null && isPublished -> model.addDatasetResource(dataset, seriesData, applicationProperties.catalogUriHost) // A dataset in a series shouldn't be associated with a catalog through dcat:dataset, only indirectly from a series in the catalog
                 isPublished -> addProperty(DCAT.dataset, model.addDatasetResource(dataset, seriesData, applicationProperties.catalogUriHost))
@@ -77,7 +77,7 @@ class RDFService(
         if (catalogId == null) SeriesData(null, null, null, null, null)
         else {
             val seriesDataset = inSeries?.let { datasetService.getDatasetByID(catalogId, inSeries) }
-                ?.takeIf { it.published && it.specializedType == SpecializedType.SERIES }
+                ?.takeIf { it.published == true && it.specializedType == SpecializedType.SERIES }
 
             val orderValue = seriesDataset?.seriesDatasetOrder?.get(id)
 
@@ -85,7 +85,7 @@ class RDFService(
             val nextAndPrev = if (orderValue == null) null
             else seriesDataset.seriesDatasetOrder.keys
                 .let { datasetService.getDatasetListByIDs(catalogId, it.toList()) }
-                .filter { it.published }
+                .filter { it.published == true }
                 .associate { it.getURI() to seriesDataset.seriesDatasetOrder[it.id] }
                 .filterNotNullKeysAndValues()
                 .let { publishedOrder ->
@@ -101,7 +101,7 @@ class RDFService(
             val firstAndLast = seriesDatasetOrder?.keys
                 ?.takeIf { specializedType == SpecializedType.SERIES }
                 ?.let { datasetService.getDatasetListByIDs(catalogId, it.toList()) }
-                ?.filter { it.published }
+                ?.filter { it.published == true }
                 ?.associate { it.getURI() to seriesDatasetOrder[it.id] }
                 ?.filterNotNullKeysAndValues()
                 ?.let { publishedOrder ->
