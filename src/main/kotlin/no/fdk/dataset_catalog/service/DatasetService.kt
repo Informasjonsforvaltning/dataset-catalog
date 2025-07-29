@@ -308,15 +308,15 @@ class DatasetService(
     }
 
     private fun triggerHarvest(datasets: List<DatasetDBO>, catalogId: String) {
-        if (datasets.any { it.published }) {
+        if (datasets.any { it.published == true }) {
             publishingService.triggerHarvest(catalogId)
         }
     }
 
     private fun isFirstPublishedDatasetForCatalog(datasets: List<DatasetDBO>, catalogId: String): Boolean =
         when {
-            datasets.none { it.published } -> false
-            getAllDatasets(catalogId).any { it.published } -> false
+            datasets.none { it.published == true } -> false
+            getAllDatasets(catalogId).any { it.published == true } -> false
             else -> true
         }
 

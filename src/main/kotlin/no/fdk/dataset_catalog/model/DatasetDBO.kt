@@ -26,8 +26,8 @@ data class DatasetDBO(
     val lastModified: LocalDateTime?,
     val uri: String?,
 
-    val published: Boolean,
-    val approved: Boolean,
+    val published: Boolean? = false,
+    val approved: Boolean? = false,
 
     val originalUri: String? = null,
     val specializedType: SpecializedType? = null,
