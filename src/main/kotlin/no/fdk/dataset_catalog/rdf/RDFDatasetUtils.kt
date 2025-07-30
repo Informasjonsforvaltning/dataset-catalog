@@ -9,7 +9,7 @@ import org.apache.jena.vocabulary.DCAT
 import org.apache.jena.vocabulary.DCTerms
 import org.apache.jena.vocabulary.RDF
 
-fun Model.addDatasetResource(dataset: DatasetDBO, seriesData: SeriesData, baseCatalogURI: String): Resource {
+fun Model.addDatasetResource(dataset: DatasetDBO, seriesData: SeriesData, baseCatalogURI: String, publisherURI: String): Resource {
     val datasetURI = when {
         dataset.originalUri.isValidURL() -> dataset.originalUri
         dataset.uri.isValidURL() -> dataset.uri
@@ -22,11 +22,13 @@ fun Model.addDatasetResource(dataset: DatasetDBO, seriesData: SeriesData, baseCa
     if (dataset.specializedType == SpecializedType.SERIES) {
         datasetResource
             .addProperty(RDF.type, ResourceFactory.createProperty("${DCAT.getURI()}DatasetSeries"))
+            .safeAddLinkedProperty(DCTerms.publisher, publisherURI)
             .safeAddLinkedProperty(ResourceFactory.createProperty("${DCAT.getURI()}first"), seriesData.first)
             .safeAddLinkedProperty(ResourceFactory.createProperty("${DCAT.getURI()}last"), seriesData.last)
     } else {
         datasetResource
             .addProperty(RDF.type, DCAT.Dataset)
+            .safeAddLinkedProperty(DCTerms.publisher, publisherURI)
             .addContactPoints(dataset.contactPoints)
             .safeAddLocalizedStringList(DCAT.keyword, dataset.keywords)
             .safeAddDateTimeLiteral(DCTerms.issued, dataset.issued)

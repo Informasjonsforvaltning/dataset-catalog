@@ -2,6 +2,7 @@
 @prefix dcat:  <http://www.w3.org/ns/dcat#> .
 
 <http://db2>  a          dcat:Dataset ;
+        dct:publisher  <http://localhost:5050/organizations/123456789> ;
         dct:type         <http://publications.europa.eu/resource/authority/dataset-type/TEST_DATA> ;
         dct:description  "test words"@en ;
         dct:isReplacedBy <http://test.uri>;

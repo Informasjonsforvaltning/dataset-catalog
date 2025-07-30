@@ -13,12 +13,15 @@
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 
 <http://db3>  a          dcat:Dataset ;
+        dct:publisher  <http://localhost:5050/organizations/123456789> ;
         dct:description  "the description"@en .
 
 <http://db1>  a    dcat:Dataset ;
+        dct:publisher  <http://localhost:5050/organizations/123456789> ;
         dct:title  "test tittel"@nb .
 
-<http://db4>  a  dcat:Dataset .
+<http://db4>  a  dcat:Dataset ;
+        dct:publisher  <http://localhost:5050/organizations/987456321> .
 
 <http://localhost:5050/catalogs/987456321>  a  dcat:Catalog ;
         dct:publisher  <http://localhost:5050/organizations/987456321> ;
@@ -26,12 +29,14 @@
         dcat:dataset  <http://db5> , <http://db4> .
 
 <http://db2>  a          dcat:Dataset ;
+        dct:publisher  <http://localhost:5050/organizations/123456789> ;
         dct:type         <http://publications.europa.eu/resource/authority/dataset-type/TEST_DATA> ;
         dct:description  "test words"@en ;
         dct:isReplacedBy     <http://test.uri>;
         dct:title        "enda en"@nb .
 
-<http://db5>  a  dcat:Dataset .
+<http://db5>  a  dcat:Dataset ;
+        dct:publisher  <http://localhost:5050/organizations/987456321> .
 
 <http://localhost:5050/catalogs/123456789>  a  dcat:Catalog ;
         dct:publisher  <http://localhost:5050/organizations/123456789> ;
@@ -46,15 +51,18 @@
 
 <http://localhost:5050/catalogs/123123123/datasets/series0>
         rdf:type        dcat:DatasetSeries ;
+        dct:publisher  <http://localhost:5050/organizations/123123123> ;
         dcat:first      <http://localhost:5050/catalogs/123123123/datasets/series1> ;
         dcat:last       <http://localhost:5050/catalogs/123123123/datasets/series5> .
 
 <http://localhost:5050/catalogs/123123123/datasets/series1>
         rdf:type        dcat:Dataset ;
+        dct:publisher  <http://localhost:5050/organizations/123123123> ;
         dcat:next       <http://localhost:5050/catalogs/123123123/datasets/series5> ;
         dcat:inSeries   <http://localhost:5050/catalogs/123123123/datasets/series0> .
 
 <http://localhost:5050/catalogs/123123123/datasets/series5>
         rdf:type        dcat:Dataset ;
+        dct:publisher  <http://localhost:5050/organizations/123123123> ;
         dcat:prev       <http://localhost:5050/catalogs/123123123/datasets/series1> ;
         dcat:inSeries   <http://localhost:5050/catalogs/123123123/datasets/series0> .
