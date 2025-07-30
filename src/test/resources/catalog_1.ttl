@@ -5,6 +5,7 @@
 
 <http://catalog/1/dataset/1>
     a                          dcat:Dataset ;
+    dct:publisher  <http://localhost:5050/organizations/1> ;
     prov:qualifiedAttribution  [ a             prov:Attribution ;
                                  dcat:hadRole  <http://registry.it.csiro.au/def/isotc211/CI_RoleCode/contributor> ;
                                  prov:agent    <https://data.brreg.no/enhetsregisteret/api/enheter/123456789>

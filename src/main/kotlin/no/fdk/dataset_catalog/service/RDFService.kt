@@ -59,8 +59,21 @@ class RDFService(
             val seriesData = dataset.seriesData()
             val isPublished = dataset.published == true
             when {
-                seriesData.inSeries != null && isPublished -> model.addDatasetResource(dataset, seriesData, applicationProperties.catalogUriHost) // A dataset in a series shouldn't be associated with a catalog through dcat:dataset, only indirectly from a series in the catalog
-                isPublished -> addProperty(DCAT.dataset, model.addDatasetResource(dataset, seriesData, applicationProperties.catalogUriHost))
+                seriesData.inSeries != null && isPublished -> model.addDatasetResource(
+                    dataset,
+                    seriesData,
+                    applicationProperties.catalogUriHost,
+                    organizationCatalogURI(dataset.catalogId)
+                ) // A dataset in a series shouldn't be associated with a catalog through dcat:dataset, only indirectly from a series in the catalog
+                isPublished -> addProperty(
+                    DCAT.dataset,
+                    model.addDatasetResource(
+                        dataset,
+                        seriesData,
+                        applicationProperties.catalogUriHost,
+                        organizationCatalogURI(dataset.catalogId)
+                    )
+                )
             }
         }
         return this
@@ -69,7 +82,7 @@ class RDFService(
     private fun DatasetDBO.createModel(): Model {
         val model = ModelFactory.createDefaultModel()
         model.setDefaultPrefixes()
-        model.addDatasetResource(this, seriesData(), applicationProperties.catalogUriHost)
+        model.addDatasetResource(this, seriesData(), applicationProperties.catalogUriHost, organizationCatalogURI(catalogId))
         return model
     }
 
