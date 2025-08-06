@@ -198,8 +198,11 @@ fun DatasetDBO.toDataset(): Dataset {
                 description = it.description?.toMap(),
                 downloadURL = it.downloadURL,
                 accessURL = it.accessURL,
+                conformsTo = it.conformsTo?.map { uri -> SkosConcept(uri = uri.uri, prefLabel = uri.prefLabel?.toMap()) },
                 format = it.format,
                 mediaType = it.mediaType,
+                accessServiceUris = it.accessServices,
+                accessService = it.accessServices?.map { uri -> DataDistributionService(uri = uri) },
                 page = it.page?.map { uri -> SkosConcept(uri = uri) }
             )
         },
