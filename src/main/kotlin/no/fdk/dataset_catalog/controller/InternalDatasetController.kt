@@ -1,6 +1,5 @@
 package no.fdk.dataset_catalog.controller
 
-import no.fdk.dataset_catalog.extensions.datasetToDBO
 import no.fdk.dataset_catalog.model.DatasetDBO
 import no.fdk.dataset_catalog.model.DatasetToCreate
 import no.fdk.dataset_catalog.model.JsonPatchOperation
@@ -89,8 +88,8 @@ open class InternalDatasetController(
         @RequestBody operations: List<JsonPatchOperation>,
     ): ResponseEntity<DatasetDBO> =
         if (endpointPermissions.hasOrgWritePermission(jwt, catalogId)) {
-            datasetService.updateDataset(catalogId, id, operations)
-                ?.let {ResponseEntity(it.datasetToDBO(), HttpStatus.OK) }
+            datasetService.updateDatasetDBO(catalogId, id, operations)
+                ?.let {ResponseEntity(it, HttpStatus.OK) }
                 ?: ResponseEntity(HttpStatus.NOT_FOUND)
         } else ResponseEntity(HttpStatus.FORBIDDEN)
 

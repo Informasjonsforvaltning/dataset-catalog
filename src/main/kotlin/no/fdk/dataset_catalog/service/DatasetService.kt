@@ -179,6 +179,22 @@ class DatasetService(
         return getByID(catalogId, id)
     }
 
+    fun updateDatasetDBO(catalogId: String, id: String, operations: List<JsonPatchOperation>): DatasetDBO? {
+        val dataset = getDatasetByID(catalogId, id)
+
+        dataset?.update(operations)
+            ?.copy(
+                id = id,
+                catalogId = catalogId,
+                specializedType = dataset.specializedType,
+                lastModified = LocalDateTime.now()
+            )
+            ?.allAffectedSeriesDatasets(dataset)
+            ?.let { persistAndHarvestDatasets(it, catalogId) }
+
+        return getDatasetByID(catalogId, id)
+    }
+
     fun delete(catalogId: String, id: String) {
         getByID(catalogId, id)
             ?.also { datasetRepository.delete(it.datasetToDBO()) }
@@ -336,7 +352,36 @@ class DatasetService(
         }
     }
 
+    private fun DatasetDBO.update(operations: List<JsonPatchOperation>): DatasetDBO {
+        validateOperations(operations)
+        return try {
+            patchDatasetDBO(this, operations)
+        } catch (ex: Exception) {
+            logger.error("PATCH failed for $id", ex)
+            when (ex) {
+                is JsonException -> throw ResponseStatusException(HttpStatus.BAD_REQUEST, ex.message)
+                is JsonProcessingException -> throw ResponseStatusException(HttpStatus.BAD_REQUEST, ex.message)
+                is IllegalArgumentException -> throw ResponseStatusException(HttpStatus.BAD_REQUEST, ex.message)
+                is java.lang.ClassCastException -> throw ResponseStatusException(HttpStatus.BAD_REQUEST, ex.message)
+                else -> throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.message)
+            }
+        }
+    }
+
     private fun patchDataset(dataset: Dataset, operations: List<JsonPatchOperation>): Dataset {
+        if (operations.isNotEmpty()) {
+            with(mapper) {
+                val changes = Json.createReader(StringReader(writeValueAsString(operations))).readArray()
+                val original = Json.createReader(StringReader(writeValueAsString(dataset))).readObject()
+
+                return Json.createPatch(changes).apply(original)
+                    .let { readValue(it.toString()) }
+            }
+        }
+        return dataset
+    }
+
+    private fun patchDatasetDBO(dataset: DatasetDBO, operations: List<JsonPatchOperation>): DatasetDBO {
         if (operations.isNotEmpty()) {
             with(mapper) {
                 val changes = Json.createReader(StringReader(writeValueAsString(operations))).readArray()
