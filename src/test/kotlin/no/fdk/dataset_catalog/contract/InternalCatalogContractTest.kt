@@ -155,7 +155,7 @@ class InternalCatalogContractTest : ApiTestContext() {
                     listOf(
                         JsonPatchOperation(
                             op = OpEnum.ADD,
-                            path = "/keyword",
+                            path = "/keywords",
                             "invalid value"
                         )
                     )
