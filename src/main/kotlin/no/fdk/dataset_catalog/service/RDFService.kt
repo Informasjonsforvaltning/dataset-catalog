@@ -12,7 +12,6 @@ import org.apache.jena.sparql.vocabulary.FOAF
 import org.apache.jena.vocabulary.*
 import org.springframework.stereotype.Service
 
-
 @Service
 class RDFService(
     private val catalogService: CatalogService,

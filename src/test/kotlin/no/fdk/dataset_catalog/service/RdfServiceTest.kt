@@ -1,10 +1,8 @@
 package no.fdk.dataset_catalog.service
 
 import no.fdk.dataset_catalog.configuration.ApplicationProperties
-import no.fdk.dataset_catalog.extensions.datasetToDBO
 import no.fdk.dataset_catalog.model.*
 import no.fdk.dataset_catalog.utils.*
-import org.apache.jena.vocabulary.DCTerms
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Tag
@@ -114,7 +112,7 @@ class RdfServiceTest {
 
         @Test
         fun `Serializes complete catalog`() {
-            val dataset = TEST_DATASET_1.datasetToDBO()
+            val dataset = TEST_DATASET_1
             val catalog = TEST_CATALOG_1
             val references = listOf(
                 ReferenceDBO(

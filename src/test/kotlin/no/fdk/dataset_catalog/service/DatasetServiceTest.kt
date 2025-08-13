@@ -2,7 +2,6 @@ package no.fdk.dataset_catalog.service
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.fdk.dataset_catalog.configuration.ApplicationProperties
-import no.fdk.dataset_catalog.extensions.datasetToDBO
 import no.fdk.dataset_catalog.model.*
 import no.fdk.dataset_catalog.repository.DatasetRepository
 import no.fdk.dataset_catalog.utils.TEST_DATASET_1
@@ -30,22 +29,18 @@ class DatasetServiceTest {
     internal inner class Create {
         @Test
         fun `persists new dataset`() {
-            val ds = Dataset(
-                "dsId",
-                "catId",
+            val ds = DatasetToCreate(
                 specializedType = SpecializedType.SERIES,
-                registrationStatus = REGISTRATION_STATUS.DRAFT
             )
-            datasetService.create("catId", ds)
+            datasetService.createDataset("catId", ds)
             argumentCaptor<List<DatasetDBO>>().apply {
                 verify(datasetRepository, times(1)).saveAll(capture())
                 assertTrue(firstValue.size == 1)
                 val actual = firstValue.first()
-                assertEquals(ds.copy(lastModified = actual.lastModified, uri = actual.uri).datasetToDBO(), actual)
+                assertEquals(actual.copy(specializedType = ds.specializedType), actual)
             }
         }
     }
-
 
     @Nested
     internal inner class GetById {
@@ -53,32 +48,32 @@ class DatasetServiceTest {
         fun `gets by id`() {
             whenever(datasetRepository.findById("dsId")).thenReturn(
                 Optional.of(
-                    Dataset(
+                    DatasetDBO(
                         "dsId",
                         "catId",
+                        uri = "uri",
                         lastModified = LocalDateTime.now()
-                    ).datasetToDBO()
+                    )
                 )
             )
-            val dataset = datasetService.getByID("catId", "dsId")
+            val dataset = datasetService.getDatasetByID("catId", "dsId")
             assertNotNull(dataset)
         }
 
         @Test
         fun `cannot get non-existing dataset`() {
             whenever(datasetRepository.findById("dsId")).thenReturn(Optional.empty())
-            val dataset = datasetService.getByID("catId", "dsId")
+            val dataset = datasetService.getDatasetByID("catId", "dsId")
             assertNull(dataset)
         }
 
         @Test
         fun `cannot get dataset in other catalog`() {
             whenever(datasetRepository.findById("dsId")).thenReturn(Optional.empty())
-            val dataset = datasetService.getByID("other-catId", "dsId")
+            val dataset = datasetService.getDatasetByID("other-catId", "dsId")
             assertNull(dataset)
         }
     }
-
 
     @Nested
     internal inner class GetAll {
@@ -89,18 +84,17 @@ class DatasetServiceTest {
                 DatasetDBO("2", "1", lastModified = LocalDateTime.now(), uri = null, published = false, approved = false)
             )
             whenever(datasetRepository.findByCatalogId("1")).thenReturn(expected)
-            val actual = datasetService.getAll("1").map { dataset -> dataset.datasetToDBO() }
+            val actual = datasetService.getAllDatasets("1").map { dataset -> dataset }
             assertEquals(expected, actual)
         }
     }
-
 
     @Nested
     internal inner class Delete {
         @Test
         fun `delete successfully removes dataset`() {
-            val ds = Dataset("dsId", "catId", lastModified = LocalDateTime.now())
-            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds.datasetToDBO()))
+            val ds = DatasetDBO("dsId", "catId", uri = "uri", lastModified = LocalDateTime.now())
+            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
             assertDoesNotThrow { datasetService.delete("catId", "dsId") }
         }
 
@@ -115,17 +109,17 @@ class DatasetServiceTest {
     internal inner class Update {
         @Test
         fun `update dataset with add operation`() {
-            val ds = Dataset("dsId", "catId")
-            val expected = Dataset("dsId", "catId", source = "test")
-            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds.datasetToDBO()))
+            val ds = DatasetDBO("dsId", "catId", uri = "uri", lastModified = null)
+            val expected = DatasetDBO("dsId", "catId", uri = "uri", lastModified = null, type = "test")
+            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
 
-            datasetService.updateDataset("catId", "dsId", listOf(JsonPatchOperation(OpEnum.ADD, "/source", "test")))
+            datasetService.updateDatasetDBO("catId", "dsId", listOf(JsonPatchOperation(OpEnum.ADD, "/type", "test")))
 
             argumentCaptor<List<DatasetDBO>>().apply {
                 verify(datasetRepository, times(1)).saveAll(capture())
                 assertTrue(firstValue.size == 1)
                 assertEquals(
-                    expected.copy(lastModified = firstValue.first().lastModified).datasetToDBO(),
+                    expected.copy(lastModified = firstValue.first().lastModified),
                     firstValue.first()
                 )
             }
@@ -133,34 +127,31 @@ class DatasetServiceTest {
 
         @Test
         fun `update dataset with replace operation`() {
-            val ds = Dataset(
+            val ds = DatasetDBO(
                 "dsId",
                 "catId",
+                uri = "uri",
                 lastModified = LocalDateTime.now(),
                 temporal = listOf(
-                    PeriodOfTime(
-                        "period-id",
-                        "period",
+                    PeriodOfTimeDBO(
                         LocalDate.of(2020, 11, 11),
                         LocalDate.of(2021, 4, 4)
                     )
                 )
             )
-            val expected = Dataset(
+            val expected = DatasetDBO(
                 "dsId",
-                "catId",
+                "catId", uri = "uri",
                 lastModified = LocalDateTime.now(),
                 temporal = listOf(
-                    PeriodOfTime(
-                        "period-id",
-                        "period",
+                    PeriodOfTimeDBO(
                         LocalDate.of(2020, 10, 10),
                         LocalDate.of(2021, 4, 4)
                     )
                 )
             )
-            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds.datasetToDBO()))
-            datasetService.updateDataset(
+            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
+            datasetService.updateDatasetDBO(
                 "catId",
                 "dsId",
                 listOf(JsonPatchOperation(OpEnum.REPLACE, "/temporal/0/startDate", "2020-10-10"))
@@ -170,7 +161,7 @@ class DatasetServiceTest {
                 verify(datasetRepository, times(1)).saveAll(capture())
                 assertTrue(firstValue.size == 1)
                 assertEquals(
-                    expected.copy(lastModified = firstValue.first().lastModified).datasetToDBO(),
+                    expected.copy(lastModified = firstValue.first().lastModified),
                     firstValue.first()
                 )
             }
@@ -178,10 +169,10 @@ class DatasetServiceTest {
 
         @Test
         fun `update dataset with copy operation`() {
-            val ds = Dataset("dsId", "catId", title = mapOf(Pair("nb", "tittel")), lastModified = LocalDateTime.now())
-            val expected = Dataset("dsId", "catId", title = mapOf(Pair("nb", "tittel"), Pair("nn", "tittel")))
-            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds.datasetToDBO()))
-            datasetService.updateDataset(
+            val ds = DatasetDBO("dsId", "catId", uri = "uri", title = LocalizedStrings(nb =  "tittel"), lastModified = LocalDateTime.now())
+            val expected = DatasetDBO("dsId", "catId", uri = "uri", lastModified = null, title = LocalizedStrings(nb = "tittel", nn = "tittel"))
+            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
+            datasetService.updateDatasetDBO(
                 "catId",
                 "dsId",
                 listOf(JsonPatchOperation(OpEnum.COPY, "/title/nn", null, "/title/nb"))
@@ -191,25 +182,25 @@ class DatasetServiceTest {
                 verify(datasetRepository, times(1)).saveAll(capture())
                 assertTrue(firstValue.size == 1)
                 assertEquals(
-                    expected.copy(lastModified = firstValue.first().lastModified).datasetToDBO(),
+                    expected.copy(lastModified = firstValue.first().lastModified),
                     firstValue.first()
                 )
             }
         }
 
-
         @Test
         fun `update dataset with move operation`() {
-            val ds = Dataset(
+            val ds = DatasetDBO(
                 "dsId",
                 "catId",
-                title = mapOf(Pair("nb", "beskrivelse")),
+                uri = "uri",
+                title = LocalizedStrings(nb = "beskrivelse"),
                 description = null,
                 lastModified = LocalDateTime.now()
             )
-            val expected = Dataset("dsId", "catId", title = null, description = mapOf(Pair("nb", "beskrivelse")))
-            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds.datasetToDBO()))
-            datasetService.updateDataset(
+            val expected = DatasetDBO("dsId", "catId", title = null, uri = "uri", lastModified = null, description = LocalizedStrings(nb = "beskrivelse"))
+            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
+            datasetService.updateDatasetDBO(
                 "catId",
                 "dsId",
                 listOf(JsonPatchOperation(OpEnum.MOVE, "/description", null, "/title"))
@@ -219,7 +210,7 @@ class DatasetServiceTest {
                 verify(datasetRepository, times(1)).saveAll(capture())
                 assertTrue(firstValue.size == 1)
                 assertEquals(
-                    expected.copy(lastModified = firstValue.first().lastModified).datasetToDBO(),
+                    expected.copy(lastModified = firstValue.first().lastModified),
                     firstValue.first()
                 )
             }
@@ -227,16 +218,16 @@ class DatasetServiceTest {
 
         @Test
         fun `update dataset with remove operation`() {
-            val ds = Dataset("dsId", "catId", type = "test", lastModified = LocalDateTime.now())
-            val expected = Dataset("dsId", "catId")
-            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds.datasetToDBO()))
-            datasetService.updateDataset("catId", "dsId", listOf(JsonPatchOperation(OpEnum.REMOVE, "/type")))
+            val ds = DatasetDBO("dsId", "catId", type = "test", uri = "uri", lastModified = LocalDateTime.now())
+            val expected = DatasetDBO("dsId", "catId", uri = "uri", lastModified = null)
+            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
+            datasetService.updateDatasetDBO("catId", "dsId", listOf(JsonPatchOperation(OpEnum.REMOVE, "/type")))
 
         argumentCaptor<List<DatasetDBO>>().apply {
             verify(datasetRepository, times(1)).saveAll(capture())
             assertTrue(firstValue.size == 1)
             assertEquals(
-                expected.copy(lastModified = firstValue.first().lastModified).datasetToDBO(),
+                expected.copy(lastModified = firstValue.first().lastModified),
                 firstValue.first()
             )
         }
@@ -244,10 +235,10 @@ class DatasetServiceTest {
 
         @Test
         fun `update of specialized type is ignored`() {
-            val ds = Dataset("dsId", "catId", lastModified = LocalDateTime.now())
-            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds.datasetToDBO()))
+            val ds = DatasetDBO("dsId", "catId", uri = "uri", lastModified = LocalDateTime.now())
+            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
             assertThrows<ResponseStatusException> {
-                datasetService.updateDataset(
+                datasetService.updateDatasetDBO(
                     "catId",
                     "dsId",
                     listOf(JsonPatchOperation(OpEnum.ADD, "/specializedType", "SERIES"))
@@ -263,56 +254,62 @@ class DatasetServiceTest {
     internal inner class TriggerHarvest {
         @Test
         fun `triggers harvest on update to published dataset`() {
-            val ds = Dataset(
+            val ds = DatasetDBO(
                 "dsId",
                 "catId",
-                registrationStatus = REGISTRATION_STATUS.PUBLISH,
+                uri = "http://uri",
+                published = true,
+                approved = true,
                 lastModified = LocalDateTime.now()
             )
 
-            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds.datasetToDBO()))
-            whenever(datasetRepository.save(any())).thenReturn(ds.datasetToDBO())
+            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
+            whenever(datasetRepository.save(any())).thenReturn(ds)
 
-            datasetService.updateDataset("catId", "dsId", emptyList())
+            datasetService.updateDatasetDBO("catId", "dsId", emptyList())
 
             verify(publishingService, times(1)).triggerHarvest("catId")
         }
 
         @Test
         fun `does not trigger harvest on update to draft dataset`() {
-            val ds = Dataset(
+            val ds = DatasetDBO(
                 "dsId",
                 "catId",
-                registrationStatus = REGISTRATION_STATUS.DRAFT,
+                uri = "http://uri",
+                published = false,
+                approved = false,
                 lastModified = LocalDateTime.now()
             )
 
-            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds.datasetToDBO()))
-            whenever(datasetRepository.save(any())).thenReturn(ds.datasetToDBO())
+            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
+            whenever(datasetRepository.save(any())).thenReturn(ds)
 
-            datasetService.updateDataset("catId", "dsId", listOf(JsonPatchOperation(OpEnum.ADD, "/source", "hei")))
+            datasetService.updateDatasetDBO("catId", "dsId", listOf(JsonPatchOperation(OpEnum.ADD, "/source", "hei")))
 
             verify(publishingService, times(0)).triggerHarvest("catId")
         }
 
         @Test
         fun `adds datasource on first published dataset in catalog`() {
-            val ds = Dataset(
+            val ds = DatasetDBO(
                 "dsId",
                 "catId",
-                registrationStatus = REGISTRATION_STATUS.DRAFT,
+                uri = "http://uri",
+                published = false,
+                approved = true,
                 lastModified = LocalDateTime.now()
             )
 
-            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds.datasetToDBO()))
-            whenever(datasetRepository.save(any())).thenReturn(ds.datasetToDBO())
+            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
+            whenever(datasetRepository.save(any())).thenReturn(ds)
             whenever(applicationProperties.datasetCatalogUriHost).thenReturn("http://mycatalog")
 
-            datasetService.create("catId", ds)
-            datasetService.updateDataset(
+            datasetService.createDataset("catId", DatasetToCreate(approved = true))
+            datasetService.updateDatasetDBO(
                 "catId",
                 "dsId",
-                listOf(JsonPatchOperation(OpEnum.REPLACE, "/registrationStatus", REGISTRATION_STATUS.PUBLISH))
+                listOf(JsonPatchOperation(OpEnum.REPLACE, "/published", true))
             )
 
             verify(publishingService, times(1)).sendNewDataSourceMessage("catId", "http://mycatalog/catId")
@@ -320,42 +317,48 @@ class DatasetServiceTest {
 
         @Test
         fun `does not add datasource on already added catalog`() {
-            val ds0 = Dataset(
+            val ds0 = DatasetDBO(
                 "dsId0",
                 "catId",
-                registrationStatus = REGISTRATION_STATUS.PUBLISH,
+                uri = "http://uri",
+                published = false,
+                approved = true,
                 lastModified = LocalDateTime.now()
             )
-            val ds1 = Dataset(
+            val ds1 = DatasetDBO(
                 "dsId1",
                 "catId",
-                registrationStatus = REGISTRATION_STATUS.PUBLISH,
+                uri = "http://uri",
+                published = false,
+                approved = true,
                 lastModified = LocalDateTime.now()
             )
 
-            whenever(datasetRepository.findById("dsId1")).thenReturn(Optional.of(ds1.datasetToDBO()))
-            whenever(datasetRepository.save(any())).thenReturn(ds1.datasetToDBO())
-            whenever(datasetRepository.findByCatalogId("catId")).thenReturn(listOf(ds0.datasetToDBO()))
+            whenever(datasetRepository.findById("dsId1")).thenReturn(Optional.of(ds1))
+            whenever(datasetRepository.save(any())).thenReturn(ds1)
+            whenever(datasetRepository.findByCatalogId("catId")).thenReturn(listOf(ds0))
 
-            datasetService.create("catId", ds1)
+            datasetService.createDataset("catId", DatasetToCreate(approved = true))
 
             verify(publishingService, times(0)).sendNewDataSourceMessage(any(), any())
         }
 
         @Test
         fun `triggers harvest and adds datasource on first published dataset in catalog`() {
-            val ds = Dataset(
+            val ds = DatasetDBO(
                 "dsId",
                 "catId",
-                registrationStatus = REGISTRATION_STATUS.PUBLISH,
+                uri = "http://uri",
+                published = true,
+                approved = true,
                 lastModified = LocalDateTime.now()
             )
 
-            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds.datasetToDBO()))
-            whenever(datasetRepository.save(any())).thenReturn(ds.datasetToDBO())
+            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
+            whenever(datasetRepository.save(any())).thenReturn(ds)
             whenever(applicationProperties.datasetCatalogUriHost).thenReturn("http://mycatalog")
 
-            datasetService.updateDataset("catId", "dsId", emptyList())
+            datasetService.updateDatasetDBO("catId", "dsId", emptyList())
 
             verify(publishingService, times(1)).triggerHarvest("catId")
             verify(publishingService, times(1)).sendNewDataSourceMessage("catId", "http://mycatalog/catId")
@@ -368,23 +371,20 @@ class DatasetServiceTest {
         @Test
         fun `Resolves references`() {
             val dataset = TEST_DATASET_1
-            val referencedDataset = Dataset(
+            val referencedDataset = DatasetDBO(
                 "1",
                 "987654321",
+                uri = "http://uri.no",
                 originalUri = "http://originaluri/resolved",
                 lastModified = LocalDateTime.now()
             )
 
-            val resolved = dataset.references?.map {
-                it.copy(
-                    source = SkosConcept("http://originaluri/resolved", prefLabel = it.source?.prefLabel)
-                )
-            }
+            val resolved = dataset.references?.map { it.copy(source = "http://originaluri/resolved") }
 
             whenever(applicationProperties.catalogUriHost).thenReturn("http://mycatalog")
-            whenever(datasetRepository.findById("1")).thenReturn(Optional.of(referencedDataset.datasetToDBO()))
+            whenever(datasetRepository.findById("1")).thenReturn(Optional.of(referencedDataset))
 
-            assertEquals(resolved, datasetService.resolveReferences(dataset))
+            assertEquals(resolved, datasetService.resolveDatasetReferences(dataset))
         }
     }
 }

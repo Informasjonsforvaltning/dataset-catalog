@@ -3,7 +3,6 @@ package no.fdk.dataset_catalog.rdf
 import org.apache.jena.rdf.model.Property
 import org.apache.jena.rdf.model.Resource
 import org.apache.jena.rdf.model.ResourceFactory
-import org.apache.jena.vocabulary.XSD
 
 class ADMS {
     companion object {
@@ -11,14 +10,6 @@ class ADMS {
 
         val identifier: Property = ResourceFactory.createProperty("${uri}identifier")
         val sample: Property = ResourceFactory.createProperty("${uri}sample")    }
-}
-
-class AT {
-    companion object {
-        const val uri = "http://publications.europa.eu/ontology/authority/"
-
-        val authorityCode: Property = ResourceFactory.createProperty("${uri}authority-code")
-    }
 }
 
 class Schema {
