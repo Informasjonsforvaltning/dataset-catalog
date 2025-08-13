@@ -1,9 +1,8 @@
 package no.fdk.dataset_catalog.utils
 
 import no.fdk.dataset_catalog.model.*
-import org.apache.jena.sparql.vocabulary.FOAF
-import org.apache.jena.vocabulary.DCTerms
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 val CATALOG_ID = "987654321"
 val CATALOG_URI = "http://localhost:5050/catalogs/$CATALOG_ID"
@@ -11,154 +10,114 @@ val CATALOG_URI = "http://localhost:5050/catalogs/$CATALOG_ID"
 val DATASET_ID = "72a54592-692c-4cfa-a938-cd1a56a2ed8d"
 val DATASET_URI = "$CATALOG_URI/datasets/$DATASET_ID"
 
-val DATASET_TITLE = mapOf(Pair("nb", "Markagrensen Oslo Kommune og nærliggende kommuner"))
+val DATASET_TITLE = LocalizedStrings(nb = "Markagrensen Oslo Kommune og nærliggende kommuner")
 
-val DATASET_DESCRIPTION = mapOf(Pair("nb", "Datasettet avgrenser område for virkeområdet til lov 6. juni 2009 nr. 35 om naturområder i Oslo og nærliggende kommuner (markaloven) som trådte i kraft 1. september 2009. Markalovens virkeområde er fastsatt i forskrift 4. september 2015 nr. 1032 om justering av markagrensen fastlegger markalovens geografiske virkeområde med tilhørende kart."))
+val DATASET_DESCRIPTION = LocalizedStrings(nb = "Datasettet avgrenser område for virkeområdet til lov 6. juni 2009 nr. 35 om naturområder i Oslo og nærliggende kommuner (markaloven) som trådte i kraft 1. september 2009. Markalovens virkeområde er fastsatt i forskrift 4. september 2015 nr. 1032 om justering av markagrensen fastlegger markalovens geografiske virkeområde med tilhørende kart.")
 
-val PUBLISHER = Publisher(
-    id="987654321",
-    name="TESTETATEN",
-    uri="http://data.brreg.no/enhetsregisteret/enhet/987654321"
+val KEYWORDS = LocalizedStringLists(
+    nb = listOf("Bestemmelse", "jord", "regulering", "statlig bestemmelse")
 )
 
-val KEYWORD = listOf(
-        mapOf(Pair("nb", "Bestemmelse")),
-        mapOf(Pair("nb", "jord")),
-        mapOf(Pair("nb", "regulering")),
-        mapOf(Pair("nb", "statlig bestemmelse"))
-    )
-
-val CONCEPT = Concept(
-    definition = Definition(text = mapOf(Pair("no", "alt som er registrert med et organisasjonsnummer "))),
-    prefLabel = mapOf(Pair("no", "enhet")),
-    uri="https://data-david.github.io/Begrep/begrep/Enhet",
-    altLabel = listOf(
-        mapOf(Pair("no", "orgnr")),
-        mapOf(Pair("en", "orgzip"))
-    )
-)
+val CONCEPT = "https://data-david.github.io/Begrep/begrep/Enhet"
 
 val SPATIAL =listOf(
-        SkosCode("http://www.geonames.org/3162656/asker.html", null, mapOf(Pair("nb", "Asker"))),
-        SkosCode("http://www.geonames.org/3162212/baerum.html", null, mapOf(Pair("nb", "Bærum"))),
-        SkosCode("http://www.geonames.org/3151404/hurum.html", null, mapOf(Pair("nb", "Hurum"))),
-        SkosCode("http://www.geonames.org/3141104/royken.html", null, mapOf(Pair("nb", "Røyken")))
-    )
+    "http://www.geonames.org/3162656/asker.html",
+    "http://www.geonames.org/3162212/baerum.html",
+    "http://www.geonames.org/3151404/hurum.html",
+    "http://www.geonames.org/3141104/royken.html"
+)
 
-val THEMES = listOf(
-    DataTheme(
-        uri="http://publications.europa.eu/resource/authority/data-theme/ENVI",
-        code="ENVI",
-        title=mapOf(Pair("nb", "Miljø"))),
-    DataTheme(
-        uri="http://publications.europa.eu/resource/authority/data-theme/GOVE",
-        code="GOVE",
-        title=mapOf(Pair("nb", "Forvaltning og offentlig støtte")))
+val THEMES = setOf(
+    "http://publications.europa.eu/resource/authority/data-theme/ENVI",
+    "http://publications.europa.eu/resource/authority/data-theme/GOVE",
 )
 
 val CONTACTS = listOf(
-    Contact(
+    ContactPoint(
         email="digitalisering@kartverket.no",
-        hasURL="http://testetaten.no/url",
-        hasTelephone="22306022",
-        name=mapOf(Pair("nb","Avdeling for digitalisering"))
+        url="http://testetaten.no/url",
+        phone="22306022",
+        name= LocalizedStrings(nb = "Avdeling for digitalisering")
     ),
-    Contact(
+    ContactPoint(
         email="anonymous@anonym.org.no",
     )
 )
 
-val CONFORMS_TO = SkosConcept(
+val CONFORMS_TO = UriWithLabel(
     uri="https://www.kartverket.no/geodataarbeid/standarder/sosi/",
-    prefLabel=mapOf(Pair("nb","SOSI")),
-    extraType=DCTerms.Standard.uri
+    prefLabel=LocalizedStrings(nb = "SOSI")
 )
 
-val SAMPLE_DESCRIPTION = DataDistributionService(
-    publisher=(PUBLISHER),
-    uri="http://www.hjem.no/",
-    title=mapOf(Pair("nb", "Eksempel-API")),
-    description=mapOf(Pair("nb", "Dette er eksempel på et API som er referert fra en distribusjon")),
-    endpointDescription = listOf(SkosConcept("http://lenke/til/en/api-beskrivelse", mapOf(Pair("nb","Oppføring i API-katalog")), FOAF.Document.uri))
-)
-
-val DISTRIBUTION = Distribution(
-    uri= "$DATASET_URI/distributions/d1",
+val DISTRIBUTION = DistributionDBO(
     accessURL= listOf("http://www.detteerenlenke.no/til-nedlasting",
         "http://www.detteerenannenlenke.no/til-en-annen-nedlasting",
         "http://www.detteerentredjelenke.no/til-en-tredje-nedlasting"),
-    description=(mapOf(Pair("nb", "Dette er beskrivelsen av distribusjonen. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Vestibulum id ligula porta felis euismod semper con desbit arum. Se dokumentasjon for denne distribusjonen."))),
+    description=LocalizedStrings(nb = "Dette er beskrivelsen av distribusjonen. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Vestibulum id ligula porta felis euismod semper con desbit arum. Se dokumentasjon for denne distribusjonen."),
     conformsTo= listOf(CONFORMS_TO),
-    license=SkosConcept("https://data.norge.no/nlod/no/2.0", mapOf(Pair("nb", "NODL")), extraType = DCTerms.LicenseDocument.uri),
-    page= listOf(SkosConcept("http://lenke/til/mer/info",  mapOf(Pair("nb", "Dokumentasjon av distribusjonen")), extraType =  FOAF.Document.uri)),
+    license="https://data.norge.no/nlod/no/2.0",
+    page= listOf("http://lenke/til/mer/info"),
     format=listOf("http://publications.europa.eu/resource/authority/file-type/JSON"),
     mediaType=listOf("https://www.iana.org/assignments/media-types/application/json"),
-    accessService=listOf(SAMPLE_DESCRIPTION),
-    accessServiceUris = setOf("http://www.hjem2.no/")
+    accessServices = setOf("http://www.hjem.no/", "http://www.hjem2.no/")
 )
 
-val SAMPLE = Distribution(
-    uri = "$DATASET_URI/samples/d2",
-    description = mapOf(Pair("nb", "Dette er beskrivelsen av eksempeldataene. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.")),
+val SAMPLE = DistributionDBO(
+    description = LocalizedStrings(nb = "Dette er beskrivelsen av eksempeldataene. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor."),
     format =  listOf("http://publications.europa.eu/resource/authority/file-type/RDF"),
     mediaType =  listOf("https://www.iana.org/assignments/media-types/application/rdf+xml"),
     accessURL =  listOf("http://www.detteerenlenke.no/til-nedlasting", "www.dette.kan.også/hende")
 )
 
-val TEST_DATASET_1 = Dataset(
-    registrationStatus = REGISTRATION_STATUS.PUBLISH,
+val TEST_DATASET_1 = DatasetDBO(
+    published = true,
+    approved = true,
     catalogId = CATALOG_ID,
     id = DATASET_ID,
     uri = DATASET_URI,
+    lastModified= LocalDateTime.of(2016, 9, 21, 0, 0, 0),
     title = DATASET_TITLE,
     description = DATASET_DESCRIPTION,
-    keyword = KEYWORD,
+    keywords = KEYWORDS,
     type="Kodeliste",
-    accessRights = SkosCode(
-        uri="http://publications.europa.eu/resource/authority/access-right/RESTRICTED",
-        code="RESTRICTED",
-        prefLabel=mapOf(Pair("nb", "Begrenset"))
-    ),
-    publisher = PUBLISHER,
-    informationModel = listOf(SkosConcept(uri="",prefLabel=mapOf(Pair("nb","SKOS")),extraType = null)),
+    accessRight = "http://publications.europa.eu/resource/authority/access-right/RESTRICTED",
+    informationModelsFromOtherSources = listOf(UriWithLabel(uri="",prefLabel=LocalizedStrings(nb = "SKOS"))),
     informationModelsFromFDK = listOf(
         "https://raw.githubusercontent.com/Informasjonsforvaltning/model-publisher/master/src/model/catalog-of-models-for-specifications.ttl#dqv-ap-no-model",
         "https://raw.githubusercontent.com/Informasjonsforvaltning/fdk-testdata/master/testdata/SkatvalModellkatalog.ttl#AdresseModell"),
-    temporal = listOf(PeriodOfTime(startDate = LocalDate.of(2017,1,1),endDate = LocalDate.of(2017,12,31)), PeriodOfTime(endDate=LocalDate.of(2018,10,20))),
-    concepts = listOf(CONCEPT),
-    accrualPeriodicity=SkosCode(uri="http://publications.europa.eu/resource/authority/frequency/ANNUAL", code="ANNUAL", prefLabel=mapOf(Pair("nb", "årlig"))),
+    temporal = listOf(PeriodOfTimeDBO(startDate = LocalDate.of(2017,1,1),endDate = LocalDate.of(2017,12,31)), PeriodOfTimeDBO(endDate=LocalDate.of(2018,10,20))),
+    concepts = setOf(CONCEPT),
+    frequency="http://publications.europa.eu/resource/authority/frequency/ANNUAL",
     issued=LocalDate.of(2012, 1, 1),
     modified=LocalDate.of(2016, 9, 21),
-    provenance=SkosCode(uri="http://data.brreg.no/datakatalog/provenance/vedtak", code="vedtak", prefLabel = mapOf(Pair("nb", "Vedtak"))),
+    provenance="http://data.brreg.no/datakatalog/provenance/vedtak",
     spatial=SPATIAL,
-    contactPoint = CONTACTS,
+    contactPoints = CONTACTS,
     conformsTo = listOf(CONFORMS_TO),
-    hasCurrentnessAnnotation=(QualityAnnotation(hasBody = mapOf(Pair("nb", "Denne teksten sier noe om aktualiteten. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras mattis consectetur purus sit amet fermentum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.")))),
-    hasRelevanceAnnotation=(QualityAnnotation(hasBody = mapOf(Pair("nb", "Denne teksten sier noe om relevansen. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras mattis consectetur purus sit amet fermentum. Cum sociis natoque penatibus et magnis dis parturient montes.")))),
-    hasCompletenessAnnotation=(QualityAnnotation(hasBody = mapOf(Pair("nb", "Denne teksten sier noe om komplettheten. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras mattis consectetur purus sit amet fermentum.")))),
-    hasAccuracyAnnotation=(QualityAnnotation(hasBody = mapOf(Pair("nb", "Denne teksten sier noe om nøyaktigheten. Cras mattis consectetur purus sit.")))),
-    hasAvailabilityAnnotation=(QualityAnnotation(hasBody = mapOf(Pair("nb", "Denne teksten sier noe om tilgjengeligheten. Vestibulum id ligula porta felis euismod semper. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras mattis consectetur purus sit amet fermentum.")))),
+    currentness=(QualityAnnotationDBO(hasBody = LocalizedStrings(nb = "Denne teksten sier noe om aktualiteten. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras mattis consectetur purus sit amet fermentum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus."))),
+    relevance=(QualityAnnotationDBO(hasBody = LocalizedStrings(nb = "Denne teksten sier noe om relevansen. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras mattis consectetur purus sit amet fermentum. Cum sociis natoque penatibus et magnis dis parturient montes."))),
+    completeness=(QualityAnnotationDBO(hasBody = LocalizedStrings(nb = "Denne teksten sier noe om komplettheten. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras mattis consectetur purus sit amet fermentum."))),
+    accuracy=(QualityAnnotationDBO(hasBody = LocalizedStrings(nb = "Denne teksten sier noe om nøyaktigheten. Cras mattis consectetur purus sit."))),
+    availability=(QualityAnnotationDBO(hasBody = LocalizedStrings(nb = "Denne teksten sier noe om tilgjengeligheten. Vestibulum id ligula porta felis euismod semper. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras mattis consectetur purus sit amet fermentum."))),
     language=listOf(
-        SkosCode("http://publications.europa.eu/resource/authority/language/NOR", "NOR", mapOf(Pair("nb", "Norsk"))),
-        SkosCode("http://publications.europa.eu/resource/authority/language/ENG", "ENG", mapOf(Pair("nb", "Engelsk")))),
+        "http://publications.europa.eu/resource/authority/language/NOR",
+        "http://publications.europa.eu/resource/authority/language/ENG"
+    ),
     landingPage=listOf("http://testetaten.no/landingsside/nr1", "www.this.can.happen/also"),
-    theme= THEMES,
+    euDataTheme = THEMES,
     losTheme = setOf("https://psi.norge.no/los/tema/lov-og-rett"),
-    references= listOf(Reference(SkosCode(DCTerms.references.uri, "references", mapOf(Pair("nb", "Referanse"))), SkosConcept("http://mycatalog/${CATALOG_ID}/datasets/1", prefLabel = mapOf(Pair("nb", "Referanse datasett"))))),
-    relations=listOf(
-            SkosConcept("http://uri-1", mapOf(Pair("nb", "label-1-nb"),Pair("en", "label-1-en"))),
-            SkosConcept("http://uri-2", mapOf(Pair("nb", "label-2-nb"),Pair("en", "label-2-en")))
+    references= listOf(ReferenceDBO("references", "http://mycatalog/${CATALOG_ID}/datasets/1")),
+    relatedResources =listOf(
+        UriWithLabel("http://uri-1", LocalizedStrings(nb = "label-1-nb", en = "label-1-en")),
+        UriWithLabel("http://uri-2", LocalizedStrings(nb = "label-2-nb", en = "label-2-en"))
     ),
-    identifier=listOf("42"),
-    page=listOf("http://uri1"),
-    admsIdentifier=listOf("http://adms.identifier.no/scheme/42"),
     legalBasisForRestriction= listOf(
-        SkosConcept("https://lovdata.no/dokument/NL/lov/1992-12-04-126", mapOf(Pair("nb","Lov om arkiv [arkivlova]"))),
-        SkosConcept("http://lovdata/paragraph/20", mapOf(Pair("nb","Den spesifikke loven § 20"))),
-        SkosConcept(prefLabel = mapOf(Pair("nb","Den mindre spesifikke loven, som ikke har tilhørende uri")))
+        UriWithLabel("https://lovdata.no/dokument/NL/lov/1992-12-04-126", LocalizedStrings(nb = "Lov om arkiv [arkivlova]")),
+        UriWithLabel("http://lovdata/paragraph/20", LocalizedStrings(nb = "Den spesifikke loven § 20")),
+        UriWithLabel(prefLabel = LocalizedStrings(nb = "Den mindre spesifikke loven, som ikke har tilhørende uri"))
     ),
-    legalBasisForProcessing= listOf(SkosConcept("http://lovdata/paragraph/2", mapOf(Pair("nb","Den andre loven med lenger tittel § 2")))),
-    legalBasisForAccess= listOf(SkosConcept("http://lovdata/paragraph/10", mapOf(Pair("nb","Den siste loven med den lengste tittelen § 10")))),
+    legalBasisForProcessing= listOf(UriWithLabel("http://lovdata/paragraph/2", LocalizedStrings(nb = "Den andre loven med lenger tittel § 2"))),
+    legalBasisForAccess= listOf(UriWithLabel("http://lovdata/paragraph/10", LocalizedStrings(nb = "Den siste loven med den lengste tittelen § 10"))),
     distribution=listOf(DISTRIBUTION),
     sample = listOf(SAMPLE)
 )

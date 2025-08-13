@@ -2,7 +2,6 @@ package no.fdk.dataset_catalog.contract
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import no.fdk.dataset_catalog.extensions.datasetToDBO
 import no.fdk.dataset_catalog.model.CatalogCount
 import no.fdk.dataset_catalog.model.DatasetDBO
 import no.fdk.dataset_catalog.model.JsonPatchOperation
@@ -241,7 +240,7 @@ class InternalCatalogContractTest : ApiTestContext() {
             )
             assertEquals(HttpStatus.OK.value(), preUpdate["status"])
             val bodyPreUpdate: DatasetDBO = mapper.readValue(preUpdate["body"] as String)
-            assertEquals(DB_DATASET_1.datasetToDBO(), bodyPreUpdate)
+            assertEquals(DB_DATASET_1, bodyPreUpdate)
 
             val patchBody =
                 mapper.writeValueAsString(listOf(JsonPatchOperation(op = OpEnum.ADD, path = "/type", "test")))
@@ -262,7 +261,7 @@ class InternalCatalogContractTest : ApiTestContext() {
             )
             assertEquals(HttpStatus.OK.value(), postUpdate["status"])
             val bodyPostUpdate: DatasetDBO = mapper.readValue(postUpdate["body"] as String)
-            assertEquals(DB_DATASET_1.datasetToDBO().copy(lastModified = bodyPostUpdate.lastModified, type = "test"), bodyPostUpdate)
+            assertEquals(DB_DATASET_1.copy(lastModified = bodyPostUpdate.lastModified, type = "test"), bodyPostUpdate)
         }
 
         @Test
@@ -289,7 +288,7 @@ class InternalCatalogContractTest : ApiTestContext() {
             val bodyPostUpdate: DatasetDBO = mapper.readValue(postUpdate["body"] as String)
 
             assertEquals(
-                DB_DATASET_1.datasetToDBO().copy(
+                DB_DATASET_1.copy(
                     lastModified = bodyPostUpdate.lastModified,
                     type = "test",
                 ), bodyPostUpdate

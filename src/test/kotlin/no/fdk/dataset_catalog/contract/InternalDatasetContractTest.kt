@@ -2,7 +2,6 @@ package no.fdk.dataset_catalog.contract
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import no.fdk.dataset_catalog.extensions.datasetToDBO
 import no.fdk.dataset_catalog.model.DatasetDBO
 import no.fdk.dataset_catalog.utils.ApiTestContext
 import no.fdk.dataset_catalog.utils.DATASET_1
@@ -85,8 +84,8 @@ class InternalDatasetContractTest : ApiTestContext() {
             val resultRead: DatasetDBO = mapper.readValue(responseRead["body"] as String)
             val resultWrite: DatasetDBO = mapper.readValue(responseWrite["body"] as String)
 
-            assertEquals(DB_DATASET_1.datasetToDBO(), resultRead)
-            assertEquals(DB_DATASET_1.datasetToDBO(), resultWrite)
+            assertEquals(DB_DATASET_1, resultRead)
+            assertEquals(DB_DATASET_1, resultWrite)
         }
 
         @Test
@@ -152,7 +151,7 @@ class InternalDatasetContractTest : ApiTestContext() {
         fun `Able to get after create`() {
             val responseCreate = apiAuthorizedRequest(
                 "/internal/catalogs/$DB_CATALOG_ID_1/datasets",
-                mapper.writeValueAsString(DATASET_1.datasetToDBO()),
+                mapper.writeValueAsString(DATASET_1),
                 JwtToken(Access.ORG_WRITE).toString(),
                 "POST"
             )
@@ -171,7 +170,7 @@ class InternalDatasetContractTest : ApiTestContext() {
             val resultGet: DatasetDBO = mapper.readValue(responseGet["body"] as String)
 
             assertEquals(
-                expected = DATASET_1.datasetToDBO().copy(
+                expected = DATASET_1.copy(
                     id = resultGet.id,
                     lastModified = resultGet.lastModified,
                     uri = resultGet.uri,
@@ -186,7 +185,7 @@ class InternalDatasetContractTest : ApiTestContext() {
         fun `All fields are persisted`() {
             val responseCreate = apiAuthorizedRequest(
                 "/internal/catalogs/$DB_CATALOG_ID_1/datasets",
-                mapper.writeValueAsString(DATASET_2.datasetToDBO()),
+                mapper.writeValueAsString(DATASET_2),
                 JwtToken(Access.ORG_WRITE).toString(),
                 "POST"
             )
@@ -204,7 +203,7 @@ class InternalDatasetContractTest : ApiTestContext() {
             val resultGet: DatasetDBO = mapper.readValue(responseGet["body"] as String)
 
             assertEquals(
-                expected = DATASET_2.datasetToDBO().copy(
+                expected = DATASET_2.copy(
                     id = resultGet.id,
                     lastModified = resultGet.lastModified,
                     uri = resultGet.uri,

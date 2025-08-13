@@ -3,7 +3,6 @@ package no.fdk.dataset_catalog.utils
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import no.fdk.dataset_catalog.model.CatalogCount
-import no.fdk.dataset_catalog.model.Organization
 import no.fdk.dataset_catalog.utils.jwk.JwkStore
 
 private val mockserver = WireMockServer(LOCAL_SERVER_PORT)
@@ -23,14 +22,6 @@ fun startMockServer() {
                             datasetCount = 1,
                         )
                     ).toString()
-                ).withStatus(200))
-        )
-        mockserver.stubFor(get(urlEqualTo("/organizations"))
-            .willReturn(aResponse()
-                .withBody(
-                    Organization(
-                        organizationId = "123456789",
-                        name = "Test Org", ).toString()
                 ).withStatus(200))
         )
         mockserver.stubFor(get(urlEqualTo("/auth/realms/fdk/protocol/openid-connect/certs"))

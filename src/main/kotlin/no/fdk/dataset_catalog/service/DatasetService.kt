@@ -7,11 +7,8 @@ import jakarta.json.Json
 import jakarta.json.JsonException
 import no.fdk.dataset_catalog.configuration.ApplicationProperties
 import no.fdk.dataset_catalog.extensions.addCreateValues
-import no.fdk.dataset_catalog.extensions.datasetToDBO
-import no.fdk.dataset_catalog.extensions.toDataset
 import no.fdk.dataset_catalog.model.*
 import no.fdk.dataset_catalog.repository.DatasetRepository
-import no.fdk.dataset_catalog.utils.isValidURI
 import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
@@ -39,18 +36,6 @@ class DatasetService(
         return datasetUriPattern as Regex
     }
 
-    fun getAll(catalogId: String, specializedTypeString: String? = null): List<Dataset> {
-        val specializedType = specializedTypeFromString(specializedTypeString)
-        val datasetList = if (specializedType == null) datasetRepository.findByCatalogId(catalogId)
-        else datasetRepository.findByCatalogIdAndSpecializedType(catalogId, specializedType)
-
-        return datasetList.map { dbo ->
-            dbo.toDataset()
-                .addOldAccessUrisToNewField()
-                .addOldThemesToNewFields()
-        }
-    }
-
     fun getAllDatasets(catalogId: String, specializedTypeString: String? = null): List<DatasetDBO> {
         val specializedType = specializedTypeFromString(specializedTypeString)
         return if (specializedType == null) {
@@ -60,89 +45,13 @@ class DatasetService(
         }
     }
 
-    // Temporary function, remove when refactoring accessService in distribution
-    private fun Distribution.addOldAccessUrisToNewField(): Distribution {
-        val updatedAccessServiceUris: MutableSet<String> =
-            accessServiceUris?.toMutableSet()
-                ?: mutableSetOf()
-        accessService?.mapNotNull { it.uri }
-            ?.filter { it.isValidURI() }
-            ?.forEach { updatedAccessServiceUris.add(it) }
-        return if (updatedAccessServiceUris.isEmpty()) this
-        else copy(accessServiceUris = updatedAccessServiceUris)
-    }
-
-    private fun Dataset.addOldAccessUrisToNewField(): Dataset {
-        return copy(
-            distribution = distribution?.map {
-                it.addOldAccessUrisToNewField()
-            }
-        )
-    }
-
-    // Temporary function, remove when refactoring themes
-    private fun Dataset.addOldThemesToNewFields(): Dataset {
-        val validUris = theme
-            ?.mapNotNull { it.uri }
-            ?.filter { it.isValidURI() }
-            ?.toList()
-            ?: emptyList()
-
-        val euDataThemes = validUris
-            .filter { it.startsWith("http://publications.europa.eu/resource/authority/data-theme") }
-            .toSet() + (euDataTheme ?: emptySet())
-
-        val losThemes = validUris
-            .filter { it.startsWith("https://psi.norge.no/los") }
-            .toSet() + (losTheme ?: emptySet())
-
-        return copy(
-            euDataTheme = euDataThemes.ifEmpty { null },
-            losTheme = losThemes.ifEmpty { null }
-        )
-    }
-
-    fun getByID(catalogId: String, id: String): Dataset? {
-        val dataset = datasetRepository.findByIdOrNull(id)
-            ?.toDataset()
-            ?.addOldAccessUrisToNewField()?.addOldThemesToNewFields()
-        return if (dataset?.catalogId != catalogId) null else dataset
-    }
-
     fun getDatasetByID(catalogId: String, id: String): DatasetDBO? {
         val dataset = datasetRepository.findByIdOrNull(id)
         return if (dataset?.catalogId != catalogId) null else dataset
     }
 
-
-    private fun getByID(id: String): Dataset? {
-        return datasetRepository.findByIdOrNull(id)
-            ?.toDataset()
-            ?.addOldAccessUrisToNewField()?.addOldThemesToNewFields()
-    }
-
-    fun getListByIDs(catalogId: String, ids: List<String>) =
-        datasetRepository.findAllById(ids).filter { it.catalogId == catalogId }
-            .map { it.toDataset().addOldAccessUrisToNewField().addOldThemesToNewFields() }
-
     fun getDatasetListByIDs(catalogId: String, ids: List<String>) =
         datasetRepository.findAllById(ids).filter { it.catalogId == catalogId }
-
-    fun create(catalogId: String, dataset: Dataset): Dataset? {
-        val datasetId = dataset.id ?: UUID.randomUUID().toString()
-
-        dataset.copy(
-            id = datasetId,
-            catalogId = catalogId,
-            lastModified = LocalDateTime.now(),
-            uri = "${applicationProperties.catalogUriHost}/$catalogId/datasets/$datasetId",
-            registrationStatus = dataset.registrationStatus ?: REGISTRATION_STATUS.DRAFT,
-        )
-            .allAffectedSeriesDatasets(null)
-            .let { persistAndHarvest(it, catalogId) }
-
-        return getByID(catalogId, datasetId)
-    }
 
     fun createDataset(catalogId: String, values: DatasetToCreate): String {
         val datasetId = UUID.randomUUID().toString()
@@ -163,22 +72,6 @@ class DatasetService(
         return datasetId
     }
 
-    fun updateDataset(catalogId: String, id: String, operations: List<JsonPatchOperation>): Dataset? {
-        val dataset = getByID(catalogId, id)
-
-        dataset?.update(operations)
-            ?.copy(
-                id = id,
-                catalogId = catalogId,
-                specializedType = dataset.specializedType,
-                lastModified = LocalDateTime.now()
-            )
-            ?.allAffectedSeriesDatasets(dataset)
-            ?.let { persistAndHarvest(it, catalogId) }
-
-        return getByID(catalogId, id)
-    }
-
     fun updateDatasetDBO(catalogId: String, id: String, operations: List<JsonPatchOperation>): DatasetDBO? {
         val dataset = getDatasetByID(catalogId, id)
 
@@ -196,48 +89,27 @@ class DatasetService(
     }
 
     fun delete(catalogId: String, id: String) {
-        getByID(catalogId, id)
-            ?.also { datasetRepository.delete(it.datasetToDBO()) }
+        getDatasetByID(catalogId, id)
+            ?.also { datasetRepository.delete(it) }
             ?.removeDeletedDatasetFromSeriesFields()
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
     }
 
-    private fun Dataset.removeDeletedDatasetFromSeriesFields() {
-        if (id != null) {
-            inSeries?.let { datasetRepository.findByIdOrNull(it) }
-                ?.let { it.copy(seriesDatasetOrder = it.seriesDatasetOrder?.minus(id)) }
-                ?.let { datasetRepository.save(it) }
+    private fun DatasetDBO.removeDeletedDatasetFromSeriesFields() {
+        inSeries?.let { datasetRepository.findByIdOrNull(it) }
+            ?.let { it.copy(seriesDatasetOrder = it.seriesDatasetOrder?.minus(id)) }
+            ?.let { datasetRepository.save(it) }
 
-            seriesDatasetOrder?.let { datasetRepository.findAllById(it.keys) }
-                ?.map { it.copy(inSeries = null) }
-                ?.let { datasetRepository.saveAll(it) }
-        }
+        seriesDatasetOrder?.let { datasetRepository.findAllById(it.keys) }
+            ?.map { it.copy(inSeries = null) }
+            ?.let { datasetRepository.saveAll(it) }
     }
-
-    fun resolveReferences(ds: Dataset): List<Reference>? =
-        ds.references?.map {
-            val originalUri: String? = if (isDatasetReference(it)) {
-                it.source?.uri?.let { uri ->
-                    getByID(uri.substring(uri.lastIndexOf("/") + 1))
-                        ?.originalUri
-                }
-            } else null
-
-            if (originalUri != null) {
-                Reference(
-                    referenceType = it.referenceType,
-                    source = SkosConcept(originalUri, it.source?.prefLabel, it.source?.extraType)
-                )
-            } else {
-                it
-            }
-        }
 
     fun resolveDatasetReferences(ds: DatasetDBO): List<ReferenceDBO>? =
         ds.references?.map { ref ->
-            val originalUri: String? = if (ref?.source?.let { getDatasetUriPattern().containsMatchIn(it) } == true) {
+            val originalUri: String? = if (ref.source?.let { getDatasetUriPattern().containsMatchIn(it) } == true) {
                 ref.source.substringAfterLast("/").let { id ->
-                    getByID(id)?.originalUri
+                    datasetRepository.findByIdOrNull(id)?.originalUri
                 }
             } else {
                 null
@@ -254,16 +126,10 @@ class DatasetService(
         }
 
     private fun DatasetDBO.allAffectedSeriesDatasets(dbDataset: DatasetDBO?): List<DatasetDBO> =
-        toDataset()
-            .allAffectedSeriesDatasets(dbDataset?.toDataset())
-            .map { it.datasetToDBO() }
-
-    private fun Dataset.allAffectedSeriesDatasets(dbDataset: Dataset?): List<Dataset> =
-        if (id == null) listOf(this)
-        else {
+        run {
             val addedInSeries = inSeries
                 ?.takeIf { it != dbDataset?.inSeries }
-                ?.let { datasetRepository.findByIdOrNull(it)?.toDataset() }
+                ?.let { datasetRepository.findByIdOrNull(it) }
                 ?.let {
                     val updatedSeriesOrder = if (it.seriesDatasetOrder.isNullOrEmpty()) {
                         mapOf(Pair(id, 0))
@@ -277,14 +143,14 @@ class DatasetService(
             val removedInSeries = dbDataset?.inSeries
                 ?.takeIf { it != inSeries }
                 ?.let { datasetRepository.findByIdOrNull(it) }
-                ?.let { it.toDataset().copy(seriesDatasetOrder = it.seriesDatasetOrder?.minus(id)) }
+                ?.let { it.copy(seriesDatasetOrder = it.seriesDatasetOrder?.minus(id)) }
                 ?.let { listOf(it) } ?: emptyList()
 
             val addedToOrder = if (specializedType == SpecializedType.SERIES) {
                 seriesDatasetOrder?.keys
                     ?.filter { it !in (dbDataset?.seriesDatasetOrder?.keys ?: emptyList()) }
                     ?.let { datasetRepository.findAllById(it) }
-                    ?.map { it.toDataset().copy(inSeries = id) }
+                    ?.map { it.copy(inSeries = id) }
                     ?: emptyList()
             } else emptyList()
 
@@ -292,18 +158,12 @@ class DatasetService(
                 dbDataset?.seriesDatasetOrder?.keys
                     ?.filter { it !in (seriesDatasetOrder?.keys ?: emptyList()) }
                     ?.let { datasetRepository.findAllById(it) }
-                    ?.map { it.toDataset().copy(inSeries = null) }
+                    ?.map { it.copy(inSeries = null) }
                     ?: emptyList()
             } else emptyList()
 
             listOf(listOf(this), addedInSeries, removedInSeries, addedToOrder, removedFromOrder).flatten()
         }
-
-    private fun isDatasetReference(ref: Reference?): Boolean =
-        ref?.source?.uri?.let { getDatasetUriPattern().containsMatchIn(it) } ?: false
-
-    private fun persistAndHarvest(datasets: List<Dataset>, catalogId: String) =
-        persistAndHarvestDatasets(datasets.map { it.datasetToDBO() }, catalogId)
 
     private fun persistAndHarvestDatasets(datasets: List<DatasetDBO>, catalogId: String) {
         val isFirstPublished = isFirstPublishedDatasetForCatalog(datasets, catalogId)
@@ -336,22 +196,6 @@ class DatasetService(
             else -> true
         }
 
-    private fun Dataset.update(operations: List<JsonPatchOperation>): Dataset {
-        validateOperations(operations)
-        return try {
-            patchDataset(this, operations)
-        } catch (ex: Exception) {
-            logger.error("PATCH failed for $id", ex)
-            when (ex) {
-                is JsonException -> throw ResponseStatusException(HttpStatus.BAD_REQUEST, ex.message)
-                is JsonProcessingException -> throw ResponseStatusException(HttpStatus.BAD_REQUEST, ex.message)
-                is IllegalArgumentException -> throw ResponseStatusException(HttpStatus.BAD_REQUEST, ex.message)
-                is java.lang.ClassCastException -> throw ResponseStatusException(HttpStatus.BAD_REQUEST, ex.message)
-                else -> throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.message)
-            }
-        }
-    }
-
     private fun DatasetDBO.update(operations: List<JsonPatchOperation>): DatasetDBO {
         validateOperations(operations)
         return try {
@@ -366,19 +210,6 @@ class DatasetService(
                 else -> throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.message)
             }
         }
-    }
-
-    private fun patchDataset(dataset: Dataset, operations: List<JsonPatchOperation>): Dataset {
-        if (operations.isNotEmpty()) {
-            with(mapper) {
-                val changes = Json.createReader(StringReader(writeValueAsString(operations))).readArray()
-                val original = Json.createReader(StringReader(writeValueAsString(dataset))).readObject()
-
-                return Json.createPatch(changes).apply(original)
-                    .let { readValue(it.toString()) }
-            }
-        }
-        return dataset
     }
 
     private fun patchDatasetDBO(dataset: DatasetDBO, operations: List<JsonPatchOperation>): DatasetDBO {

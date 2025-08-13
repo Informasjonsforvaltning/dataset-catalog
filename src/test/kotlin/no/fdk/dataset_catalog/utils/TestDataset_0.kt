@@ -2,98 +2,91 @@ package no.fdk.dataset_catalog.utils
 
 import no.fdk.dataset_catalog.model.*
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 
-val CONCEPT_EX = Concept(
-    uri = "http://test.uri",
-)
+val CONCEPT_EX = "http://test.uri"
 
-val CONTACT_EX = Contact(
+val CONTACT_EX = ContactPoint(
     email = "test@digdir.no",
-    name = mapOf(Pair("nb","Enhet")),
-    hasURL = "http://www.hjemmeside.no",
-    hasTelephone = "45678912",
+    name = LocalizedStrings(nb = "Enhet"),
+    url = "http://www.hjemmeside.no",
+    phone = "45678912",
 )
 
-val SKOSCODE_EX = SkosCode(
-    uri = "http://test.uri",
-)
+val SKOSCODE_EX = "http://test.uri"
 
-val REFERENCETYPE_EX = SkosCode(
-    uri = "http://purl.org/dc/terms/isReplacedBy",
-    code = "isReplacedBy",
-    prefLabel = mapOf(Pair("en", "isReplacedBy"))
-)
+val REFERENCETYPE_EX = "isReplacedBy"
 
-val DISTRIBUTION_EX = Distribution(
-    title = mapOf(Pair("nb", "Distribusjonsnavn")),
-    description = mapOf(Pair("nb", "Beskrivelse")),
+val DISTRIBUTION_EX = DistributionDBO(
+    title = LocalizedStrings(nb = "Distribusjonsnavn"),
+    description = LocalizedStrings(nb = "Beskrivelse"),
     downloadURL = listOf("www.hjemmeside.no"),
     accessURL = listOf("www.borteside.no"),
-    license = SkosConcept(uri = "https://license.com"),
-    conformsTo = listOf(SkosConcept("http://test.uri")),
+    license = "https://license.com",
+    conformsTo = listOf(UriWithLabel("http://test.uri")),
     format = listOf("Formats"),
     mediaType = listOf("MediaTypes"),
-    accessServiceUris = setOf("http://test.uri"),
-    accessService = listOf(DataDistributionService(uri = "http://test.uri"))
-
+    accessServices = setOf("http://test.uri")
 )
 
-val SAMPLE_EX = Distribution(
-    title = mapOf(Pair("nb", "Distribusjonsnavn")),
-    description = mapOf(Pair("nb", "Beskrivelse")),
+val SAMPLE_EX = DistributionDBO(
+    title = LocalizedStrings(nb = "Distribusjonsnavn"),
+    description = LocalizedStrings(nb = "Beskrivelse"),
     downloadURL = listOf("www.hjemmeside.no"),
     accessURL = listOf("www.borteside.no"),
 )
 
-val PERIODOFTIME_EX = PeriodOfTime(
+val PERIODOFTIME_EX = PeriodOfTimeDBO(
     startDate = LocalDate.now(),
     endDate = LocalDate.now().plusYears(1)
 )
 
-val QUALITYANNOTATION_EX = QualityAnnotation(
-    hasBody = mapOf(Pair("nb", "BodyText"))
+val QUALITYANNOTATION_EX = QualityAnnotationDBO(
+    hasBody = LocalizedStrings(nb = "BodyText")
 )
 
-val REFERENCE_EX = Reference(
+val REFERENCE_EX = ReferenceDBO(
     referenceType = REFERENCETYPE_EX,
-    source = SkosConcept(uri = "http://test.uri")
+    source = "http://test.uri"
 )
 
-val TEST_DATASET_0 = Dataset(
+val TEST_DATASET_0 = DatasetDBO(
     id = UUID.randomUUID().toString(),
     catalogId = UUID.randomUUID().toString(),
-    registrationStatus = REGISTRATION_STATUS.DRAFT,
-    concepts = listOf(CONCEPT_EX),
+    published = false,
+    approved = false,
+    lastModified = LocalDateTime.now(),
+    concepts = setOf(CONCEPT_EX),
     uri = "http://test.uri",
     originalUri = "http://original.uri",
-    title = mapOf(Pair("nb", "Datasett tittel")),
-    description = mapOf(Pair("nb", "Beskrivelse av et datasett")),
-    contactPoint = listOf(CONTACT_EX),
-    keyword = listOf(mapOf(Pair("nb", "Nøkkelord"))),
+    title = LocalizedStrings(nb = "Datasett tittel"),
+    description = LocalizedStrings(nb = "Beskrivelse av et datasett"),
+    contactPoints = listOf(CONTACT_EX),
+    keywords = LocalizedStringLists(nb = listOf("Nøkkelord")),
     issued = LocalDate.now(),
     modified = LocalDate.now(),
-    language = listOf(SkosCode(uri = "http://publications.europa.eu/resource/authority/language/NNO", code = "NNO")),
+    language = listOf("http://publications.europa.eu/resource/authority/language/NNO"),
     landingPage = listOf("www.hjemmeside.no"),
     distribution = listOf(DISTRIBUTION_EX),
     sample = listOf(SAMPLE_EX),
     temporal = listOf(PERIODOFTIME_EX),
     spatial = listOf(SKOSCODE_EX),
-    accessRights = SKOSCODE_EX,
-    legalBasisForRestriction = listOf(SkosConcept(uri = "http://test.uri")),
-    legalBasisForProcessing = listOf(SkosConcept(uri = "http://test.uri")),
-    legalBasisForAccess = listOf(SkosConcept(uri = "http://test.uri")),
-    hasAccuracyAnnotation = QUALITYANNOTATION_EX,
-    hasCompletenessAnnotation = QUALITYANNOTATION_EX,
-    hasCurrentnessAnnotation = QUALITYANNOTATION_EX,
-    hasAvailabilityAnnotation = QUALITYANNOTATION_EX,
-    hasRelevanceAnnotation = QUALITYANNOTATION_EX,
+    accessRight = SKOSCODE_EX,
+    legalBasisForRestriction = listOf(UriWithLabel(uri = "http://test.uri")),
+    legalBasisForProcessing = listOf(UriWithLabel(uri = "http://test.uri")),
+    legalBasisForAccess = listOf(UriWithLabel(uri = "http://test.uri")),
+    accuracy = QUALITYANNOTATION_EX,
+    completeness = QUALITYANNOTATION_EX,
+    currentness = QUALITYANNOTATION_EX,
+    availability = QUALITYANNOTATION_EX,
+    relevance = QUALITYANNOTATION_EX,
     references = listOf(REFERENCE_EX),
-    relations = listOf(SkosConcept(uri = "http://test.uri")),
+    relatedResources = listOf(UriWithLabel(uri = "http://test.uri")),
     provenance = SKOSCODE_EX,
-    accrualPeriodicity = SKOSCODE_EX,
-    conformsTo = listOf(SkosConcept(uri = "http://test.uri")),
-    informationModel = listOf(SkosConcept(uri = "http://test.uri")),
+    frequency = SKOSCODE_EX,
+    conformsTo = listOf(UriWithLabel(uri = "http://test.uri")),
+    informationModelsFromOtherSources = listOf(UriWithLabel(uri = "http://test.uri")),
     qualifiedAttributions = setOf("910244132"),
     type = "type",
 )
