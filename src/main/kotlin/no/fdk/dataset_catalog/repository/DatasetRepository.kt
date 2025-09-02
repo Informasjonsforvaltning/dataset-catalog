@@ -19,7 +19,7 @@ const val matchDescription =
         "\$or : [{'description.nb' : { \$regex: /\\b?1/, \$options: 'i' }}, {'description.nn' : { \$regex: /\\b?1/ , \$options: 'i'}}, {'description.en' : { \$regex: /\\b?1/, \$options: 'i' }}]" +
     "}"
 @Repository
-interface DatasetRepository : MongoRepository<DatasetDBO, String?> {
+interface DatasetRepository : MongoRepository<DatasetDBO, String> {
     fun findByCatalogId(catalogId: String) : Collection<DatasetDBO>
     fun findByCatalogIdAndSpecializedType(catalogId: String, specializedType: SpecializedType) : Collection<DatasetDBO>
 
