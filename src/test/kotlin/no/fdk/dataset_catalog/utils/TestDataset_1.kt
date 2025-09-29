@@ -36,7 +36,7 @@ val CONTACTS = listOf(
     ContactPoint(
         email="digitalisering@kartverket.no",
         url="http://testetaten.no/url",
-        phone="22306022",
+        phone="22 30 60 22",
         name= LocalizedStrings(nb = "Avdeling for digitalisering")
     ),
     ContactPoint(
