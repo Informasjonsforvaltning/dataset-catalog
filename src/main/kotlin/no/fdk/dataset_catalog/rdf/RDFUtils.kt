@@ -104,7 +104,7 @@ fun Resource.addContactPoints(contactPoints: List<ContactPoint>?): Resource {
                 .safeAddLocalizedString(VCARD4.fn, it.name)
                 .safeAddURLs(VCARD4.hasURL, listOf(it.url))
                 .safeAddLinkedProperty(VCARD4.hasEmail, it.email?.addContactStringPrefix("mailto:"))
-                .safeAddLinkedProperty(VCARD4.hasTelephone, it.phone?.addContactStringPrefix("tel:"))
+                .safeAddLinkedProperty(VCARD4.hasTelephone, it.phone?.replace(Regex("\\s"), "")?.addContactStringPrefix("tel:"))
         )
     }
     return this
