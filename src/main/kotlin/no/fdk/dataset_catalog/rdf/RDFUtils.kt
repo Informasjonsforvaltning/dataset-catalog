@@ -97,15 +97,15 @@ fun String.addContactStringPrefix(prefix: String): String? =
 
 fun Resource.addContactPoints(contactPoints: List<ContactPoint>?): Resource {
     contactPoints?.forEach {
-        addProperty(
-            DCAT.contactPoint,
-            model.safeCreateResource()
-                .addProperty(RDF.type, VCARD4.Organization)
-                .safeAddLocalizedString(VCARD4.fn, it.name)
-                .safeAddURLs(VCARD4.hasURL, listOf(it.url))
-                .safeAddLinkedProperty(VCARD4.hasEmail, it.email?.addContactStringPrefix("mailto:"))
-                .safeAddLinkedProperty(VCARD4.hasTelephone, it.phone?.replace(Regex("\\s"), "")?.addContactStringPrefix("tel:"))
-        )
+        val resource = model.safeCreateResource()
+            .addProperty(RDF.type, VCARD4.Organization)
+            .safeAddLocalizedString(VCARD4.fn, it.name)
+            .safeAddURLs(VCARD4.hasURL, listOf(it.url))
+            .safeAddLinkedProperty(VCARD4.hasEmail, it.email?.addContactStringPrefix("mailto:"))
+        if (!it.phone.isNullOrBlank()) {
+            resource.addProperty(VCARD4.hasTelephone, model.telephoneResource(it.phone))
+        }
+        addProperty(DCAT.contactPoint, resource)
     }
     return this
 }
@@ -420,6 +420,17 @@ fun Resource.addDatasetType(datasetType: String?): Resource {
 }
 
 // -------- Model Extensions --------
+
+fun Model.telephoneResource(telephone: String): Resource =
+    telephone.trim { it <= ' ' }
+        .filterIndexed { index, c ->
+            when {
+                index == 0 && c == '+' -> true // global-number-digits
+                c in '0'..'9' -> true // digit
+                else -> false // skip visual-separator and other content
+            }
+        }
+        .let { createResource("tel:$it") }
 
 fun Model.createRDFResponse(lang: Lang): String =
     StringWriter().use { out ->
