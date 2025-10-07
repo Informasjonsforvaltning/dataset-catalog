@@ -285,7 +285,7 @@ private fun referenceTypeToProperty(referenceTypeString: String?): Property? {
         "hasVersion" -> DCTerms.hasVersion
         "isVersionOf" -> DCTerms.isVersionOf
         "isPartOf" -> DCTerms.isPartOf
-        "hasPart" -> DCTerms.hasVersion
+        "hasPart" -> DCTerms.hasPart
         "isReferencedBy" -> DCTerms.isReferencedBy
         "references" -> DCTerms.references
         "isReplacedBy" -> DCTerms.isReplacedBy

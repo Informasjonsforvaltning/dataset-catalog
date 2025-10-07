@@ -96,6 +96,7 @@
         dct:modified                    "2016-09-21"^^xsd:date ;
         dct:provenance                  <http://data.brreg.no/datakatalog/provenance/vedtak> ;
         dct:references                  <http://referenced/dataset/resolved> ;
+        dct:hasPart                     <http://has-part.no> ;
         dct:relation                    <http://uri-2> , <http://uri-1> ;
         dct:spatial                     <http://www.geonames.org/3162656/asker.html> , <http://www.geonames.org/3141104/royken.html> , <http://www.geonames.org/3162212/baerum.html> , <http://www.geonames.org/3151404/hurum.html> ;
         dct:subject                     <https://data-david.github.io/Begrep/begrep/Enhet> ;
