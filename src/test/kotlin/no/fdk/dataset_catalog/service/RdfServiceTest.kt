@@ -118,6 +118,10 @@ class RdfServiceTest {
                 ReferenceDBO(
                     referenceType = "references",
                     source = "http://referenced/dataset/resolved"
+                ),
+                ReferenceDBO(
+                    referenceType = "hasPart",
+                    source = "http://has-part.no"
                 )
             )
 
