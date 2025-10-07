@@ -6,6 +6,7 @@ import no.fdk.dataset_catalog.utils.isValidURI
 import org.apache.jena.datatypes.xsd.XSDDatatype
 import org.apache.jena.rdf.model.*
 import org.apache.jena.riot.Lang
+import org.apache.jena.sparql.vocabulary.FOAF
 import org.apache.jena.util.URIref
 import org.apache.jena.vocabulary.*
 import org.springframework.http.HttpStatus
@@ -151,6 +152,7 @@ fun Resource.addDatasetDistribution(property: Property, distributions: Collectio
                     .safeAddURLs(DCAT.downloadURL, it.downloadURL)
                     .safeAddURLs(DCTerms.license, listOfNotNull(it.license))
                     .addConformsTo(it.conformsTo)
+                    .safeAddURLs(FOAF.page, it.page)
                     .safeAddURLs(DCTerms.format, it.format)
                     .safeAddURLs(DCAT.mediaType, it.mediaType)
                     .addDistributionServices(it.accessServices)
