@@ -16,7 +16,6 @@
 @prefix eli:  <http://data.europa.eu/eli/ontology#> .
 @prefix cpsv:  <http://purl.org/vocab/cpsv#> .
 @prefix cpsvno:  <https://data.norge.no/vocabulary/cpsvno#> .
-@prefix mobilitydcatap: <https://mobilitydcat-ap.github.io/mobilityDCAT-AP/drafts/latest/index.html#> .
 
 
 <http://localhost:5050/catalogs/987654321>
@@ -137,13 +136,10 @@
                                           dcat:accessService  <http://www.hjem.no/> , <http://www.hjem2.no/> ;
                                           dcat:accessURL         <http://www.detteerentredjelenke.no/til-en-tredje-nedlasting> , <http://www.detteerenannenlenke.no/til-en-annen-nedlasting> , <http://www.detteerenlenke.no/til-nedlasting> ;
                                           dcat:mediaType         <https://www.iana.org/assignments/media-types/application/json> ;
-                                          mobilitydcatap:MobilityDataStandard <https://w3id.org/mobilitydcat-ap/mobility-data-standard/datex-II> ;
-                                          dct:rights             [ a      dct:rights ;
-                                              dct:type              <https://w3id.org/mobilitydcat-ap/conditions-for-access-and-usage>; ]
                                         ];
         dcat:keyword                    "Bestemmelse"@nb , "statlig bestemmelse"@nb , "regulering"@nb , "jord"@nb ;
         dcat:landingPage                <http://testetaten.no/landingsside/nr1> ;
-        dcat:theme                      <http://publications.europa.eu/resource/authority/data-theme/ENVI> , <http://publications.europa.eu/resource/authority/data-theme/GOVE> , <https://psi.norge.no/los/tema/lov-og-rett> , <https://w3id.org/mobilitydcat-ap/mobility-theme/static-traffic-signs-and-regulations>;
+        dcat:theme                      <http://publications.europa.eu/resource/authority/data-theme/ENVI> , <http://publications.europa.eu/resource/authority/data-theme/GOVE> , <https://psi.norge.no/los/tema/lov-og-rett>;
         dqv:hasQualityAnnotation        [ a                dqv:QualityAnnotation ;
                                           dqv:inDimension  <http://iso.org/25012/2008/dataquality/Currentness> ;
                                           oa:hasBody     [ a    oa:TextualBody ;

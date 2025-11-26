@@ -79,11 +79,3 @@ class CPSVNO {
         val ruleForNonDisclosure: Resource = ResourceFactory.createResource("${uri}ruleForNonDisclosure")
     }
 }
-
-class mobilitydcatap {
-    companion object {
-        const val uri = "https://mobilitydcat-ap.github.io/mobilityDCAT-AP/drafts/latest/index.html#"
-
-        val MobilityDataStandard: Property = ResourceFactory.createProperty("${uri}class-mobility-data-standard")
-    }
-}

@@ -156,34 +156,12 @@ fun Resource.addDatasetDistribution(property: Property, distributions: Collectio
                     .safeAddURLs(DCTerms.format, it.format)
                     .safeAddURLs(DCAT.mediaType, it.mediaType)
                     .addDistributionServices(it.accessServices)
-                    .addMobilityDataStandard(mobilitydcatap.MobilityDataStandard, it.mobilityDataStandard)
-                    .addDistributionRights(DCTerms.rights, it.rights)
             )
         }
     }
     return this
 }
 
-fun Resource.addDistributionRights(property: Property, rights: RightsDBO?): Resource {
-    safeAddProperty(
-        property,
-        addType(rights?.type)
-    )
-    return this
-} 
-
-fun Resource.addType(type: String?): Resource {
-  safeAddLinkedProperty(DCTerms.type, type)
-  return this
-}
-
-fun Resource.addMobilityDataStandard(property: Property, mobilityDataStandard: String?): Resource {
-    safeAddLinkedProperty(
-        property,
-        mobilityDataStandard
-    )
-    return this
-}
 
 private fun DistributionDBO.hasNonNullOrEmptyProperty(): Boolean =
     title?.run { listOf(nb, nn, en).any { !it.isNullOrEmpty() } } == true ||
@@ -203,10 +181,6 @@ fun Resource.addDatasetThemes(ds: DatasetDBO): Resource {
 
     ds.euDataTheme?.filter { it.isValidURI() }
         ?.let { uniqueThemes.addAll(it) }
-
-    ds.mobilityTheme?.filter { it.isValidURI() }
-        ?.let { uniqueThemes.addAll(it) }
-    
     safeAddLinkListProperty(DCAT.theme, uniqueThemes.toList())
 
     return this
@@ -283,7 +257,6 @@ fun Resource.addQualityAnnotation(qualityAnnotation: QualityAnnotationDBO?, dime
     }
     return this
 }
-//use qualityAnnotation as example for
 
 fun Resource.addQualityAnnotationBody(body: LocalizedStrings?): Resource {
     body?.nb?.let { nb ->

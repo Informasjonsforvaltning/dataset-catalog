@@ -49,10 +49,6 @@ val CONFORMS_TO = UriWithLabel(
     prefLabel=LocalizedStrings(nb = "SOSI")
 )
 
-val RIGHTS = RightsDBO(
-  type = "https://w3id.org/mobilitydcat-ap/conditions-for-access-and-usage"
-)
-
 val DISTRIBUTION = DistributionDBO(
     accessURL= listOf("http://www.detteerenlenke.no/til-nedlasting",
         "http://www.detteerenannenlenke.no/til-en-annen-nedlasting",
@@ -63,9 +59,7 @@ val DISTRIBUTION = DistributionDBO(
     page= listOf("http://lenke/til/mer/info"),
     format=listOf("http://publications.europa.eu/resource/authority/file-type/JSON"),
     mediaType=listOf("https://www.iana.org/assignments/media-types/application/json"),
-    accessServices = setOf("http://www.hjem.no/", "http://www.hjem2.no/"),
-    mobilityDataStandard = "https://w3id.org/mobilitydcat-ap/mobility-data-standard/datex-II",
-    rights = RIGHTS
+    accessServices = setOf("http://www.hjem.no/", "http://www.hjem2.no/")
 )
 
 val SAMPLE = DistributionDBO(
@@ -112,7 +106,6 @@ val TEST_DATASET_1 = DatasetDBO(
     landingPage=listOf("http://testetaten.no/landingsside/nr1", "www.this.can.happen/also"),
     euDataTheme = THEMES,
     losTheme = setOf("https://psi.norge.no/los/tema/lov-og-rett"),
-    mobilityTheme = setOf("https://w3id.org/mobilitydcat-ap/mobility-theme/static-traffic-signs-and-regulations"),
     references= listOf(ReferenceDBO("references", "http://mycatalog/${CATALOG_ID}/datasets/1")),
     relatedResources =listOf(
         UriWithLabel("http://uri-1", LocalizedStrings(nb = "label-1-nb", en = "label-1-en")),
