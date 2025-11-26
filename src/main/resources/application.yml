@@ -8,7 +8,7 @@ spring:
     port: 27017
     database: datasetCatalog
     auto-index-creation: true
-  security.oauth2.resourceserver.jwt.jwk-set-uri: ${OIDC_JWKS:https://sso.staging.fellesdatakatalog.digdir.no/auth/realms/fdk/protocol/openid-connect/certs}
+  security.oauth2.resourceserver.jwt.jwk-set-uri: ${OIDC_JWKS:https://auth.staging.fellesdatakatalog.digdir.no/realms/fdk/protocol/openid-connect/certs}
   rabbitmq:
     host: ${RABBIT_HOST}
     port: 5672
@@ -44,7 +44,7 @@ application:
   newDataSourceRoute: dataset.publisher.NewDataSource
   exchangeName: harvests
 security:
-  fdkIssuer: ${OIDC_ISSUER:https://sso.staging.fellesdatakatalog.digdir.no/auth/realms/fdk}
+  fdkIssuer: ${OIDC_ISSUER:https://auth.staging.fellesdatakatalog.digdir.no/realms/fdk}
   corsOriginPatterns: "${CORS_ORIGIN_PATTERNS}"
 
 ---
@@ -69,7 +69,7 @@ security.corsOriginPatterns: "*"
 ---
 spring:
   config.activate.on-profile: contract-test
-  security.oauth2.resourceserver.jwt.jwk-set-uri: http://localhost:5050/auth/realms/fdk/protocol/openid-connect/certs
+  security.oauth2.resourceserver.jwt.jwk-set-uri: http://localhost:5050/realms/fdk/protocol/openid-connect/certs
 server.port: 5555
 application:
   fdkBaseHost: http://localhost:5050
@@ -97,8 +97,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: ${SSO_HOST}/auth/realms/fdk
-          jwk-set-uri: ${SSO_HOST}/auth/realms/fdk/protocol/openid-connect/certs
+          issuer-uri: ${SSO_HOST}/realms/fdk
+          jwk-set-uri: ${SSO_HOST}/realms/fdk/protocol/openid-connect/certs
           audiences: dataset-catalog
           authorities-claim-name: authorities
           authority-prefix: ""
