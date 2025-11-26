@@ -8,7 +8,7 @@ spring:
     port: 27017
     database: datasetCatalog
     auto-index-creation: true
-  security.oauth2.resourceserver.jwt.jwk-set-uri: ${OIDC_JWKS:https://keycloak.staging.fellesdatakatalog.digdir.no/realms/fdk/protocol/openid-connect/certs}
+  security.oauth2.resourceserver.jwt.jwk-set-uri: ${OIDC_JWKS:https://auth.staging.fellesdatakatalog.digdir.no/realms/fdk/protocol/openid-connect/certs}
   rabbitmq:
     host: ${RABBIT_HOST}
     port: 5672
@@ -44,7 +44,7 @@ application:
   newDataSourceRoute: dataset.publisher.NewDataSource
   exchangeName: harvests
 security:
-  fdkIssuer: ${OIDC_ISSUER:https://keycloak.staging.fellesdatakatalog.digdir.no/realms/fdk}
+  fdkIssuer: ${OIDC_ISSUER:https://auth.staging.fellesdatakatalog.digdir.no/realms/fdk}
   corsOriginPatterns: "${CORS_ORIGIN_PATTERNS}"
 
 ---
