@@ -31,6 +31,7 @@ data class DatasetDBO(
 
     val originalUri: String? = null,
     val specializedType: SpecializedType? = null,
+    val applicationProfile: ApplicationProfile = ApplicationProfile.DCAT_AP_NO,
     val concepts: Set<String>? = null,
 
     val title: LocalizedStrings? = null,
@@ -52,6 +53,7 @@ data class DatasetDBO(
 
     val euDataTheme: Set<String>? = null,
     val losTheme: Set<String>? = null,
+    val mobilityTheme: Set<String>? = null,
 
     val distribution: List<DistributionDBO>? = null,
     val sample: List<DistributionDBO>? = null,
@@ -92,6 +94,7 @@ data class DatasetToCreate(
     val approved: Boolean = false,
     val originalUri: String? = null,
     val specializedType: SpecializedType? = null,
+    val applicationProfile: ApplicationProfile = ApplicationProfile.DCAT_AP_NO,
     val concepts: Set<String>? = null,
 
     val title: LocalizedStrings? = null,
@@ -113,6 +116,7 @@ data class DatasetToCreate(
 
     val euDataTheme: Set<String>? = null,
     val losTheme: Set<String>? = null,
+    val mobilityTheme: Set<String>? = null,
 
     val distribution: List<DistributionDBO>? = null,
     val sample: List<DistributionDBO>? = null,
@@ -151,6 +155,11 @@ enum class SpecializedType {
     SERIES
 }
 
+enum class ApplicationProfile {
+  DCAT_AP_NO,
+  MOBILITYDCAT_AP,
+}
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class ContactPoint(
@@ -173,6 +182,8 @@ data class DistributionDBO(
     val format: List<String>? = null,
     val mediaType: List<String>? = null,
     var accessServices: Set<String>? = null,
+    val mobilityDataStandard: String? = null,
+    val rights: RightsDBO? = null,
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -227,4 +238,10 @@ data class User(
 data class UriWithLabel(
     val uri: String? = null,
     val prefLabel: LocalizedStrings? = null,
+)
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class RightsDBO(
+    val type: String? = null,
 )
