@@ -231,7 +231,8 @@ class DatasetService(
             "/catalogId",
             "/specializedType",
             "/uri",
-            "/originalUri"
+            "/originalUri",
+            "/applicationProfile"
         )
         if (operations.any { it.path in invalidPaths }) {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Patch of paths $invalidPaths is not permitted")
