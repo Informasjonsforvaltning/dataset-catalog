@@ -312,7 +312,7 @@ class DatasetServiceTest {
                 listOf(JsonPatchOperation(OpEnum.REPLACE, "/published", true))
             )
 
-            verify(publishingService, times(1)).sendNewDataSourceMessage("catId", "http://mycatalog/catId")
+            verify(publishingService, times(1)).createNewDataSource("catId")
         }
 
         @Test
@@ -340,7 +340,7 @@ class DatasetServiceTest {
 
             datasetService.createDataset("catId", DatasetToCreate(approved = true))
 
-            verify(publishingService, times(0)).sendNewDataSourceMessage(any(), any())
+            verify(publishingService, times(0)).createNewDataSource(any())
         }
 
         @Test
@@ -361,7 +361,7 @@ class DatasetServiceTest {
             datasetService.updateDatasetDBO("catId", "dsId", emptyList())
 
             verify(publishingService, times(1)).triggerHarvest("catId")
-            verify(publishingService, times(1)).sendNewDataSourceMessage("catId", "http://mycatalog/catId")
+            verify(publishingService, times(1)).createNewDataSource("catId")
         }
     }
 

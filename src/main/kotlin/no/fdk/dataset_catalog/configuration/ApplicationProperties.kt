@@ -8,6 +8,7 @@ data class ApplicationProperties(
     val organizationCatalogHost: String,
     val catalogUriHost: String,
     val datasetCatalogUriHost: String,
+    val harvestAdminUri: String,
     val harvestDelay: Long,
     val catalogHarvestRoute: String,
     val newDataSourceRoute: String,
