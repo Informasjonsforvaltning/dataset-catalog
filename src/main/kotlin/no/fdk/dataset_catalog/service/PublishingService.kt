@@ -1,72 +1,88 @@
 package no.fdk.dataset_catalog.service
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory
 import no.fdk.dataset_catalog.configuration.ApplicationProperties
 import org.slf4j.LoggerFactory
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpHeaders
+import org.springframework.http.MediaType
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.stereotype.Service
-import org.springframework.amqp.rabbit.core.RabbitTemplate
-import java.time.LocalDateTime
-import java.util.*
-import kotlin.concurrent.schedule
+import org.springframework.web.client.RestTemplate
+import org.springframework.web.client.postForEntity
+import java.net.URI
 
 private val logger = LoggerFactory.getLogger(PublishingService::class.java)
 
 @Service
 class PublishingService(
-    private val rabbitTemplate: RabbitTemplate,
     private val applicationProperties: ApplicationProperties,
+    private val restTemplate: RestTemplate = RestTemplate(),
 ) {
 
-    private val toHarvest = mutableMapOf<String, TimerTask>()
+    fun createNewDataSource(catalogId: String) {
+        val baseUri = applicationProperties.harvestAdminUri
 
-    @Synchronized
+        val url = "$baseUri/organizations/$catalogId/datasources"
+
+        val headers = HttpHeaders().apply {
+            contentType = MediaType.APPLICATION_JSON
+            resolveBearerToken()?.let { set(HttpHeaders.AUTHORIZATION, "Bearer $it") }
+        }
+
+        val body = HarvestAdminDataSource(
+            dataSourceType = "DCAT-AP-NO",
+            dataType = "dataset",
+            url = "${applicationProperties.datasetCatalogUriHost}/$catalogId",
+            acceptHeaderValue = "text/turtle",
+            publisherId = catalogId,
+            description = "Automatically generated data source for $catalogId"
+        )
+
+        runCatching {
+            restTemplate.postForEntity<Any>(URI(url), HttpEntity(body, headers))
+        }.onFailure {
+            logger.error("Error calling Harvest Admin createDataSource for catalog {}", catalogId, it)
+        }
+    }
+
     fun triggerHarvest(catalogId: String) {
-        logger.info("Scheduling harvest for ${LocalDateTime.now().plusSeconds(applicationProperties.harvestDelay/1000)} on catalog $catalogId")
+        val baseUri = applicationProperties.harvestAdminUri
 
-        if (toHarvest.containsKey(catalogId)) {
-            toHarvest[catalogId]?.cancel()
+        val url = "$baseUri/organizations/$catalogId/datasources/start-harvesting"
+
+        val headers = HttpHeaders().apply {
+            contentType = MediaType.APPLICATION_JSON
+            resolveBearerToken()?.let { set(HttpHeaders.AUTHORIZATION, "Bearer $it") }
         }
 
-        toHarvest[catalogId] = Timer(catalogId, false).schedule(applicationProperties.harvestDelay) {
-            sendHarvestMessage(catalogId)
-        }
-    }
+        val body = StartHarvestByUrlRequest(
+            url = "${applicationProperties.datasetCatalogUriHost}/$catalogId",
+            dataType = "dataset",
+        )
 
-    private fun sendHarvestMessage(catalogId: String) {
-        logger.info("Sending harvest message to queue for catalog with ID $catalogId")
-        val payload = JsonNodeFactory.instance.objectNode()
-        payload.put("publisherId", catalogId)
-        try {
-            rabbitTemplate.convertAndSend(applicationProperties.catalogHarvestRoute, payload)
-            logger.info("Successfully sent harvest message for publisher $catalogId")
-            toHarvest.remove(catalogId)
-        } catch (e: Exception) {
-            logger.error("Failed to send harvest message for publisher $catalogId", e)
+        runCatching {
+            restTemplate.postForEntity<Any>(URI(url), HttpEntity(body, headers))
+        }.onFailure {
+            logger.error("Error calling Harvest Admin startHarvestingByUrlAndDataType for catalog {}", catalogId, it)
         }
     }
 
-    fun sendNewDataSourceMessage(publisherId: String?, url: String?): Boolean {
-        logger.info("Adding data source for $publisherId")
-
-        if (!publisherId.isNullOrEmpty() && !url.isNullOrEmpty()) {
-            val payload = JsonNodeFactory.instance.objectNode()
-            payload.put("publisherId", publisherId)
-            payload.put("url", url)
-            payload.put("dataSourceType", "DCAT-AP-NO")
-            payload.put("dataType", "dataset")
-            payload.put("acceptHeaderValue", "text/turtle")
-            payload.put("description", "Automatically generated data source for $publisherId")
-
-            try {
-                rabbitTemplate.convertAndSend(applicationProperties.newDataSourceRoute, payload)
-                logger.info("Successfully sent data source message for $publisherId")
-                return true
-            } catch (e: Exception) {
-                logger.error("Failed to send data source message for $publisherId", e)
-            }
-        } else {
-            logger.warn("New data source message could not be sent for catalog with id $publisherId")
-        }
-        return false
-    }
+    private fun resolveBearerToken(): String? =
+        (SecurityContextHolder.getContext().authentication?.principal as? Jwt)
+            ?.tokenValue
 }
+
+private data class HarvestAdminDataSource(
+    val dataSourceType: String,
+    val dataType: String,
+    val url: String,
+    val acceptHeaderValue: String? = null,
+    val publisherId: String,
+    val description: String? = null,
+)
+
+data class StartHarvestByUrlRequest(
+    val url: String,
+    val dataType: String,
+)

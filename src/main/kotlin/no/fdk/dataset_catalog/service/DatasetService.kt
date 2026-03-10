@@ -171,16 +171,9 @@ class DatasetService(
         datasetRepository
             .saveAll(datasets)
             .also {
-                if (isFirstPublished) addDataSource(catalogId)
+                if (isFirstPublished) publishingService.createNewDataSource(catalogId)
                 triggerHarvest(datasets, catalogId)
             }
-    }
-
-    fun addDataSource(catalogId: String) {
-        publishingService.sendNewDataSourceMessage(
-            catalogId,
-            "${applicationProperties.datasetCatalogUriHost}/$catalogId"
-        )
     }
 
     private fun triggerHarvest(datasets: List<DatasetDBO>, catalogId: String) {
