@@ -264,7 +264,7 @@ class DatasetServiceTest {
             )
 
             whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
-            whenever(datasetRepository.save(any())).thenReturn(ds)
+            whenever(datasetRepository.save(any<DatasetDBO>())).thenReturn(ds)
 
             datasetService.updateDatasetDBO("catId", "dsId", emptyList())
 
@@ -283,7 +283,7 @@ class DatasetServiceTest {
             )
 
             whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
-            whenever(datasetRepository.save(any())).thenReturn(ds)
+            whenever(datasetRepository.save(any<DatasetDBO>())).thenReturn(ds)
 
             datasetService.updateDatasetDBO("catId", "dsId", listOf(JsonPatchOperation(OpEnum.ADD, "/source", "hei")))
 
@@ -302,7 +302,7 @@ class DatasetServiceTest {
             )
 
             whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
-            whenever(datasetRepository.save(any())).thenReturn(ds)
+            whenever(datasetRepository.save(any<DatasetDBO>())).thenReturn(ds)
             whenever(applicationProperties.datasetCatalogUriHost).thenReturn("http://mycatalog")
 
             datasetService.createDataset("catId", DatasetToCreate(approved = true))
@@ -335,7 +335,7 @@ class DatasetServiceTest {
             )
 
             whenever(datasetRepository.findById("dsId1")).thenReturn(Optional.of(ds1))
-            whenever(datasetRepository.save(any())).thenReturn(ds1)
+            whenever(datasetRepository.save(any<DatasetDBO>())).thenReturn(ds1)
             whenever(datasetRepository.findByCatalogId("catId")).thenReturn(listOf(ds0))
 
             datasetService.createDataset("catId", DatasetToCreate(approved = true))
@@ -355,7 +355,7 @@ class DatasetServiceTest {
             )
 
             whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
-            whenever(datasetRepository.save(any())).thenReturn(ds)
+            whenever(datasetRepository.save(any<DatasetDBO>())).thenReturn(ds)
             whenever(applicationProperties.datasetCatalogUriHost).thenReturn("http://mycatalog")
 
             datasetService.updateDatasetDBO("catId", "dsId", emptyList())

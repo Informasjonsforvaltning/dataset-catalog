@@ -1,5 +1,5 @@
 spring:
-  data.mongodb:
+  mongodb:
     host: ${MONGODB_HOST}
     username: ${MONGODB_USER}
     password: ${MONGODB_PASSWORD}
@@ -9,13 +9,6 @@ spring:
     database: datasetCatalog
     auto-index-creation: true
   security.oauth2.resourceserver.jwt.jwk-set-uri: ${OIDC_JWKS}
-  rabbitmq:
-    host: ${RABBIT_HOST}
-    port: 5672
-    username: ${RABBIT_USERNAME}
-    password: ${RABBIT_PASSWORD}
-    template:
-      exchange: harvests
 server.port: 8080
 logging:
   level.root: WARN
@@ -51,7 +44,7 @@ security:
 ---
 spring:
   config.activate.on-profile: develop
-  data.mongodb.uri: mongodb://admin:admin@localhost:27017/datasetCatalog?authSource=admin&authMechanism=SCRAM-SHA-1
+  mongodb.uri: mongodb://admin:admin@localhost:27017/datasetCatalog?authSource=admin&authMechanism=SCRAM-SHA-1
   rabbitmq:
     host: 127.0.0.1
     port: 5672
@@ -87,13 +80,12 @@ spring:
   config:
     activate:
       on-profile: dev
-  data:
-    mongodb:
-      host: localhost
-      username: root
-      password: secret
-      authentication-database: admin
-      replica-set-name: null
+  mongodb:
+    host: localhost
+    username: root
+    password: secret
+    authentication-database: admin
+    replica-set-name: null
   security:
     oauth2:
       resourceserver:

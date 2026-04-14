@@ -39,14 +39,14 @@ fun apiAuthorizedRequest(path: String, body: String? = null, token: String? = nu
     return try {
         val response = request.exchange(url, httpMethod, entity, String::class.java)
         mapOf(
-            "body" to response.body,
+            "body" to (response.body ?: ""),
             "header" to response.headers,
             "status" to response.statusCode.value()
         )
 
     } catch (e: HttpClientErrorException) {
         mapOf(
-            "status" to e.rawStatusCode,
+            "status" to e.statusCode.value(),
             "header" to " ",
             "body" to e.toString()
         )
