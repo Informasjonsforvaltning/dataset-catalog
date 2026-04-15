@@ -459,12 +459,7 @@ fun Model.safeCreateLinkedResource(value: String? = null): Resource? =
 // -------- Utils --------
 
 fun String?.isValidURL(): Boolean =
-    try {
-        URL(this)
-        true
-    } catch (e: Exception) {
-        false
-    }
+    this != null && runCatching { URI(this).toURL() }.isSuccess
 
 enum class LinguisticSystem(val uri: String) {
     NOB("http://publications.europa.eu/resource/authority/language/NOB"),
