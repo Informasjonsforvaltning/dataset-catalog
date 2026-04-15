@@ -21,8 +21,8 @@ data class DatasetDBO(
     val id: String,
     val catalogId: String,
 
-    @JsonSerialize(using = LocalDateTimeSerializer::class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
+    @param:JsonSerialize(using = LocalDateTimeSerializer::class)
+    @param:JsonDeserialize(using = LocalDateTimeDeserializer::class)
     val lastModified: LocalDateTime?,
     val uri: String?,
 
@@ -40,12 +40,12 @@ data class DatasetDBO(
     val contactPoints: List<ContactPoint>? = null,
     val keywords: LocalizedStringLists? = null,
 
-    @JsonSerialize(using = LocalDateSerializer::class)
-    @JsonDeserialize(using = LocalDateDeserializer::class)
+    @param:JsonSerialize(using = LocalDateSerializer::class)
+    @param:JsonDeserialize(using = LocalDateDeserializer::class)
     val issued: LocalDate? = null,
 
-    @JsonSerialize(using = LocalDateSerializer::class)
-    @JsonDeserialize(using = LocalDateDeserializer::class)
+    @param:JsonSerialize(using = LocalDateSerializer::class)
+    @param:JsonDeserialize(using = LocalDateDeserializer::class)
     val modified: LocalDate? = null,
 
     val language: List<String>? = null,
@@ -94,7 +94,7 @@ data class DatasetToCreate(
     val approved: Boolean = false,
     val originalUri: String? = null,
     val specializedType: SpecializedType? = null,
-    val applicationProfile: ApplicationProfile = ApplicationProfile.DCAT_AP_NO,
+    val applicationProfile: ApplicationProfile? = ApplicationProfile.DCAT_AP_NO,
     val concepts: Set<String>? = null,
 
     val title: LocalizedStrings? = null,
@@ -103,12 +103,12 @@ data class DatasetToCreate(
     val contactPoints: List<ContactPoint>? = null,
     val keywords: LocalizedStringLists? = null,
 
-    @JsonSerialize(using = LocalDateSerializer::class)
-    @JsonDeserialize(using = LocalDateDeserializer::class)
+    @param:JsonSerialize(using = LocalDateSerializer::class)
+    @param:JsonDeserialize(using = LocalDateDeserializer::class)
     val issued: LocalDate? = null,
 
-    @JsonSerialize(using = LocalDateSerializer::class)
-    @JsonDeserialize(using = LocalDateDeserializer::class)
+    @param:JsonSerialize(using = LocalDateSerializer::class)
+    @param:JsonDeserialize(using = LocalDateDeserializer::class)
     val modified: LocalDate? = null,
 
     val language: List<String>? = null,
@@ -189,11 +189,11 @@ data class DistributionDBO(
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class PeriodOfTimeDBO(
-    @JsonSerialize(using = LocalDateSerializer::class)
-    @JsonDeserialize(using = LocalDateDeserializer::class)
+    @param:JsonSerialize(using = LocalDateSerializer::class)
+    @param:JsonDeserialize(using = LocalDateDeserializer::class)
     val startDate: LocalDate? = null,
-    @JsonSerialize(using = LocalDateSerializer::class)
-    @JsonDeserialize(using = LocalDateDeserializer::class)
+    @param:JsonSerialize(using = LocalDateSerializer::class)
+    @param:JsonDeserialize(using = LocalDateDeserializer::class)
     val endDate: LocalDate? = null,
 )
 
