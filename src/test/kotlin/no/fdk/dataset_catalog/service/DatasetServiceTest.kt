@@ -8,7 +8,6 @@ import no.fdk.dataset_catalog.utils.TEST_DATASET_1
 import org.junit.jupiter.api.*
 import org.mockito.kotlin.*
 import org.springframework.web.server.ResponseStatusException
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 import kotlin.test.assertEquals
@@ -39,6 +38,38 @@ class DatasetServiceTest {
                 val actual = firstValue.first()
                 assertEquals(actual.copy(specializedType = ds.specializedType), actual)
             }
+        }
+
+        @Test
+        fun `persists year-only temporal verbatim`() {
+            val ds = DatasetToCreate(
+                temporal = listOf(PeriodOfTimeDBO(startDate = "2024", endDate = "2024-06"))
+            )
+            datasetService.createDataset("catId", ds)
+            argumentCaptor<List<DatasetDBO>>().apply {
+                verify(datasetRepository, times(1)).saveAll(capture())
+                assertEquals("2024", firstValue.first().temporal?.get(0)?.startDate)
+                assertEquals("2024-06", firstValue.first().temporal?.get(0)?.endDate)
+            }
+        }
+
+        @Test
+        fun `rejects invalid calendar date on create`() {
+            val ds = DatasetToCreate(
+                temporal = listOf(PeriodOfTimeDBO(startDate = "2023-02-29"))
+            )
+            val ex = assertThrows<ResponseStatusException> { datasetService.createDataset("catId", ds) }
+            assertEquals(org.springframework.http.HttpStatus.BAD_REQUEST, ex.statusCode)
+            verify(datasetRepository, times(0)).saveAll(any<List<DatasetDBO>>())
+        }
+
+        @Test
+        fun `rejects start after end on create`() {
+            val ds = DatasetToCreate(
+                temporal = listOf(PeriodOfTimeDBO(startDate = "2024-06-15", endDate = "2024-06-14"))
+            )
+            val ex = assertThrows<ResponseStatusException> { datasetService.createDataset("catId", ds) }
+            assertEquals(org.springframework.http.HttpStatus.BAD_REQUEST, ex.statusCode)
         }
     }
 
@@ -132,23 +163,13 @@ class DatasetServiceTest {
                 "catId",
                 uri = "uri",
                 lastModified = LocalDateTime.now(),
-                temporal = listOf(
-                    PeriodOfTimeDBO(
-                        LocalDate.of(2020, 11, 11),
-                        LocalDate.of(2021, 4, 4)
-                    )
-                )
+                temporal = listOf(PeriodOfTimeDBO("2020-11-11", "2021-04-04"))
             )
             val expected = DatasetDBO(
                 "dsId",
                 "catId", uri = "uri",
                 lastModified = LocalDateTime.now(),
-                temporal = listOf(
-                    PeriodOfTimeDBO(
-                        LocalDate.of(2020, 10, 10),
-                        LocalDate.of(2021, 4, 4)
-                    )
-                )
+                temporal = listOf(PeriodOfTimeDBO("2020-10-10", "2021-04-04"))
             )
             whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
             datasetService.updateDatasetDBO(
@@ -246,6 +267,42 @@ class DatasetServiceTest {
             }
             argumentCaptor<List<DatasetDBO>>().apply {
                 verify(datasetRepository, times(0)).saveAll(capture())
+            }
+        }
+
+        @Test
+        fun `patch with invalid temporal value returns BAD_REQUEST`() {
+            val ds = DatasetDBO(
+                "dsId", "catId", uri = "uri", lastModified = LocalDateTime.now(),
+                temporal = listOf(PeriodOfTimeDBO("2024-06-01", "2024-06-30"))
+            )
+            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
+            val ex = assertThrows<ResponseStatusException> {
+                datasetService.updateDatasetDBO(
+                    "catId",
+                    "dsId",
+                    listOf(JsonPatchOperation(OpEnum.REPLACE, "/temporal/0/startDate", "not-a-date"))
+                )
+            }
+            assertEquals(org.springframework.http.HttpStatus.BAD_REQUEST, ex.statusCode)
+            verify(datasetRepository, times(0)).saveAll(any<List<DatasetDBO>>())
+        }
+
+        @Test
+        fun `patch with year-only temporal value accepted`() {
+            val ds = DatasetDBO(
+                "dsId", "catId", uri = "uri", lastModified = LocalDateTime.now(),
+                temporal = listOf(PeriodOfTimeDBO("2024-06-01", "2024-06-30"))
+            )
+            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds))
+            datasetService.updateDatasetDBO(
+                "catId",
+                "dsId",
+                listOf(JsonPatchOperation(OpEnum.REPLACE, "/temporal/0/startDate", "2024"))
+            )
+            argumentCaptor<List<DatasetDBO>>().apply {
+                verify(datasetRepository, times(1)).saveAll(capture())
+                assertEquals("2024", firstValue.first().temporal?.get(0)?.startDate)
             }
         }
     }

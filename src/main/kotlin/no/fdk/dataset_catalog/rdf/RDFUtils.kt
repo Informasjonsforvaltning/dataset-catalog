@@ -73,6 +73,17 @@ fun Resource.safeAddDateTimeLiteral(property: Property, dateTime: LocalDate?): R
         safeAddLiteral(property, model.createTypedLiteral(dateTime.toString(), XSDDatatype.XSDdate))
     } else this
 
+fun Resource.safeAddFlexibleDateLiteral(property: Property, value: String?): Resource {
+    if (value.isNullOrEmpty()) return this
+    val xsdType = when (value.length) {
+        4 -> XSDDatatype.XSDgYear
+        7 -> XSDDatatype.XSDgYearMonth
+        10 -> XSDDatatype.XSDdate
+        else -> return this
+    }
+    return safeAddLiteral(property, model.createTypedLiteral(value, xsdType))
+}
+
 fun Resource.safeAddLinkedProperty(property: Property, value: String?): Resource =
     if (value.isNullOrEmpty()) this
     else addProperty(property, model.createResource(value))
@@ -232,13 +243,13 @@ private fun Resource.addRule(rule: UriWithLabel, ruleType: Resource): Resource {
 
 fun Resource.addTemporal(temporal: List<PeriodOfTimeDBO>?): Resource {
     temporal?.forEach {
-        if (it.startDate != null || it.endDate != null) {
+        if (!it.startDate.isNullOrEmpty() || !it.endDate.isNullOrEmpty()) {
             addProperty(
                 DCTerms.temporal,
                 model.safeCreateResource()
                     .addProperty(RDF.type, DCTerms.PeriodOfTime)
-                    .safeAddDateTimeLiteral(Schema.startDate, it.startDate)
-                    .safeAddDateTimeLiteral(Schema.endDate, it.endDate)
+                    .safeAddFlexibleDateLiteral(Schema.startDate, it.startDate)
+                    .safeAddFlexibleDateLiteral(Schema.endDate, it.endDate)
             )
         }
     }

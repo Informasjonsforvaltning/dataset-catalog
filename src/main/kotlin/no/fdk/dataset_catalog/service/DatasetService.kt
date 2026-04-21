@@ -9,6 +9,7 @@ import no.fdk.dataset_catalog.configuration.ApplicationProperties
 import no.fdk.dataset_catalog.extensions.addCreateValues
 import no.fdk.dataset_catalog.model.*
 import no.fdk.dataset_catalog.repository.DatasetRepository
+import no.fdk.dataset_catalog.validation.TemporalValidator
 import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
@@ -66,6 +67,7 @@ class DatasetService(
         )
 
         newDataset.addCreateValues(values)
+            .also { TemporalValidator.validate(it) }
             .allAffectedSeriesDatasets(null)
             .let { persistAndHarvestDatasets(it, catalogId) }
 
@@ -191,7 +193,7 @@ class DatasetService(
 
     private fun DatasetDBO.update(operations: List<JsonPatchOperation>): DatasetDBO {
         validateOperations(operations)
-        return try {
+        val patched = try {
             patchDatasetDBO(this, operations)
         } catch (ex: Exception) {
             logger.error("PATCH failed for $id", ex)
@@ -203,6 +205,8 @@ class DatasetService(
                 else -> throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.message)
             }
         }
+        TemporalValidator.validate(patched)
+        return patched
     }
 
     private fun patchDatasetDBO(dataset: DatasetDBO, operations: List<JsonPatchOperation>): DatasetDBO {

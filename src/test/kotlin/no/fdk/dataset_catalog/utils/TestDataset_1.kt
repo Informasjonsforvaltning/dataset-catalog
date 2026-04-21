@@ -85,7 +85,7 @@ val TEST_DATASET_1 = DatasetDBO(
     informationModelsFromFDK = listOf(
         "https://raw.githubusercontent.com/Informasjonsforvaltning/model-publisher/master/src/model/catalog-of-models-for-specifications.ttl#dqv-ap-no-model",
         "https://raw.githubusercontent.com/Informasjonsforvaltning/fdk-testdata/master/testdata/SkatvalModellkatalog.ttl#AdresseModell"),
-    temporal = listOf(PeriodOfTimeDBO(startDate = LocalDate.of(2017,1,1),endDate = LocalDate.of(2017,12,31)), PeriodOfTimeDBO(endDate=LocalDate.of(2018,10,20))),
+    temporal = listOf(PeriodOfTimeDBO(startDate = "2017-01-01", endDate = "2017-12-31"), PeriodOfTimeDBO(endDate = "2018-10-20")),
     concepts = setOf(CONCEPT),
     frequency="http://publications.europa.eu/resource/authority/frequency/ANNUAL",
     issued=LocalDate.of(2012, 1, 1),

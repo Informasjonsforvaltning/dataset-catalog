@@ -189,12 +189,8 @@ data class DistributionDBO(
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class PeriodOfTimeDBO(
-    @param:JsonSerialize(using = LocalDateSerializer::class)
-    @param:JsonDeserialize(using = LocalDateDeserializer::class)
-    val startDate: LocalDate? = null,
-    @param:JsonSerialize(using = LocalDateSerializer::class)
-    @param:JsonDeserialize(using = LocalDateDeserializer::class)
-    val endDate: LocalDate? = null,
+    val startDate: String? = null,
+    val endDate: String? = null,
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
