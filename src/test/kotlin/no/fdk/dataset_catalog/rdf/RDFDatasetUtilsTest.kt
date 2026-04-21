@@ -110,6 +110,16 @@ class RDFDatasetUtilsTest {
         assertFalse { resource.hasProperty(Schema.startDate) }
     }
 
+    @Test
+    fun flexibleDateLiteralIgnoresLexicallyInvalidValue() {
+        val model = ModelFactory.createDefaultModel()
+        val resource = model.createResource("http://my-dataset-lexical")
+        resource.safeAddFlexibleDateLiteral(Schema.startDate, "abcd")
+        resource.safeAddFlexibleDateLiteral(Schema.endDate, "2024-13-01")
+        assertFalse { resource.hasProperty(Schema.startDate) }
+        assertFalse { resource.hasProperty(Schema.endDate) }
+    }
+
     private fun temporalDatatype(period: PeriodOfTimeDBO, property: org.apache.jena.rdf.model.Property): String {
         val model = ModelFactory.createDefaultModel()
         val resource = model.createResource("http://my-dataset-temporal")

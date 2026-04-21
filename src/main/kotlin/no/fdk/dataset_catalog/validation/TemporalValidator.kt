@@ -13,8 +13,6 @@ import java.time.format.ResolverStyle
 
 object TemporalValidator {
 
-    private val FORMAT_REGEX = Regex("""^\d{4}$|^\d{4}-\d{2}$|^\d{4}-\d{2}-\d{2}$""")
-
     private val YEAR_FMT: DateTimeFormatter =
         DateTimeFormatter.ofPattern("uuuu").withResolverStyle(ResolverStyle.STRICT)
     private val YEAR_MONTH_FMT: DateTimeFormatter =
@@ -42,19 +40,17 @@ object TemporalValidator {
     }
 
     private fun validateValue(value: String, path: String) {
-        if (!FORMAT_REGEX.matches(value)) {
-            throw badRequest(
-                "$path: '$value' is not in format yyyy, yyyy-MM, or yyyy-MM-dd"
-            )
-        }
         try {
             when (value.length) {
                 4 -> Year.parse(value, YEAR_FMT)
                 7 -> YearMonth.parse(value, YEAR_MONTH_FMT)
-                else -> LocalDate.parse(value, DATE_FMT)
+                10 -> LocalDate.parse(value, DATE_FMT)
+                else -> throw badRequest(
+                    "$path: '$value' must be yyyy, yyyy-MM, or yyyy-MM-dd"
+                )
             }
         } catch (ex: DateTimeParseException) {
-            throw badRequest("$path: '$value' is not a valid calendar date")
+            throw badRequest("$path: '$value' is not a valid date")
         }
     }
 

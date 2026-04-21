@@ -81,6 +81,7 @@ fun Resource.safeAddFlexibleDateLiteral(property: Property, value: String?): Res
         10 -> XSDDatatype.XSDdate
         else -> return this
     }
+    if (!xsdType.isValid(value)) return this
     return safeAddLiteral(property, model.createTypedLiteral(value, xsdType))
 }
 
