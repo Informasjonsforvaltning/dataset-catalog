@@ -102,6 +102,14 @@ class RDFDatasetUtilsTest {
         assertFalse { resource.hasProperty(DCTerms.temporal) }
     }
 
+    @Test
+    fun flexibleDateLiteralIgnoresMalformedLength() {
+        val model = ModelFactory.createDefaultModel()
+        val resource = model.createResource("http://my-dataset-malformed")
+        resource.safeAddFlexibleDateLiteral(Schema.startDate, "2024-06-1")
+        assertFalse { resource.hasProperty(Schema.startDate) }
+    }
+
     private fun temporalDatatype(period: PeriodOfTimeDBO, property: org.apache.jena.rdf.model.Property): String {
         val model = ModelFactory.createDefaultModel()
         val resource = model.createResource("http://my-dataset-temporal")

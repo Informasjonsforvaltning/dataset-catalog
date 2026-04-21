@@ -51,7 +51,7 @@ object TemporalValidator {
             when (value.length) {
                 4 -> Year.parse(value, YEAR_FMT)
                 7 -> YearMonth.parse(value, YEAR_MONTH_FMT)
-                10 -> LocalDate.parse(value, DATE_FMT)
+                else -> LocalDate.parse(value, DATE_FMT)
             }
         } catch (ex: DateTimeParseException) {
             throw badRequest("$path: '$value' is not a valid calendar date")
@@ -61,15 +61,13 @@ object TemporalValidator {
     private fun startBound(value: String): LocalDate = when (value.length) {
         4 -> LocalDate.of(value.toInt(), 1, 1)
         7 -> YearMonth.parse(value, YEAR_MONTH_FMT).atDay(1)
-        10 -> LocalDate.parse(value, DATE_FMT)
-        else -> error("unreachable: value validated before bound computation")
+        else -> LocalDate.parse(value, DATE_FMT)
     }
 
     private fun endBound(value: String): LocalDate = when (value.length) {
         4 -> LocalDate.of(value.toInt(), 12, 31)
         7 -> YearMonth.parse(value, YEAR_MONTH_FMT).atEndOfMonth()
-        10 -> LocalDate.parse(value, DATE_FMT)
-        else -> error("unreachable: value validated before bound computation")
+        else -> LocalDate.parse(value, DATE_FMT)
     }
 
     private fun badRequest(message: String): ResponseStatusException =
