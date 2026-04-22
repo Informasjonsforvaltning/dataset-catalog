@@ -38,8 +38,8 @@ val SAMPLE_EX = DistributionDBO(
 )
 
 val PERIODOFTIME_EX = PeriodOfTimeDBO(
-    startDate = LocalDate.now(),
-    endDate = LocalDate.now().plusYears(1)
+    startDate = LocalDate.now().toString(),
+    endDate = LocalDate.now().plusYears(1).toString()
 )
 
 val QUALITYANNOTATION_EX = QualityAnnotationDBO(

@@ -830,12 +830,12 @@ components:
           description: Period name
         startDate:
           type: string
-          format: date
-          description: Date of period start
+          pattern: "^\\d{4}$|^\\d{4}-\\d{2}$|^\\d{4}-\\d{2}-\\d{2}$"
+          description: "Start of period as ISO-8601 partial date. Accepts year (yyyy), year-month (yyyy-MM), or full date (yyyy-MM-dd)."
         endDate:
           type: string
-          format: date
-          description: Date of period end
+          pattern: "^\\d{4}$|^\\d{4}-\\d{2}$|^\\d{4}-\\d{2}-\\d{2}$"
+          description: "End of period as ISO-8601 partial date. Accepts year (yyyy), year-month (yyyy-MM), or full date (yyyy-MM-dd)."
     SkosConcept:
       type: object
       description: Skos Concept
