@@ -1,29 +1,34 @@
 package no.fdk.dataset_catalog.repository
 
+import jakarta.persistence.EntityManager
 import no.fdk.dataset_catalog.model.CatalogCount
-import no.fdk.dataset_catalog.model.DatasetDBO
-import org.springframework.data.mongodb.core.MongoOperations
-import org.springframework.data.mongodb.core.aggregation.Aggregation
-import org.springframework.data.mongodb.core.query.Criteria
+import no.fdk.dataset_catalog.model.DatasetEntity
 import org.springframework.stereotype.Service
 
 @Service
-class DatasetOperations(private val mongoOperations: MongoOperations) {
+class DatasetOperations(private val entityManager: EntityManager) {
 
     fun datasetCountForCatalogs(catalogIds: List<String>): List<CatalogCount> {
-        val aggregation = Aggregation.newAggregation(
-            Aggregation.match(Criteria.where("catalogId").`in`(catalogIds)),
-            Aggregation.group("catalogId")
-                .count().`as`("datasetCount")
+        if (catalogIds.isEmpty()) return emptyList()
+        val query = entityManager.createQuery(
+            """
+            SELECT new no.fdk.dataset_catalog.model.CatalogCount(d.catalogId, COUNT(d))
+            FROM DatasetEntity d
+            WHERE d.catalogId IN :catalogIds
+            GROUP BY d.catalogId
+            """,
+            CatalogCount::class.java
         )
-
-        return mongoOperations.aggregate(aggregation, "datasets", CatalogCount::class.java).toList()
+        query.setParameter("catalogIds", catalogIds)
+        return query.resultList
     }
 
-    fun getAllCatalogIds(): List<String> =
-        mongoOperations.query(DatasetDBO::class.java)
-            .distinct("catalogId")
-            .`as`(String::class.java)
-            .all()
+    fun getAllCatalogIds(): List<String> {
+        val query = entityManager.createQuery(
+            "SELECT DISTINCT d.catalogId FROM DatasetEntity d",
+            String::class.java
+        )
+        return query.resultList
+    }
 
 }

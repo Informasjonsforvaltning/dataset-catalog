@@ -8,16 +8,12 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
-import org.springframework.data.annotation.*
-import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-@Document(collection = "datasets")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class DatasetDBO(
-    @Id
     val id: String,
     val catalogId: String,
 

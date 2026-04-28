@@ -11,7 +11,6 @@ import no.fdk.dataset_catalog.model.*
 import no.fdk.dataset_catalog.repository.DatasetRepository
 import no.fdk.dataset_catalog.validation.TemporalValidator
 import org.slf4j.LoggerFactory
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
@@ -40,19 +39,20 @@ class DatasetService(
     fun getAllDatasets(catalogId: String, specializedTypeString: String? = null): List<DatasetDBO> {
         val specializedType = specializedTypeFromString(specializedTypeString)
         return if (specializedType == null) {
-            datasetRepository.findByCatalogId(catalogId).toList()
+            datasetRepository.findByCatalogId(catalogId).map { it.toApiModel(mapper) }
         } else {
-            datasetRepository.findByCatalogIdAndSpecializedType(catalogId, specializedType).toList()
+            datasetRepository.findByCatalogIdAndSpecializedType(catalogId, specializedType).map { it.toApiModel(mapper) }
         }
     }
 
     fun getDatasetByID(catalogId: String, id: String): DatasetDBO? {
-        val dataset = datasetRepository.findByIdOrNull(id)
-        return if (dataset?.catalogId != catalogId) null else dataset
+        val entity = datasetRepository.findById(id).orElse(null)
+        if (entity == null || entity.catalogId != catalogId) return null
+        return entity.toApiModel(mapper)
     }
 
     fun getDatasetListByIDs(catalogId: String, ids: List<String>) =
-        datasetRepository.findAllById(ids).filter { it.catalogId == catalogId }
+        datasetRepository.findAllById(ids).filter { it.catalogId == catalogId }.map { it.toApiModel(mapper) }
 
     fun createDataset(catalogId: String, values: DatasetToCreate): String {
         val datasetId = UUID.randomUUID().toString()
@@ -91,27 +91,27 @@ class DatasetService(
     }
 
     fun delete(catalogId: String, id: String) {
-        getDatasetByID(catalogId, id)
-            ?.also { datasetRepository.delete(it) }
-            ?.removeDeletedDatasetFromSeriesFields()
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+        val dataset = getDatasetByID(catalogId, id) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+        datasetRepository.deleteById(dataset.id)
+        dataset.removeDeletedDatasetFromSeriesFields()
     }
 
     private fun DatasetDBO.removeDeletedDatasetFromSeriesFields() {
-        inSeries?.let { datasetRepository.findByIdOrNull(it) }
+        inSeries?.let { seriesId -> datasetRepository.findById(seriesId).orElse(null) }
+            ?.toApiModel(mapper)
             ?.let { it.copy(seriesDatasetOrder = it.seriesDatasetOrder?.minus(id)) }
-            ?.let { datasetRepository.save(it) }
+            ?.let { datasetRepository.save(it.toEntity(mapper)) }
 
         seriesDatasetOrder?.let { datasetRepository.findAllById(it.keys) }
-            ?.map { it.copy(inSeries = null) }
+            ?.map { it.toApiModel(mapper).copy(inSeries = null).toEntity(mapper) }
             ?.let { datasetRepository.saveAll(it) }
     }
 
     fun resolveDatasetReferences(ds: DatasetDBO): List<ReferenceDBO>? =
         ds.references?.map { ref ->
             val originalUri: String? = if (ref.source?.let { getDatasetUriPattern().containsMatchIn(it) } == true) {
-                ref.source.substringAfterLast("/").let { id ->
-                    datasetRepository.findByIdOrNull(id)?.originalUri
+                ref.source.substringAfterLast("/").let { refId ->
+                    datasetRepository.findById(refId).orElse(null)?.toApiModel(mapper)?.originalUri
                 }
             } else {
                 null
@@ -131,7 +131,7 @@ class DatasetService(
         run {
             val addedInSeries = inSeries
                 ?.takeIf { it != dbDataset?.inSeries }
-                ?.let { datasetRepository.findByIdOrNull(it) }
+                ?.let { datasetRepository.findById(it).orElse(null)?.toApiModel(mapper) }
                 ?.let {
                     val updatedSeriesOrder = if (it.seriesDatasetOrder.isNullOrEmpty()) {
                         mapOf(Pair(id, 0))
@@ -144,7 +144,7 @@ class DatasetService(
 
             val removedInSeries = dbDataset?.inSeries
                 ?.takeIf { it != inSeries }
-                ?.let { datasetRepository.findByIdOrNull(it) }
+                ?.let { datasetRepository.findById(it).orElse(null)?.toApiModel(mapper) }
                 ?.let { it.copy(seriesDatasetOrder = it.seriesDatasetOrder?.minus(id)) }
                 ?.let { listOf(it) } ?: emptyList()
 
@@ -152,7 +152,7 @@ class DatasetService(
                 seriesDatasetOrder?.keys
                     ?.filter { it !in (dbDataset?.seriesDatasetOrder?.keys ?: emptyList()) }
                     ?.let { datasetRepository.findAllById(it) }
-                    ?.map { it.copy(inSeries = id) }
+                    ?.map { it.toApiModel(mapper).copy(inSeries = id) }
                     ?: emptyList()
             } else emptyList()
 
@@ -160,7 +160,7 @@ class DatasetService(
                 dbDataset?.seriesDatasetOrder?.keys
                     ?.filter { it !in (seriesDatasetOrder?.keys ?: emptyList()) }
                     ?.let { datasetRepository.findAllById(it) }
-                    ?.map { it.copy(inSeries = null) }
+                    ?.map { it.toApiModel(mapper).copy(inSeries = null) }
                     ?: emptyList()
             } else emptyList()
 
@@ -171,7 +171,7 @@ class DatasetService(
         val isFirstPublished = isFirstPublishedDatasetForCatalog(datasets, catalogId)
 
         datasetRepository
-            .saveAll(datasets)
+            .saveAll(datasets.map { it.toEntity(mapper) })
             .also {
                 if (isFirstPublished) publishingService.createNewDataSource(catalogId)
                 triggerHarvest(datasets, catalogId)

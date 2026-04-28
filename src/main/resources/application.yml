@@ -1,13 +1,15 @@
 spring:
-  mongodb:
-    host: ${MONGODB_HOST}
-    username: ${MONGODB_USER}
-    password: ${MONGODB_PASSWORD}
-    authentication-database: ${MONGODB_AUTH}
-    replica-set-name: ${MONGODB_REPLICASET}
-    port: 27017
-    database: datasetCatalog
-    auto-index-creation: true
+  datasource:
+    url: jdbc:postgresql://${POSTGRESQL_HOST}:5432/${POSTGRESQL_DB:dataset_catalog}
+    username: ${POSTGRESQL_USERNAME}
+    password: ${POSTGRESQL_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
   security.oauth2.resourceserver.jwt.jwk-set-uri: ${OIDC_JWKS}
 server.port: 8080
 logging:
@@ -44,7 +46,11 @@ security:
 ---
 spring:
   config.activate.on-profile: develop
-  mongodb.uri: mongodb://admin:admin@localhost:27017/datasetCatalog?authSource=admin&authMechanism=SCRAM-SHA-1
+  datasource:
+    url: jdbc:postgresql://localhost:5432/dataset_catalog
+    username: root
+    password: secret
+    driver-class-name: org.postgresql.Driver
   rabbitmq:
     host: 127.0.0.1
     port: 5672
@@ -80,12 +86,11 @@ spring:
   config:
     activate:
       on-profile: dev
-  mongodb:
-    host: localhost
+  datasource:
+    url: jdbc:postgresql://localhost:5432/dataset_catalog
     username: root
     password: secret
-    authentication-database: admin
-    replica-set-name: null
+    driver-class-name: org.postgresql.Driver
   security:
     oauth2:
       resourceserver:
