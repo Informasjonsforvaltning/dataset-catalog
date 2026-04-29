@@ -25,18 +25,23 @@ spec:
             - name: POSTGRESQL_HOST
               valueFrom:
                 secretKeyRef:
-                  name: dataset-catalog
-                  key: POSTGRESQL_HOST
+                  name: postgres
+                  key: HOST
+            - name: POSTGRESQL_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: postgres
+                  key: PORT
             - name: POSTGRESQL_DB
               valueFrom:
                 secretKeyRef:
                   name: dataset-catalog
                   key: POSTGRESQL_DB
-            - name: POSTGRESQL_USERNAME
+            - name: POSTGRESQL_USER
               valueFrom:
                 secretKeyRef:
                   name: dataset-catalog
-                  key: POSTGRESQL_USERNAME
+                  key: POSTGRESQL_USER
             - name: POSTGRESQL_PASSWORD
               valueFrom:
                 secretKeyRef:
