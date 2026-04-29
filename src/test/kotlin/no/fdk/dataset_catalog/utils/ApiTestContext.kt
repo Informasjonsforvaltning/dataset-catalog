@@ -14,7 +14,7 @@ abstract class ApiTestContext {
     internal class Initializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
         override fun initialize(configurableApplicationContext: ConfigurableApplicationContext) {
             TestPropertyValues.of(
-                "spring.datasource.url=${postgresContainer.getJdbcUrl()}",
+                "spring.datasource.url=$postgresJdbcUrl",
                 "spring.datasource.username=$DB_USER",
                 "spring.datasource.password=$DB_PASSWORD",
             ).applyTo(configurableApplicationContext.environment)
@@ -24,18 +24,36 @@ abstract class ApiTestContext {
     companion object {
 
         private val logger = LoggerFactory.getLogger(ApiTestContext::class.java)
-        var postgresContainer: KPostgreSQLContainer
+        private var postgresContainer: KPostgreSQLContainer? = null
+        var postgresJdbcUrl: String = ""
 
         init {
 
             startMockServer()
 
-            postgresContainer = KPostgreSQLContainer("postgres:16")
-                .withDatabaseName(DB_NAME)
-                .withUsername(DB_USER)
-                .withPassword(DB_PASSWORD)
+            val externalHost = System.getenv("POSTGRES_HOST")
+                ?: System.getenv("POSTGRESQL_HOST")
+                ?: System.getenv("DB_HOST")
 
-            postgresContainer.start()
+            if (externalHost != null) {
+                val port = System.getenv("POSTGRES_PORT")
+                    ?: System.getenv("POSTGRESQL_PORT")
+                    ?: System.getenv("DB_PORT")
+                    ?: "5432"
+                val dbName = System.getenv("POSTGRES_DB")
+                    ?: System.getenv("POSTGRESQL_DB")
+                    ?: System.getenv("DB_NAME")
+                    ?: DB_NAME
+                postgresJdbcUrl = "jdbc:postgresql://$externalHost:$port/$dbName"
+                logger.info("Using external Postgres at {}", postgresJdbcUrl)
+            } else {
+                postgresContainer = KPostgreSQLContainer("postgres:16")
+                    .withDatabaseName(DB_NAME)
+                    .withUsername(DB_USER)
+                    .withPassword(DB_PASSWORD)
+                postgresContainer!!.start()
+                postgresJdbcUrl = postgresContainer!!.jdbcUrl
+            }
 
             resetDB()
 

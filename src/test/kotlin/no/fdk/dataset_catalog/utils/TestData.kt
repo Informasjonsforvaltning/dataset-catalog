@@ -5,9 +5,23 @@ import no.fdk.dataset_catalog.model.*
 const val API_TEST_PORT = 5555
 const val LOCAL_SERVER_PORT = 5050
 
-const val DB_USER = "root"
-const val DB_PASSWORD = "secret"
-const val DB_NAME = "dataset_catalog"
+val DB_USER =
+    System.getenv("POSTGRES_USER")
+        ?: System.getenv("POSTGRESQL_USER")
+        ?: System.getenv("DB_USER")
+        ?: "root"
+
+val DB_PASSWORD =
+    System.getenv("POSTGRES_PASSWORD")
+        ?: System.getenv("POSTGRESQL_PASSWORD")
+        ?: System.getenv("DB_PASSWORD")
+        ?: "secret"
+
+val DB_NAME =
+    System.getenv("POSTGRES_DB")
+        ?: System.getenv("POSTGRESQL_DB")
+        ?: System.getenv("DB_NAME")
+        ?: "dataset_catalog"
 
 val DB_CATALOG_ID_1 = "123456789"
 val DB_CATALOG_ID_2 = "987456321"

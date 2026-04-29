@@ -6,7 +6,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.fdk.dataset_catalog.model.DatasetDBO
 import no.fdk.dataset_catalog.model.toEntity
 import no.fdk.dataset_catalog.rdf.createRDFResponse
-import no.fdk.dataset_catalog.utils.ApiTestContext.Companion.postgresContainer
+import no.fdk.dataset_catalog.utils.ApiTestContext.Companion.postgresJdbcUrl
 import org.apache.jena.rdf.model.Model
 import org.apache.jena.rdf.model.ModelFactory
 import org.apache.jena.riot.Lang
@@ -67,11 +67,11 @@ fun apiAuthorizedRequest(path: String, body: String? = null, token: String? = nu
 
 fun resetDB() {
     Flyway.configure()
-        .dataSource(postgresContainer.getJdbcUrl(), DB_USER, DB_PASSWORD)
+        .dataSource(postgresJdbcUrl, DB_USER, DB_PASSWORD)
         .load()
         .migrate()
 
-    val conn = DriverManager.getConnection(postgresContainer.getJdbcUrl(), DB_USER, DB_PASSWORD)
+    val conn = DriverManager.getConnection(postgresJdbcUrl, DB_USER, DB_PASSWORD)
 
     conn.createStatement().execute("DELETE FROM datasets")
 
