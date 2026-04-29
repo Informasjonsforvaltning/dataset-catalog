@@ -73,7 +73,7 @@ val DB_DATASET_1 = DatasetDBO(
     approved = true,
 )
 
-val DB_DATASET_2 = TEST_DATASET_0.copy(
+val DB_DATASET_2 = DatasetDBO(
     DB_DATASET_ID_2,
     DB_CATALOG_ID_1,
     lastModified = null,
@@ -83,6 +83,7 @@ val DB_DATASET_2 = TEST_DATASET_0.copy(
     description = LocalizedStrings(en = "test words"),
     published = true,
     approved = true,
+    references = listOf(REFERENCE_EX),
 )
 
 val DB_DATASET_3 = DatasetDBO(
