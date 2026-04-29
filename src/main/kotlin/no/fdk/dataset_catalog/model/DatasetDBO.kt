@@ -13,7 +13,7 @@ import java.time.LocalDateTime
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class DatasetDBO(
+data class DatasetDTO(
     val id: String,
     val catalogId: String,
 
@@ -83,6 +83,8 @@ data class DatasetDBO(
     val inSeries: String? = null,
     val seriesDatasetOrder: Map<String, Int>? = null
 )
+
+typealias DatasetDBO = DatasetDTO
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
