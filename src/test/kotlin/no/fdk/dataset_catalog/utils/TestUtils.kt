@@ -1,22 +1,27 @@
 package no.fdk.dataset_catalog.utils
 
-import com.mongodb.ConnectionString
-import com.mongodb.MongoClientSettings
-import com.mongodb.client.MongoClient
-import com.mongodb.client.MongoClients
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import no.fdk.dataset_catalog.model.DatasetDBO
+import no.fdk.dataset_catalog.model.toEntity
 import no.fdk.dataset_catalog.rdf.createRDFResponse
-import no.fdk.dataset_catalog.utils.ApiTestContext.Companion.mongoContainer
+import no.fdk.dataset_catalog.utils.ApiTestContext.Companion.postgresJdbcUrl
 import org.apache.jena.rdf.model.Model
 import org.apache.jena.rdf.model.ModelFactory
 import org.apache.jena.riot.Lang
-import org.bson.codecs.configuration.CodecRegistries
-import org.bson.codecs.pojo.PojoCodecProvider
+import org.flywaydb.core.Flyway
+import org.postgresql.util.PGobject
 import org.slf4j.Logger
 import org.springframework.http.*
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
 import java.io.StringReader
+import java.sql.DriverManager
+import java.sql.Timestamp
+
+private val testMapper: ObjectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
 
 fun apiAuthorizedRequest(path: String, body: String? = null, token: String? = null, method: String, accept: MediaType = MediaType.APPLICATION_JSON): Map<String, Any> {
     val request = RestTemplate()
@@ -61,21 +66,50 @@ fun apiAuthorizedRequest(path: String, body: String? = null, token: String? = nu
 }
 
 fun resetDB() {
-    val connectionString = ConnectionString("mongodb://${MONGO_USER}:${MONGO_PASSWORD}@localhost:${mongoContainer.getMappedPort(MONGO_PORT)}/$MONGO_DB_NAME?authSource=admin&authMechanism=SCRAM-SHA-1")
-    val pojoCodecRegistry = CodecRegistries.fromRegistries(MongoClientSettings.getDefaultCodecRegistry(), CodecRegistries.fromProviders(PojoCodecProvider.builder().automatic(true).build()))
+    Flyway.configure()
+        .dataSource(postgresJdbcUrl, DB_USER, DB_PASSWORD)
+        .load()
+        .migrate()
 
-    val client: MongoClient = MongoClients.create(connectionString)
-    val mongoDatabase = client.getDatabase(MONGO_DB_NAME).withCodecRegistry(pojoCodecRegistry)
+    val conn = DriverManager.getConnection(postgresJdbcUrl, DB_USER, DB_PASSWORD)
 
-    val datasetCollection = mongoDatabase.getCollection("datasets")
-    datasetCollection.deleteMany(org.bson.Document())
-    datasetCollection.insertMany(datasetDbPopulation())
+    conn.createStatement().execute("DELETE FROM datasets")
 
-    client.close()
+    val sql = """
+        INSERT INTO datasets (id, catalog_id, published, approved, last_modified, uri, specialized_type, application_profile, data)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """
+    val ps = conn.prepareStatement(sql)
+
+    datasetDbPopulation().forEach { dataset ->
+        val entity = dataset.toEntity(testMapper)
+        ps.setString(1, entity.id)
+        ps.setString(2, entity.catalogId)
+        ps.setBoolean(3, entity.published)
+        ps.setBoolean(4, entity.approved)
+        if (entity.lastModified != null) {
+            ps.setTimestamp(5, Timestamp.valueOf(entity.lastModified))
+        } else {
+            ps.setNull(5, java.sql.Types.TIMESTAMP)
+        }
+        ps.setString(6, entity.uri)
+        ps.setString(7, entity.specializedType?.name)
+        ps.setString(8, entity.applicationProfile.name)
+
+        val jsonData = PGobject()
+        jsonData.type = "jsonb"
+        jsonData.value = if (entity.data != null) testMapper.writeValueAsString(entity.data) else null
+        ps.setObject(9, jsonData)
+
+        ps.addBatch()
+    }
+
+    ps.executeBatch()
+    ps.close()
+    conn.close()
 }
 
 fun checkIfIsomorphicAndPrintDiff(actual: Model, expected: Model, name: String, logger: Logger): Boolean {
-    // Its necessary to parse the created models from strings to have the same base, and ensure blank node validity
     val parsedActual = ModelFactory.createDefaultModel().read(StringReader(actual.createRDFResponse(Lang.TURTLE)), null, "TURTLE")
     val parsedExpected = ModelFactory.createDefaultModel().read(StringReader(expected.createRDFResponse(Lang.TURTLE)), null, "TURTLE")
 

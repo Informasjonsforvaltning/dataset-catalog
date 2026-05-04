@@ -22,31 +22,31 @@ spec:
       containers:
         - name: dataset-catalog
           env:
-            - name: MONGODB_USER
+            - name: POSTGRESQL_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: postgres
+                  key: HOST
+            - name: POSTGRESQL_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: postgres
+                  key: PORT
+            - name: POSTGRESQL_DB
               valueFrom:
                 secretKeyRef:
                   name: dataset-catalog
-                  key: MONGODB_USER
-            - name: MONGODB_PASSWORD
+                  key: POSTGRESQL_DB
+            - name: POSTGRESQL_USER
               valueFrom:
                 secretKeyRef:
                   name: dataset-catalog
-                  key: MONGODB_PASSWORD
-            - name: MONGODB_HOST
+                  key: POSTGRESQL_USER
+            - name: POSTGRESQL_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: mongodb
-                  key: MONGODB_HOST
-            - name: MONGODB_REPLICASET
-              valueFrom:
-                secretKeyRef:
-                  name: mongodb
-                  key: MONGODB_REPLICASET
-            - name: MONGODB_AUTH
-              valueFrom:
-                secretKeyRef:
-                  name: mongodb
-                  key: MONGODB_AUTH
+                  name: dataset-catalog
+                  key: POSTGRESQL_PASSWORD
             - name: ORGANIZATION_CATALOG_HOST
               valueFrom:
                 secretKeyRef:
