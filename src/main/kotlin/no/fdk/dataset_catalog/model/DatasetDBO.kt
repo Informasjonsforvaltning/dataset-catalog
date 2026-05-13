@@ -81,7 +81,9 @@ data class DatasetDTO(
     val type: String? = null,
 
     val inSeries: String? = null,
-    val seriesDatasetOrder: Map<String, Int>? = null
+    val seriesDatasetOrder: Map<String, Int>? = null,
+
+    val costs: List<Cost>? = null
 )
 
 typealias DatasetDBO = DatasetDTO
@@ -146,7 +148,9 @@ data class DatasetToCreate(
     val type: String? = null,
 
     val inSeries: String? = null,
-    val seriesDatasetOrder: Map<String, Int>? = null
+    val seriesDatasetOrder: Map<String, Int>? = null,
+
+    val costs: List<Cost>? = null
 )
 
 enum class SpecializedType {
@@ -238,4 +242,13 @@ data class UriWithLabel(
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class RightsDBO(
     val type: String? = null,
+)
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class Cost(
+    val value: Double? = null,
+    val description: LocalizedStrings? = null,
+    val documentation: List<String>? = null,
+    val currency: String? = null,
 )

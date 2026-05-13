@@ -79,3 +79,15 @@ class CPSVNO {
         val ruleForNonDisclosure: Resource = ResourceFactory.createResource("${uri}ruleForNonDisclosure")
     }
 }
+
+class CV {
+    companion object {
+        const val uri = "http://data.europa.eu/m8g/"
+
+        val Cost: Resource = ResourceFactory.createResource("${uri}Cost")
+
+        val currency: Property = ResourceFactory.createProperty("${uri}currency")
+        val hasCost: Property = ResourceFactory.createProperty("${uri}hasCost")
+        val hasValue: Property = ResourceFactory.createProperty("${uri}hasValue")
+    }
+}

@@ -158,6 +158,7 @@ class RDFService(
         setNsPrefix("cpsv", CPSV.uri)
         setNsPrefix("cpsvno", CPSVNO.uri)
         setNsPrefix("eli", ELI.uri)
+        setNsPrefix("cv", CV.uri)
     }
 
     private fun organizationCatalogURI(organizationNumber: String) =
