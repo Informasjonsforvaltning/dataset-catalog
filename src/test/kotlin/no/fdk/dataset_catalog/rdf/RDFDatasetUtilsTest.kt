@@ -1,14 +1,19 @@
 package no.fdk.dataset_catalog.rdf
 
+import no.fdk.dataset_catalog.model.Cost
 import no.fdk.dataset_catalog.model.DistributionDBO
 import no.fdk.dataset_catalog.model.LocalizedStrings
 import no.fdk.dataset_catalog.model.PeriodOfTimeDBO
 import no.fdk.dataset_catalog.model.UriWithLabel
 import org.apache.jena.datatypes.xsd.XSDDatatype
 import org.apache.jena.rdf.model.ModelFactory
+import org.apache.jena.sparql.vocabulary.FOAF
 import org.apache.jena.vocabulary.DCTerms
+import org.apache.jena.vocabulary.RDF
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -126,6 +131,149 @@ class RDFDatasetUtilsTest {
         resource.addTemporal(listOf(period))
         val periodResource = resource.getProperty(DCTerms.temporal).`object`.asResource()
         return periodResource.getProperty(property).literal.datatypeURI
+    }
+
+    @Test
+    fun nullCostsListAddsNothing() {
+        val model = ModelFactory.createDefaultModel()
+        val resource = model.createResource("http://my-dataset-cost")
+
+        resource.addCosts(null)
+
+        assertFalse { resource.hasProperty(CV.hasCost) }
+    }
+
+    @Test
+    fun emptyCostsListAddsNothing() {
+        val model = ModelFactory.createDefaultModel()
+        val resource = model.createResource("http://my-dataset-cost")
+
+        resource.addCosts(emptyList())
+
+        assertFalse { resource.hasProperty(CV.hasCost) }
+    }
+
+    @Test
+    fun costWithAllFieldsIsSerialized() {
+        val model = ModelFactory.createDefaultModel()
+        val resource = model.createResource("http://my-dataset-cost")
+
+        resource.addCosts(
+            listOf(
+                Cost(
+                    value = 125.57,
+                    description = LocalizedStrings(nb = "med doc", en = "with doc"),
+                    documentation = listOf("https://gebyr-doc.no"),
+                    currency = "http://publications.europa.eu/resource/authority/currency/EUR",
+                )
+            )
+        )
+
+        val costResource = resource.getProperty(CV.hasCost).`object`.asResource()
+        assertTrue { costResource.hasProperty(RDF.type, CV.Cost) }
+
+        val valueLiteral = costResource.getProperty(CV.hasValue).literal
+        assertEquals(125.57, valueLiteral.double)
+        assertEquals(XSDDatatype.XSDdouble.uri, valueLiteral.datatypeURI)
+
+        assertEquals(
+            "http://publications.europa.eu/resource/authority/currency/EUR",
+            costResource.getProperty(CV.currency).`object`.asResource().uri
+        )
+
+        assertEquals(
+            "https://gebyr-doc.no",
+            costResource.getProperty(FOAF.page).`object`.asResource().uri
+        )
+
+        val descriptions = costResource.listProperties(DCTerms.description).toList()
+        assertEquals(2, descriptions.size)
+        val descriptionsByLang = descriptions.associate { it.literal.language to it.literal.string }
+        assertEquals("med doc", descriptionsByLang["nb"])
+        assertEquals("with doc", descriptionsByLang["en"])
+    }
+
+    @Test
+    fun costWithoutValueIsStillSerialized() {
+        val model = ModelFactory.createDefaultModel()
+        val resource = model.createResource("http://my-dataset-cost")
+
+        resource.addCosts(
+            listOf(
+                Cost(
+                    value = null,
+                    description = LocalizedStrings(nb = "med doc"),
+                    documentation = listOf("https://gebyr-doc.no"),
+                    currency = null,
+                )
+            )
+        )
+
+        val costResource = resource.getProperty(CV.hasCost).`object`.asResource()
+        assertTrue { costResource.hasProperty(RDF.type, CV.Cost) }
+        assertNull(costResource.getProperty(CV.hasValue))
+        assertNull(costResource.getProperty(CV.currency))
+        assertNotNull(costResource.getProperty(DCTerms.description))
+        assertNotNull(costResource.getProperty(FOAF.page))
+    }
+
+    @Test
+    fun multipleCostsAreSerialized() {
+        val model = ModelFactory.createDefaultModel()
+        val resource = model.createResource("http://my-dataset-cost")
+
+        resource.addCosts(
+            listOf(
+                Cost(
+                    value = 125.57,
+                    currency = "http://publications.europa.eu/resource/authority/currency/EUR",
+                ),
+                Cost(
+                    description = LocalizedStrings(nb = "med doc"),
+                    documentation = listOf("https://gebyr-doc.no"),
+                )
+            )
+        )
+
+        assertEquals(2, resource.listProperties(CV.hasCost).toList().size)
+    }
+
+    @Test
+    fun invalidCurrencyUrlIsSkipped() {
+        val model = ModelFactory.createDefaultModel()
+        val resource = model.createResource("http://my-dataset-cost")
+
+        resource.addCosts(
+            listOf(
+                Cost(
+                    value = 10.0,
+                    currency = "not-a-uri",
+                )
+            )
+        )
+
+        val costResource = resource.getProperty(CV.hasCost).`object`.asResource()
+        assertNull(costResource.getProperty(CV.currency))
+        assertNotNull(costResource.getProperty(CV.hasValue))
+    }
+
+    @Test
+    fun invalidDocumentationUrlsAreSkipped() {
+        val model = ModelFactory.createDefaultModel()
+        val resource = model.createResource("http://my-dataset-cost")
+
+        resource.addCosts(
+            listOf(
+                Cost(
+                    documentation = listOf("not-a-uri", "https://gebyr-doc.no"),
+                )
+            )
+        )
+
+        val costResource = resource.getProperty(CV.hasCost).`object`.asResource()
+        val pages = costResource.listProperties(FOAF.page).toList()
+        assertEquals(1, pages.size)
+        assertEquals("https://gebyr-doc.no", pages[0].`object`.asResource().uri)
     }
 
 }

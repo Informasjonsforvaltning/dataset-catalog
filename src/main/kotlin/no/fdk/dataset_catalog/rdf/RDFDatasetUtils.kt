@@ -56,6 +56,7 @@ fun Model.addDatasetResource(dataset: DatasetDBO, seriesData: SeriesData, baseCa
             .addQualifiedAttributions(dataset.qualifiedAttributions)
             .addDatasetType(dataset.type)
             .addConcepts(dataset.concepts)
+            .addCosts(dataset.costs)
             .addLanguages(dataset.language)
             .safeAddLinkedProperty(ResourceFactory.createProperty("${DCAT.getURI()}inSeries"), seriesData.inSeries)
             .safeAddLinkedProperty(ResourceFactory.createProperty("${DCAT.getURI()}next"), seriesData.next)

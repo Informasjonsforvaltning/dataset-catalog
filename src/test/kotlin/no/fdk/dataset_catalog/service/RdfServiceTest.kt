@@ -111,6 +111,46 @@ class RdfServiceTest {
         }
 
         @Test
+        fun `Serializes dataset costs`() {
+            val dataset = DatasetDBO(
+                catalogId = "1",
+                published = true,
+                approved = true,
+                lastModified = LocalDateTime.now(),
+                id = "http://catalog/dataset",
+                uri = "http://catalog/dataset",
+                costs = listOf(
+                    Cost(
+                        value = 125.57,
+                        currency = "http://publications.europa.eu/resource/authority/currency/EUR",
+                    ),
+                    Cost(
+                        description = LocalizedStrings(nb = "med doc"),
+                        documentation = listOf("https://gebyr-doc.no"),
+                    )
+                )
+            )
+
+            val catalog = CatalogCount(id = "1", datasetCount = 1)
+
+            whenever(catalogService.getByID("1")).thenReturn(catalog)
+            whenever(datasetService.getAllDatasets("1")).thenReturn(listOf(dataset))
+            whenever(applicationProperties.organizationCatalogHost).thenReturn("http://localhost:5050")
+
+            val expected = responseReader.parseFile("dataset_with_costs.ttl", "TURTLE")
+            val responseModel = rdfService.getCatalogById("1")
+
+            assertTrue(
+                checkIfIsomorphicAndPrintDiff(
+                    responseModel!!,
+                    expected,
+                    "Serializing dataset costs",
+                    logger
+                )
+            )
+        }
+
+        @Test
         fun `Serializes complete catalog`() {
             val dataset = TEST_DATASET_1
             val catalog = TEST_CATALOG_1

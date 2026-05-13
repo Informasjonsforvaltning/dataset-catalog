@@ -399,6 +399,26 @@ fun Resource.addConcepts(subjects: Set<String>?): Resource {
     return this
 }
 
+fun Resource.addCosts(costs: Collection<Cost>?): Resource {
+    costs?.forEach { cost ->
+        val costResource = model.safeCreateResource()
+            .addProperty(RDF.type, CV.Cost)
+            .safeAddLocalizedString(DCTerms.description, cost.description)
+            .safeAddURLs(FOAF.page, cost.documentation)
+
+        cost.value?.let {
+            costResource.addLiteral(CV.hasValue, model.createTypedLiteral(it))
+        }
+
+        cost.currency?.takeIf { it.isValidURL() }?.let {
+            costResource.safeAddLinkedProperty(CV.currency, it)
+        }
+
+        addProperty(CV.hasCost, costResource)
+    }
+    return this
+}
+
 fun Resource.addLanguages(language: List<String>?): Resource {
     language?.forEach {
         addProperty(

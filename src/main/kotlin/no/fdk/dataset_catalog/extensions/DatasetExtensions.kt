@@ -44,4 +44,5 @@ fun DatasetDBO.addCreateValues(toCreate: DatasetToCreate) =
         type = toCreate.type,
         inSeries = toCreate.inSeries,
         seriesDatasetOrder = toCreate.seriesDatasetOrder,
+        costs = toCreate.costs,
     )

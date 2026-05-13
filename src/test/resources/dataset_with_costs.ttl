@@ -1,0 +1,24 @@
+PREFIX cv:     <http://data.europa.eu/m8g/>
+PREFIX dcat:   <http://www.w3.org/ns/dcat#>
+PREFIX dct:    <http://purl.org/dc/terms/>
+PREFIX foaf:   <http://xmlns.com/foaf/0.1/>
+PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX xsd:    <http://www.w3.org/2001/XMLSchema#>
+
+<http://localhost:5050/catalogs/1>
+        rdf:type       dcat:Catalog;
+        dct:publisher  <http://localhost:5050/organizations/1>;
+        dct:title      "Dataset catalog belonging to 1"@en;
+        dcat:dataset   <http://catalog/dataset> .
+
+<http://catalog/dataset>
+        rdf:type       dcat:Dataset;
+        cv:hasCost     [ rdf:type         cv:Cost;
+                         dct:description  "med doc"@nb;
+                         foaf:page        <https://gebyr-doc.no>
+                       ] ,
+                       [ rdf:type     cv:Cost;
+                         cv:currency  <http://publications.europa.eu/resource/authority/currency/EUR>;
+                         cv:hasValue  "125.57"^^xsd:double
+                       ];
+        dct:publisher  <http://localhost:5050/organizations/1> .
