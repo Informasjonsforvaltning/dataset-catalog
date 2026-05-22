@@ -1,6 +1,7 @@
 package no.fdk.dataset_catalog.utils
 
 import no.fdk.dataset_catalog.model.*
+import org.apache.jena.vocabulary.DCTerms
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -16,7 +17,7 @@ val CONTACT_EX = ContactPoint(
 
 val SKOSCODE_EX = "http://test.uri"
 
-val REFERENCETYPE_EX = "isReplacedBy"
+val REFERENCETYPE_EX = DCTerms.isReplacedBy.uri
 
 val DISTRIBUTION_EX = DistributionDBO(
     title = LocalizedStrings(nb = "Distribusjonsnavn"),
