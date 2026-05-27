@@ -156,11 +156,11 @@ class RdfServiceTest {
             val catalog = TEST_CATALOG_1
             val references = listOf(
                 ReferenceDBO(
-                    referenceType = "references",
+                    referenceType = "http://purl.org/dc/terms/references",
                     source = "http://referenced/dataset/resolved"
                 ),
                 ReferenceDBO(
-                    referenceType = "hasPart",
+                    referenceType = "http://purl.org/dc/terms/hasPart",
                     source = "http://has-part.no"
                 )
             )
