@@ -294,34 +294,13 @@ fun Resource.addQualityAnnotationBody(text: String, lang: String) {
     )
 }
 
-private fun referenceTypeToProperty(referenceTypeString: String?): Property? {
-    return when (referenceTypeString) {
-        "hasVersion" -> DCTerms.hasVersion
-        DCTerms.hasVersion.uri -> DCTerms.hasVersion
-        "isVersionOf" -> DCTerms.isVersionOf
-        DCTerms.isVersionOf.uri -> DCTerms.isVersionOf
-        "isPartOf" -> DCTerms.isPartOf
-        DCTerms.isPartOf.uri -> DCTerms.isPartOf
-        "hasPart" -> DCTerms.hasPart
-        DCTerms.hasPart.uri -> DCTerms.hasPart
-        "isReferencedBy" -> DCTerms.isReferencedBy
-        DCTerms.isReferencedBy.uri -> DCTerms.isReferencedBy
-        "references" -> DCTerms.references
-        DCTerms.references.uri -> DCTerms.references
-        "isReplacedBy" -> DCTerms.isReplacedBy
-        DCTerms.isReplacedBy.uri -> DCTerms.isReplacedBy
-        "replaces" -> DCTerms.replaces
-        DCTerms.replaces.uri -> DCTerms.replaces
-        "relation" -> DCTerms.relation
-        DCTerms.relation.uri -> DCTerms.relation
-        "source" -> DCTerms.source
-        DCTerms.source.uri -> DCTerms.source
-        else -> {
-            defaultLogger.warn("Unknown reference type $referenceTypeString")
-            null
-        }
+private fun referenceTypeToProperty(referenceTypeURI: String?): Property? =
+    if (referenceTypeURI.isValidURL()) {
+        ResourceFactory.createProperty(referenceTypeURI)
+    } else {
+        defaultLogger.warn("Invalid reference type $referenceTypeURI")
+        null
     }
-}
 
 fun Resource.addReferences(references: Collection<ReferenceDBO>?): Resource {
     references?.forEach {
