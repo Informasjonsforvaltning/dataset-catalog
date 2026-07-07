@@ -1,13 +1,16 @@
 package no.fdk.dataset_catalog.rdf
 
 import no.fdk.dataset_catalog.model.Cost
+import no.fdk.dataset_catalog.model.DatasetDBO
 import no.fdk.dataset_catalog.model.DistributionDBO
 import no.fdk.dataset_catalog.model.LocalizedStrings
 import no.fdk.dataset_catalog.model.PeriodOfTimeDBO
+import no.fdk.dataset_catalog.model.RightsDBO
 import no.fdk.dataset_catalog.model.UriWithLabel
 import org.apache.jena.datatypes.xsd.XSDDatatype
 import org.apache.jena.rdf.model.ModelFactory
 import org.apache.jena.sparql.vocabulary.FOAF
+import org.apache.jena.vocabulary.DCAT
 import org.apache.jena.vocabulary.DCTerms
 import org.apache.jena.vocabulary.RDF
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -274,6 +277,97 @@ class RDFDatasetUtilsTest {
         val pages = costResource.listProperties(FOAF.page).toList()
         assertEquals(1, pages.size)
         assertEquals("https://gebyr-doc.no", pages[0].`object`.asResource().uri)
+    }
+
+    @Test
+    fun mobilityThemeEmittedAsSeparatePropertyFromDcatTheme() {
+        val model = ModelFactory.createDefaultModel()
+        val resource = model.createResource("http://my-mobility-dataset")
+
+        resource.addDatasetThemes(
+            DatasetDBO(
+                id = "1",
+                catalogId = "1",
+                lastModified = null,
+                uri = "http://my-mobility-dataset",
+                euDataTheme = setOf("http://eu-theme"),
+                mobilityTheme = setOf("http://mobility-theme-1", "http://mobility-theme-2", "not a uri"),
+            )
+        )
+
+        val dcatThemes = resource.listProperties(DCAT.theme).toList().map { it.`object`.asResource().uri }
+        assertEquals(listOf("http://eu-theme"), dcatThemes)
+
+        val mobilityThemes = resource.listProperties(MOBILITYDCATAP.mobilityTheme).toList()
+            .map { it.`object`.asResource().uri }
+            .sorted()
+        assertEquals(listOf("http://mobility-theme-1", "http://mobility-theme-2"), mobilityThemes)
+    }
+
+    @Test
+    fun distributionMobilityDataStandardEmittedAsLinkedUri() {
+        val model = ModelFactory.createDefaultModel()
+        val resource = model.createResource("http://my-dataset-mds")
+
+        resource.addDatasetDistribution(
+            DCAT.distribution,
+            listOf(DistributionDBO(mobilityDataStandard = "http://mobility-data-standard"))
+        )
+
+        val distribution = resource.getProperty(DCAT.distribution).`object`.asResource()
+        assertEquals(
+            "http://mobility-data-standard",
+            distribution.getProperty(MOBILITYDCATAP.mobilityDataStandard).`object`.asResource().uri
+        )
+    }
+
+    @Test
+    fun distributionRightsEmittedAsNestedRightsStatement() {
+        val model = ModelFactory.createDefaultModel()
+        val resource = model.createResource("http://my-dataset-rights")
+
+        resource.addDatasetDistribution(
+            DCAT.distribution,
+            listOf(DistributionDBO(rights = RightsDBO(type = "http://rights-type")))
+        )
+
+        val distribution = resource.getProperty(DCAT.distribution).`object`.asResource()
+        val rightsStatement = distribution.getProperty(DCTerms.rights).`object`.asResource()
+        assertTrue { rightsStatement.hasProperty(RDF.type, DCTerms.RightsStatement) }
+        assertEquals(
+            "http://rights-type",
+            rightsStatement.getProperty(DCTerms.type).`object`.asResource().uri
+        )
+    }
+
+    @Test
+    fun distributionRightsWithoutTypeIsNotEmitted() {
+        val model = ModelFactory.createDefaultModel()
+        val resource = model.createResource("http://my-dataset-rights-empty")
+
+        resource.addDatasetDistribution(
+            DCAT.distribution,
+            listOf(DistributionDBO(accessURL = listOf("http://access"), rights = RightsDBO(type = null)))
+        )
+
+        val distribution = resource.getProperty(DCAT.distribution).`object`.asResource()
+        assertNull(distribution.getProperty(DCTerms.rights))
+    }
+
+    @Test
+    fun distributionWithOnlyMobilityFieldsIsIncluded() {
+        val model = ModelFactory.createDefaultModel()
+        val resource = model.createResource("http://my-dataset-mobility-only")
+
+        resource.addDatasetDistribution(
+            DCAT.distribution,
+            listOf(
+                DistributionDBO(mobilityDataStandard = "http://mobility-data-standard"),
+                DistributionDBO(rights = RightsDBO(type = "http://rights-type")),
+            )
+        )
+
+        assertEquals(2, resource.listProperties(DCAT.distribution).toList().size)
     }
 
 }

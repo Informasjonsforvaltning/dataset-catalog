@@ -1,0 +1,22 @@
+PREFIX dcat:            <http://www.w3.org/ns/dcat#>
+PREFIX dct:             <http://purl.org/dc/terms/>
+PREFIX mobilitydcatap:  <https://w3id.org/mobilitydcat-ap#>
+PREFIX rdf:             <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+
+<http://localhost:5050/catalogs/1>
+        rdf:type       dcat:Catalog;
+        dct:publisher  <http://localhost:5050/organizations/1>;
+        dct:title      "Dataset catalog belonging to 1"@en;
+        dcat:dataset   <http://catalog/mobility-dataset> .
+
+<http://catalog/mobility-dataset>
+        rdf:type                       dcat:Dataset;
+        dct:publisher                  <http://localhost:5050/organizations/1>;
+        mobilitydcatap:mobilityTheme   <http://mobility-theme-1> , <http://mobility-theme-2>;
+        dcat:distribution              [ rdf:type                             dcat:Distribution;
+                                         dcat:accessURL                       <http://access-url>;
+                                         mobilitydcatap:mobilityDataStandard  <http://mobility-data-standard>;
+                                         dct:rights  [ rdf:type   dct:RightsStatement;
+                                                       dct:type   <http://rights-type>
+                                                     ]
+                                       ] .
