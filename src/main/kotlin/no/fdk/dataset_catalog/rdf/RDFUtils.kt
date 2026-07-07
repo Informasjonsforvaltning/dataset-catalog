@@ -168,8 +168,22 @@ fun Resource.addDatasetDistribution(property: Property, distributions: Collectio
                     .safeAddURLs(DCTerms.format, it.format)
                     .safeAddURLs(DCAT.mediaType, it.mediaType)
                     .addDistributionServices(it.accessServices)
+                    .safeAddLinkedProperty(MOBILITYDCATAP.mobilityDataStandard, it.mobilityDataStandard)
+                    .addDistributionRights(it.rights)
             )
         }
+    }
+    return this
+}
+
+fun Resource.addDistributionRights(rights: RightsDBO?): Resource {
+    rights?.type?.takeIf { it.isNotEmpty() }?.let { type ->
+        addProperty(
+            DCTerms.rights,
+            model.safeCreateResource()
+                .addProperty(RDF.type, DCTerms.RightsStatement)
+                .safeAddLinkedProperty(DCTerms.type, type)
+        )
     }
     return this
 }
@@ -183,7 +197,9 @@ private fun DistributionDBO.hasNonNullOrEmptyProperty(): Boolean =
         conformsTo?.any { !it.uri.isNullOrEmpty() } == true ||
         format?.any { it.isNotEmpty() } == true ||
         mediaType?.any { it.isNotEmpty() } == true ||
-        !accessServices.isNullOrEmpty()
+        !accessServices.isNullOrEmpty() ||
+        !mobilityDataStandard.isNullOrEmpty() ||
+        !rights?.type.isNullOrEmpty()
 
 fun Resource.addDatasetThemes(ds: DatasetDBO): Resource {
     val uniqueThemes = mutableSetOf<String>()
@@ -194,6 +210,9 @@ fun Resource.addDatasetThemes(ds: DatasetDBO): Resource {
     ds.euDataTheme?.filter { it.isValidURI() }
         ?.let { uniqueThemes.addAll(it) }
     safeAddLinkListProperty(DCAT.theme, uniqueThemes.toList())
+
+    ds.mobilityTheme?.filter { it.isValidURI() }
+        ?.let { safeAddLinkListProperty(MOBILITYDCATAP.mobilityTheme, it) }
 
     return this
 }

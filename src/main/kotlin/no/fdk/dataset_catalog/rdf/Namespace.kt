@@ -91,3 +91,12 @@ class CV {
         val hasValue: Property = ResourceFactory.createProperty("${uri}hasValue")
     }
 }
+
+class MOBILITYDCATAP {
+    companion object {
+        const val uri = "https://w3id.org/mobilitydcat-ap#"
+
+        val mobilityTheme: Property = ResourceFactory.createProperty("${uri}mobilityTheme")
+        val mobilityDataStandard: Property = ResourceFactory.createProperty("${uri}mobilityDataStandard")
+    }
+}
