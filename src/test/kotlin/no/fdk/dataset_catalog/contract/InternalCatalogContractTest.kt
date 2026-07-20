@@ -267,8 +267,7 @@ class InternalCatalogContractTest : ApiTestContext() {
         @Test
         fun `Only specified fields are updated`() {
             resetDB()
-            // Bare string value exercises the ACCEPT_SINGLE_VALUE_AS_ARRAY read-path bridge.
-            val update = listOf(JsonPatchOperation(OpEnum.ADD, "/type", "test"))
+            val update = listOf(JsonPatchOperation(OpEnum.ADD, "/type", listOf("test")))
 
             val rspUpdate = apiAuthorizedRequest(
                 "/internal/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}",

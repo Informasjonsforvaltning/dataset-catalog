@@ -18,6 +18,5 @@ open class JacksonConfigurer {
         return jacksonObjectMapper()
             .registerModule(JavaTimeModule())
             .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-            .configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true)
     }
 }
