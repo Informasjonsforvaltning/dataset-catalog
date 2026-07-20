@@ -89,5 +89,5 @@ val TEST_DATASET_0 = DatasetDBO(
     conformsTo = listOf(UriWithLabel(uri = "http://test.uri")),
     informationModelsFromOtherSources = listOf(UriWithLabel(uri = "http://test.uri")),
     qualifiedAttributions = setOf("910244132"),
-    type = "type",
+    type = listOf("type"),
 )
