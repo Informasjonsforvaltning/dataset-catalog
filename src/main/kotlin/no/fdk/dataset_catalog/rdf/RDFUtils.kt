@@ -452,11 +452,13 @@ fun jenaLangFromAcceptHeader(accept: String?): Lang =
         else -> throw HttpServerErrorException(HttpStatus.NOT_ACCEPTABLE)
     }
 
-fun Resource.addDatasetType(datasetType: String?): Resource {
-    if (datasetType.isValidURL()) {
-        safeAddProperty(DCTerms.type, model.safeCreateLinkedResource(datasetType))
-    } else {
-        safeAddProperty(DCTerms.type, datasetType)
+fun Resource.addDatasetType(datasetTypes: List<String>?): Resource {
+    datasetTypes?.forEach { datasetType ->
+        if (datasetType.isValidURL()) {
+            safeAddProperty(DCTerms.type, model.safeCreateLinkedResource(datasetType))
+        } else {
+            safeAddProperty(DCTerms.type, datasetType)
+        }
     }
     return this
 }

@@ -79,7 +79,7 @@ val TEST_DATASET_1 = DatasetDBO(
     title = DATASET_TITLE,
     description = DATASET_DESCRIPTION,
     keywords = KEYWORDS,
-    type="Kodeliste",
+    type = listOf("Kodeliste"),
     accessRight = "http://publications.europa.eu/resource/authority/access-right/RESTRICTED",
     informationModelsFromOtherSources = listOf(UriWithLabel(uri="",prefLabel=LocalizedStrings(nb = "SKOS"))),
     informationModelsFromFDK = listOf(

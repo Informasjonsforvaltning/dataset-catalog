@@ -243,7 +243,7 @@ class InternalCatalogContractTest : ApiTestContext() {
             assertEquals(DB_DATASET_1, bodyPreUpdate)
 
             val patchBody =
-                mapper.writeValueAsString(listOf(JsonPatchOperation(op = OpEnum.ADD, path = "/type", "test")))
+                mapper.writeValueAsString(listOf(JsonPatchOperation(op = OpEnum.ADD, path = "/type", listOf("test"))))
 
             val rspUpdate = apiAuthorizedRequest(
                 "/internal/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}",
@@ -261,13 +261,13 @@ class InternalCatalogContractTest : ApiTestContext() {
             )
             assertEquals(HttpStatus.OK.value(), postUpdate["status"])
             val bodyPostUpdate: DatasetDBO = mapper.readValue(postUpdate["body"] as String)
-            assertEquals(DB_DATASET_1.copy(lastModified = bodyPostUpdate.lastModified, type = "test"), bodyPostUpdate)
+            assertEquals(DB_DATASET_1.copy(lastModified = bodyPostUpdate.lastModified, type = listOf("test")), bodyPostUpdate)
         }
 
         @Test
         fun `Only specified fields are updated`() {
             resetDB()
-            val update = listOf(JsonPatchOperation(OpEnum.ADD, "/type", "test"))
+            val update = listOf(JsonPatchOperation(OpEnum.ADD, "/type", listOf("test")))
 
             val rspUpdate = apiAuthorizedRequest(
                 "/internal/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}",
@@ -290,7 +290,7 @@ class InternalCatalogContractTest : ApiTestContext() {
             assertEquals(
                 DB_DATASET_1.copy(
                     lastModified = bodyPostUpdate.lastModified,
-                    type = "test",
+                    type = listOf("test"),
                 ), bodyPostUpdate
             )
         }

@@ -370,4 +370,44 @@ class RDFDatasetUtilsTest {
         assertEquals(2, resource.listProperties(DCAT.distribution).toList().size)
     }
 
+    @Test
+    fun datasetTypeEmitsOneTriplePerValue() {
+        val model = ModelFactory.createDefaultModel()
+        val resource = model.createResource("http://my-dataset1")
+
+        resource.addDatasetType(
+            listOf(
+                "http://publications.europa.eu/resource/authority/dataset-type/TEST_DATA",
+                "Kodeliste",
+            )
+        )
+
+        val types = resource.listProperties(DCTerms.type).toList()
+        assertEquals(2, types.size)
+        // URL value -> linked resource, non-URL value -> literal
+        assertTrue {
+            types.any {
+                it.`object`.isResource &&
+                    it.`object`.asResource().uri ==
+                    "http://publications.europa.eu/resource/authority/dataset-type/TEST_DATA"
+            }
+        }
+        assertTrue {
+            types.any { it.`object`.isLiteral && it.`object`.asLiteral().string == "Kodeliste" }
+        }
+    }
+
+    @Test
+    fun nullOrEmptyDatasetTypeAddsNothing() {
+        val model = ModelFactory.createDefaultModel()
+
+        val nullResource = model.createResource("http://my-dataset-null")
+        nullResource.addDatasetType(null)
+        assertFalse { nullResource.hasProperty(DCTerms.type) }
+
+        val emptyResource = model.createResource("http://my-dataset-empty")
+        emptyResource.addDatasetType(emptyList())
+        assertFalse { emptyResource.hasProperty(DCTerms.type) }
+    }
+
 }

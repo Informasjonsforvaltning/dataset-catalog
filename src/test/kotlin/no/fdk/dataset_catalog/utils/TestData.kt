@@ -78,7 +78,7 @@ val DB_DATASET_2 = DatasetDBO(
     DB_CATALOG_ID_1,
     lastModified = null,
     uri = "http://$DB_DATASET_ID_2",
-    type = "http://publications.europa.eu/resource/authority/dataset-type/TEST_DATA",
+    type = listOf("http://publications.europa.eu/resource/authority/dataset-type/TEST_DATA"),
     title = LocalizedStrings(nb = "enda en"),
     description = LocalizedStrings(en = "test words"),
     published = true,

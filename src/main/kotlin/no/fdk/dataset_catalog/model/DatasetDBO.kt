@@ -78,7 +78,7 @@ data class DatasetDTO(
     val informationModelsFromOtherSources: List<UriWithLabel>? = null,
     val informationModelsFromFDK: List<String>? = null,
     val qualifiedAttributions: Set<String>? = null,
-    val type: String? = null,
+    val type: List<String>? = null,
 
     val inSeries: String? = null,
     val seriesDatasetOrder: Map<String, Int>? = null,
@@ -145,7 +145,7 @@ data class DatasetToCreate(
     val informationModelsFromOtherSources: List<UriWithLabel>? = null,
     val informationModelsFromFDK: List<String>? = null,
     val qualifiedAttributions: Set<String>? = null,
-    val type: String? = null,
+    val type: List<String>? = null,
 
     val inSeries: String? = null,
     val seriesDatasetOrder: Map<String, Int>? = null,

@@ -152,10 +152,10 @@ class DatasetServiceTest {
         @Test
         fun `update dataset with add operation`() {
             val ds = DatasetDBO("dsId", "catId", uri = "uri", lastModified = null)
-            val expected = DatasetDBO("dsId", "catId", uri = "uri", lastModified = null, type = "test")
+            val expected = DatasetDBO("dsId", "catId", uri = "uri", lastModified = null, type = listOf("test"))
             whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds.asEntity()))
 
-            datasetService.updateDatasetDBO("catId", "dsId", listOf(JsonPatchOperation(OpEnum.ADD, "/type", "test")))
+            datasetService.updateDatasetDBO("catId", "dsId", listOf(JsonPatchOperation(OpEnum.ADD, "/type", listOf("test"))))
 
             argumentCaptor<List<DatasetEntity>>().apply {
                 verify(datasetRepository, times(1)).saveAll(capture())
@@ -254,7 +254,7 @@ class DatasetServiceTest {
 
         @Test
         fun `update dataset with remove operation`() {
-            val ds = DatasetDBO("dsId", "catId", type = "test", uri = "uri", lastModified = LocalDateTime.now())
+            val ds = DatasetDBO("dsId", "catId", type = listOf("test"), uri = "uri", lastModified = LocalDateTime.now())
             val expected = DatasetDBO("dsId", "catId", uri = "uri", lastModified = null)
             whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds.asEntity()))
             datasetService.updateDatasetDBO("catId", "dsId", listOf(JsonPatchOperation(OpEnum.REMOVE, "/type")))
