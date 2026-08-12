@@ -258,18 +258,14 @@
                 </configuration>
             </plugin>
 
-            <!-- ktlint derives its source roots from the project's compile source roots.
-                 Those are set to src/main/kotlin and src/test/kotlin by <sourceDirectory>
-                 and <testSourceDirectory> above, so ktlint sees all Kotlin sources. -->
             <plugin>
                 <groupId>com.github.gantsign.maven</groupId>
                 <artifactId>ktlint-maven-plugin</artifactId>
                 <version>${ktlint.version}</version>
                 <executions>
                     <execution>
-                        <id>format-and-check</id>
+                        <id>ktlint-check</id>
                         <goals>
-                            <goal>format</goal>
                             <goal>check</goal>
                         </goals>
                     </execution>
