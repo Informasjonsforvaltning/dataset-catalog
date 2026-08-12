@@ -191,6 +191,8 @@
 
     <build>
         <finalName>app</finalName>
+        <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
+        <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -226,9 +228,6 @@
                         <goals> <goal>compile</goal> </goals>
                         <configuration>
                             <jvmTarget>${java.release}</jvmTarget>
-                            <sourceDirs>
-                                <sourceDir>src/main/kotlin</sourceDir>
-                            </sourceDirs>
                         </configuration>
                     </execution>
                     <execution>
@@ -236,9 +235,6 @@
                         <goals> <goal>test-compile</goal> </goals>
                         <configuration>
                             <jvmTarget>${java.release}</jvmTarget>
-                            <sourceDirs>
-                                <sourceDir>src/test/kotlin</sourceDir>
-                            </sourceDirs>
                         </configuration>
                     </execution>
                 </executions>
@@ -262,43 +258,9 @@
                 </configuration>
             </plugin>
 
-            <!-- ktlint derives its source roots from the project's compile source roots,
-                 which only contain src/main/java. Registering the Kotlin sources here is
-                 what makes ktlint actually see them. -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.6.1</version>
-                <executions>
-                    <execution>
-                        <id>add-kotlin-sources</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>${project.basedir}/src/main/kotlin</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>add-kotlin-test-sources</id>
-                        <!-- generate-sources, not generate-test-sources: ktlint's format goal
-                             runs at process-sources and must already see the test sources. -->
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>add-test-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>${project.basedir}/src/test/kotlin</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
+            <!-- ktlint derives its source roots from the project's compile source roots.
+                 Those are set to src/main/kotlin and src/test/kotlin by <sourceDirectory>
+                 and <testSourceDirectory> above, so ktlint sees all Kotlin sources. -->
             <plugin>
                 <groupId>com.github.gantsign.maven</groupId>
                 <artifactId>ktlint-maven-plugin</artifactId>
