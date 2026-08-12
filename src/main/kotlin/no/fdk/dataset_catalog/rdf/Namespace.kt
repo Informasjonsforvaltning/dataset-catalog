@@ -6,97 +6,94 @@ import org.apache.jena.rdf.model.ResourceFactory
 
 class ADMS {
     companion object {
-        const val uri = "http://www.w3.org/ns/adms#"
+        const val URI = "http://www.w3.org/ns/adms#"
 
-        val identifier: Property = ResourceFactory.createProperty("${uri}identifier")
-        val sample: Property = ResourceFactory.createProperty("${uri}sample")    }
+        val identifier: Property = ResourceFactory.createProperty("${URI}identifier")
+        val sample: Property = ResourceFactory.createProperty("${URI}sample")
+    }
 }
 
 class Schema {
     companion object {
-        const val uri = "http://schema.org/"
-        var startDate: Property = ResourceFactory.createProperty("${uri}startDate")
-        var endDate: Property = ResourceFactory.createProperty("${uri}endDate")
+        const val URI = "http://schema.org/"
+        var startDate: Property = ResourceFactory.createProperty("${URI}startDate")
+        var endDate: Property = ResourceFactory.createProperty("${URI}endDate")
     }
 }
 
 class DQV {
     companion object {
-        const val uri = "http://www.w3.org/ns/dqv#"
+        const val URI = "http://www.w3.org/ns/dqv#"
         const val ISO = "http://iso.org/25012/2008/dataquality/"
 
+        val hasQualityAnnotation: Property = ResourceFactory.createProperty("${URI}hasQualityAnnotation")
+        val inDimension: Property = ResourceFactory.createProperty("${URI}inDimension")
 
-        val hasQualityAnnotation: Property = ResourceFactory.createProperty("${uri}hasQualityAnnotation")
-        val inDimension: Property = ResourceFactory.createProperty("${uri}inDimension")
-
-        val QualityAnnotation: Resource = ResourceFactory.createResource("${uri}QualityAnnotation")
+        val QualityAnnotation: Resource = ResourceFactory.createResource("${URI}QualityAnnotation")
         val Accuracy: Resource = ResourceFactory.createResource("${ISO}Accuracy")
         val Availability: Resource = ResourceFactory.createResource("${ISO}Availability")
         val Completeness: Resource = ResourceFactory.createResource("${ISO}Completeness")
         val Currentness: Resource = ResourceFactory.createResource("${ISO}Currentness")
         val Relevance: Resource = ResourceFactory.createResource("${ISO}Relevance")
-
     }
-
 }
 
 class PROV {
     companion object {
-        const val uri = "http://www.w3.org/ns/prov#"
-        val Attribution: Resource = ResourceFactory.createResource("${uri}Attribution")
+        const val URI = "http://www.w3.org/ns/prov#"
+        val Attribution: Resource = ResourceFactory.createResource("${URI}Attribution")
 
-        val agent: Property = ResourceFactory.createProperty("${uri}agent")
-        val qualifiedAttribution: Property = ResourceFactory.createProperty("${uri}qualifiedAttribution")
-
+        val agent: Property = ResourceFactory.createProperty("${URI}agent")
+        val qualifiedAttribution: Property = ResourceFactory.createProperty("${URI}qualifiedAttribution")
     }
 }
 
 class ELI {
     companion object {
-        const val uri = "http://data.europa.eu/eli/ontology#"
+        const val URI = "http://data.europa.eu/eli/ontology#"
 
-        val LegalResource: Resource = ResourceFactory.createResource("${uri}LegalResource")
+        val LegalResource: Resource = ResourceFactory.createResource("${URI}LegalResource")
     }
 }
 
 class CPSV {
     companion object {
-        const val uri = "http://purl.org/vocab/cpsv#"
+        const val URI = "http://purl.org/vocab/cpsv#"
 
-        val Rule: Resource = ResourceFactory.createResource("${uri}Rule")
+        val Rule: Resource = ResourceFactory.createResource("${URI}Rule")
 
-        val follows: Property = ResourceFactory.createProperty("${uri}follows")
-        val implements: Property = ResourceFactory.createProperty("${uri}implements")
+        val follows: Property = ResourceFactory.createProperty("${URI}follows")
+        val implements: Property = ResourceFactory.createProperty("${URI}implements")
     }
 }
 
 class CPSVNO {
     companion object {
-        const val uri = "https://data.norge.no/vocabulary/cpsvno#"
+        const val URI = "https://data.norge.no/vocabulary/cpsvno#"
 
-        val ruleForDataProcessing: Resource = ResourceFactory.createResource("${uri}ruleForDataProcessing")
-        val ruleForDisclosure: Resource = ResourceFactory.createResource("${uri}ruleForDisclosure")
-        val ruleForNonDisclosure: Resource = ResourceFactory.createResource("${uri}ruleForNonDisclosure")
+        val ruleForDataProcessing: Resource = ResourceFactory.createResource("${URI}ruleForDataProcessing")
+        val ruleForDisclosure: Resource = ResourceFactory.createResource("${URI}ruleForDisclosure")
+        val ruleForNonDisclosure: Resource = ResourceFactory.createResource("${URI}ruleForNonDisclosure")
     }
 }
 
 class CV {
     companion object {
-        const val uri = "http://data.europa.eu/m8g/"
+        const val URI = "http://data.europa.eu/m8g/"
 
-        val Cost: Resource = ResourceFactory.createResource("${uri}Cost")
+        val Cost: Resource = ResourceFactory.createResource("${URI}Cost")
 
-        val currency: Property = ResourceFactory.createProperty("${uri}currency")
-        val hasCost: Property = ResourceFactory.createProperty("${uri}hasCost")
-        val hasValue: Property = ResourceFactory.createProperty("${uri}hasValue")
+        val currency: Property = ResourceFactory.createProperty("${URI}currency")
+        val hasCost: Property = ResourceFactory.createProperty("${URI}hasCost")
+        val hasValue: Property = ResourceFactory.createProperty("${URI}hasValue")
     }
 }
 
 class MOBILITYDCATAP {
     companion object {
-        const val uri = "https://w3id.org/mobilitydcat-ap#"
+        const val URI = "https://w3id.org/mobilitydcat-ap#"
 
-        val mobilityTheme: Property = ResourceFactory.createProperty("${uri}mobilityTheme")
-        val mobilityDataStandard: Property = ResourceFactory.createProperty("${uri}mobilityDataStandard")
+        val mobilityTheme: Property = ResourceFactory.createProperty("${URI}mobilityTheme")
+        val mobilityDataStandard: Property = ResourceFactory.createProperty("${URI}mobilityDataStandard")
     }
 }

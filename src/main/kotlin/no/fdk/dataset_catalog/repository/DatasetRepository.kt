@@ -10,7 +10,11 @@ import org.springframework.stereotype.Repository
 @Repository
 interface DatasetRepository : JpaRepository<DatasetEntity, String> {
     fun findByCatalogId(catalogId: String): List<DatasetEntity>
-    fun findByCatalogIdAndSpecializedType(catalogId: String, specializedType: SpecializedType): List<DatasetEntity>
+
+    fun findByCatalogIdAndSpecializedType(
+        catalogId: String,
+        specializedType: SpecializedType,
+    ): List<DatasetEntity>
 
     @Query(
         value = """
@@ -22,11 +26,11 @@ interface DatasetRepository : JpaRepository<DatasetEntity, String> {
                 OR d.data->'title'->>'en' ILIKE '%' || :query || '%'
             )
         """,
-        nativeQuery = true
+        nativeQuery = true,
     )
     fun findByTitleContaining(
         @Param("catalogIds") catalogIds: List<String>,
-        @Param("query") query: String
+        @Param("query") query: String,
     ): List<DatasetEntity>
 
     @Query(
@@ -39,10 +43,10 @@ interface DatasetRepository : JpaRepository<DatasetEntity, String> {
                 OR d.data->'description'->>'en' ILIKE '%' || :query || '%'
             )
         """,
-        nativeQuery = true
+        nativeQuery = true,
     )
     fun findByDescriptionContaining(
         @Param("catalogIds") catalogIds: List<String>,
-        @Param("query") query: String
+        @Param("query") query: String,
     ): List<DatasetEntity>
 }

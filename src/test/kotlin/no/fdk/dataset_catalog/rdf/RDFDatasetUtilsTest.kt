@@ -40,25 +40,29 @@ class RDFDatasetUtilsTest {
         val model = ModelFactory.createDefaultModel()
         val resource = model.createResource("http://my-dataset1")
 
-        resource.addDatasetDistribution(ADMS.sample, listOf(
-            DistributionDBO(
-                title = LocalizedStrings(nb = ""),
-                description = LocalizedStrings(nb = ""),
-                accessURL = listOf(""),
-                conformsTo = listOf(UriWithLabel(uri = "", prefLabel = LocalizedStrings(nb = ""))),
-                format = listOf(""),
-                license = "",
-                page = listOf("")
-            ),
-            DistributionDBO(
+        resource.addDatasetDistribution(
+            ADMS.sample,
+            listOf(
+                DistributionDBO(
+                    title = LocalizedStrings(nb = ""),
+                    description = LocalizedStrings(nb = ""),
+                    accessURL = listOf(""),
+                    conformsTo = listOf(UriWithLabel(uri = "", prefLabel = LocalizedStrings(nb = ""))),
+                    format = listOf(""),
+                    license = "",
+                    page = listOf(""),
+                ),
+                DistributionDBO(
                     title = null,
                     description = LocalizedStrings(),
                     accessURL = listOf(""),
                     conformsTo = null,
                     format = listOf(),
                     license = null,
-                    page = null
-                )))
+                    page = null,
+                ),
+            ),
+        )
 
         assertFalse { resource.hasProperty(ADMS.sample) }
     }
@@ -128,7 +132,10 @@ class RDFDatasetUtilsTest {
         assertFalse { resource.hasProperty(Schema.endDate) }
     }
 
-    private fun temporalDatatype(period: PeriodOfTimeDBO, property: org.apache.jena.rdf.model.Property): String {
+    private fun temporalDatatype(
+        period: PeriodOfTimeDBO,
+        property: org.apache.jena.rdf.model.Property,
+    ): String {
         val model = ModelFactory.createDefaultModel()
         val resource = model.createResource("http://my-dataset-temporal")
         resource.addTemporal(listOf(period))
@@ -168,8 +175,8 @@ class RDFDatasetUtilsTest {
                     description = LocalizedStrings(nb = "med doc", en = "with doc"),
                     documentation = listOf("https://gebyr-doc.no"),
                     currency = "http://publications.europa.eu/resource/authority/currency/EUR",
-                )
-            )
+                ),
+            ),
         )
 
         val costResource = resource.getProperty(CV.hasCost).`object`.asResource()
@@ -181,12 +188,20 @@ class RDFDatasetUtilsTest {
 
         assertEquals(
             "http://publications.europa.eu/resource/authority/currency/EUR",
-            costResource.getProperty(CV.currency).`object`.asResource().uri
+            costResource
+                .getProperty(CV.currency)
+                .`object`
+                .asResource()
+                .uri,
         )
 
         assertEquals(
             "https://gebyr-doc.no",
-            costResource.getProperty(FOAF.page).`object`.asResource().uri
+            costResource
+                .getProperty(FOAF.page)
+                .`object`
+                .asResource()
+                .uri,
         )
 
         val descriptions = costResource.listProperties(DCTerms.description).toList()
@@ -208,8 +223,8 @@ class RDFDatasetUtilsTest {
                     description = LocalizedStrings(nb = "med doc"),
                     documentation = listOf("https://gebyr-doc.no"),
                     currency = null,
-                )
-            )
+                ),
+            ),
         )
 
         val costResource = resource.getProperty(CV.hasCost).`object`.asResource()
@@ -234,8 +249,8 @@ class RDFDatasetUtilsTest {
                 Cost(
                     description = LocalizedStrings(nb = "med doc"),
                     documentation = listOf("https://gebyr-doc.no"),
-                )
-            )
+                ),
+            ),
         )
 
         assertEquals(2, resource.listProperties(CV.hasCost).toList().size)
@@ -251,8 +266,8 @@ class RDFDatasetUtilsTest {
                 Cost(
                     value = 10.0,
                     currency = "not-a-uri",
-                )
-            )
+                ),
+            ),
         )
 
         val costResource = resource.getProperty(CV.hasCost).`object`.asResource()
@@ -269,8 +284,8 @@ class RDFDatasetUtilsTest {
             listOf(
                 Cost(
                     documentation = listOf("not-a-uri", "https://gebyr-doc.no"),
-                )
-            )
+                ),
+            ),
         )
 
         val costResource = resource.getProperty(CV.hasCost).`object`.asResource()
@@ -292,15 +307,18 @@ class RDFDatasetUtilsTest {
                 uri = "http://my-mobility-dataset",
                 euDataTheme = setOf("http://eu-theme"),
                 mobilityTheme = setOf("http://mobility-theme-1", "http://mobility-theme-2", "not a uri"),
-            )
+            ),
         )
 
         val dcatThemes = resource.listProperties(DCAT.theme).toList().map { it.`object`.asResource().uri }
         assertEquals(listOf("http://eu-theme"), dcatThemes)
 
-        val mobilityThemes = resource.listProperties(MOBILITYDCATAP.mobilityTheme).toList()
-            .map { it.`object`.asResource().uri }
-            .sorted()
+        val mobilityThemes =
+            resource
+                .listProperties(MOBILITYDCATAP.mobilityTheme)
+                .toList()
+                .map { it.`object`.asResource().uri }
+                .sorted()
         assertEquals(listOf("http://mobility-theme-1", "http://mobility-theme-2"), mobilityThemes)
     }
 
@@ -311,13 +329,17 @@ class RDFDatasetUtilsTest {
 
         resource.addDatasetDistribution(
             DCAT.distribution,
-            listOf(DistributionDBO(mobilityDataStandard = "http://mobility-data-standard"))
+            listOf(DistributionDBO(mobilityDataStandard = "http://mobility-data-standard")),
         )
 
         val distribution = resource.getProperty(DCAT.distribution).`object`.asResource()
         assertEquals(
             "http://mobility-data-standard",
-            distribution.getProperty(MOBILITYDCATAP.mobilityDataStandard).`object`.asResource().uri
+            distribution
+                .getProperty(MOBILITYDCATAP.mobilityDataStandard)
+                .`object`
+                .asResource()
+                .uri,
         )
     }
 
@@ -328,7 +350,7 @@ class RDFDatasetUtilsTest {
 
         resource.addDatasetDistribution(
             DCAT.distribution,
-            listOf(DistributionDBO(rights = RightsDBO(type = "http://rights-type")))
+            listOf(DistributionDBO(rights = RightsDBO(type = "http://rights-type"))),
         )
 
         val distribution = resource.getProperty(DCAT.distribution).`object`.asResource()
@@ -336,7 +358,11 @@ class RDFDatasetUtilsTest {
         assertTrue { rightsStatement.hasProperty(RDF.type, DCTerms.RightsStatement) }
         assertEquals(
             "http://rights-type",
-            rightsStatement.getProperty(DCTerms.type).`object`.asResource().uri
+            rightsStatement
+                .getProperty(DCTerms.type)
+                .`object`
+                .asResource()
+                .uri,
         )
     }
 
@@ -347,7 +373,7 @@ class RDFDatasetUtilsTest {
 
         resource.addDatasetDistribution(
             DCAT.distribution,
-            listOf(DistributionDBO(accessURL = listOf("http://access"), rights = RightsDBO(type = null)))
+            listOf(DistributionDBO(accessURL = listOf("http://access"), rights = RightsDBO(type = null))),
         )
 
         val distribution = resource.getProperty(DCAT.distribution).`object`.asResource()
@@ -364,7 +390,7 @@ class RDFDatasetUtilsTest {
             listOf(
                 DistributionDBO(mobilityDataStandard = "http://mobility-data-standard"),
                 DistributionDBO(rights = RightsDBO(type = "http://rights-type")),
-            )
+            ),
         )
 
         assertEquals(2, resource.listProperties(DCAT.distribution).toList().size)
@@ -379,7 +405,7 @@ class RDFDatasetUtilsTest {
             listOf(
                 "http://publications.europa.eu/resource/authority/dataset-type/TEST_DATA",
                 "Kodeliste",
-            )
+            ),
         )
 
         val types = resource.listProperties(DCTerms.type).toList()
@@ -409,5 +435,4 @@ class RDFDatasetUtilsTest {
         emptyResource.addDatasetType(emptyList())
         assertFalse { emptyResource.hasProperty(DCTerms.type) }
     }
-
 }

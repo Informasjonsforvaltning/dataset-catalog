@@ -4,30 +4,39 @@ import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.stereotype.Component
 
 private const val ROLE_ROOT_ADMIN = "system:root:admin"
+
 private fun roleOrgAdmin(orgnr: String) = "organization:$orgnr:admin"
+
 private fun roleOrgWrite(orgnr: String) = "organization:$orgnr:write"
+
 private fun roleOrgRead(orgnr: String) = "organization:$orgnr:read"
 
 @Component
 class EndpointPermissions {
-
-    fun getOrgsByPermission(jwt: Jwt, permission: String): Set<String> {
+    fun getOrgsByPermission(
+        jwt: Jwt,
+        permission: String,
+    ): Set<String> {
         val authorities: String? = jwt.claims["authorities"] as? String
-        val regex = when(permission){
-            "read" -> Regex("""[0-9]{9}""")
-            else -> Regex("""[0-9]{9}:$permission""")
-        }
+        val regex =
+            when (permission) {
+                "read" -> Regex("""[0-9]{9}""")
+                else -> Regex("""[0-9]{9}:$permission""")
+            }
 
         return authorities
-            ?.let { regex.findAll(it)}
-            ?.map { matchResult -> matchResult.value
-                .replace(Regex("[A-Za-z:]"), "")}
-            ?.toSet()
+            ?.let { regex.findAll(it) }
+            ?.map { matchResult ->
+                matchResult.value
+                    .replace(Regex("[A-Za-z:]"), "")
+            }?.toSet()
             ?: emptySet()
     }
 
-
-    fun hasOrgReadPermission(jwt: Jwt, orgnr: String): Boolean {
+    fun hasOrgReadPermission(
+        jwt: Jwt,
+        orgnr: String,
+    ): Boolean {
         val authorities: String? = jwt.claims["authorities"] as? String
         return when {
             authorities == null -> false
@@ -39,7 +48,10 @@ class EndpointPermissions {
         }
     }
 
-    fun hasOrgWritePermission(jwt: Jwt, orgnr: String): Boolean {
+    fun hasOrgWritePermission(
+        jwt: Jwt,
+        orgnr: String,
+    ): Boolean {
         val authorities: String? = jwt.claims["authorities"] as? String
         return when {
             authorities == null -> false
@@ -55,5 +67,4 @@ class EndpointPermissions {
 
         return authorities?.contains(ROLE_ROOT_ADMIN) ?: false
     }
-
 }

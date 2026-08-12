@@ -13,7 +13,10 @@ import org.apache.jena.riot.Lang
 import org.flywaydb.core.Flyway
 import org.postgresql.util.PGobject
 import org.slf4j.Logger
-import org.springframework.http.*
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
+import org.springframework.http.MediaType
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
@@ -23,7 +26,13 @@ import java.sql.Timestamp
 
 private val testMapper: ObjectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
 
-fun apiAuthorizedRequest(path: String, body: String? = null, token: String? = null, method: String, accept: MediaType = MediaType.APPLICATION_JSON): Map<String, Any> {
+fun apiAuthorizedRequest(
+    path: String,
+    body: String? = null,
+    token: String? = null,
+    method: String,
+    accept: MediaType = MediaType.APPLICATION_JSON,
+): Map<String, Any> {
     val request = RestTemplate()
     request.requestFactory = HttpComponentsClientHttpRequestFactory()
     val url = "http://localhost:$API_TEST_PORT$path"
@@ -32,41 +41,41 @@ fun apiAuthorizedRequest(path: String, body: String? = null, token: String? = nu
     token?.let { headers.setBearerAuth(it) }
     headers.contentType = MediaType.APPLICATION_JSON
     val entity: HttpEntity<String> = HttpEntity(body, headers)
-    val httpMethod = when (method) {
-        "GET" -> HttpMethod.GET
-        "POST" -> HttpMethod.POST
-        "PUT" -> HttpMethod.PUT
-        "PATCH" -> HttpMethod.PATCH
-        "DELETE" -> HttpMethod.DELETE
-        else -> throw Exception()
-    }
+    val httpMethod =
+        when (method) {
+            "GET" -> HttpMethod.GET
+            "POST" -> HttpMethod.POST
+            "PUT" -> HttpMethod.PUT
+            "PATCH" -> HttpMethod.PATCH
+            "DELETE" -> HttpMethod.DELETE
+            else -> throw Exception()
+        }
 
     return try {
         val response = request.exchange(url, httpMethod, entity, String::class.java)
         mapOf(
             "body" to (response.body ?: ""),
             "header" to response.headers,
-            "status" to response.statusCode.value()
+            "status" to response.statusCode.value(),
         )
-
     } catch (e: HttpClientErrorException) {
         mapOf(
             "status" to e.statusCode.value(),
             "header" to " ",
-            "body" to e.toString()
+            "body" to e.toString(),
         )
     } catch (e: Exception) {
         mapOf(
             "status" to e.toString(),
             "header" to " ",
-            "body" to " "
+            "body" to " ",
         )
     }
-
 }
 
 fun resetDB() {
-    Flyway.configure()
+    Flyway
+        .configure()
         .dataSource(postgresJdbcUrl, DB_USER, DB_PASSWORD)
         .load()
         .migrate()
@@ -109,7 +118,12 @@ fun resetDB() {
     conn.close()
 }
 
-fun checkIfIsomorphicAndPrintDiff(actual: Model, expected: Model, name: String, logger: Logger): Boolean {
+fun checkIfIsomorphicAndPrintDiff(
+    actual: Model,
+    expected: Model,
+    name: String,
+    logger: Logger,
+): Boolean {
     val parsedActual = ModelFactory.createDefaultModel().read(StringReader(actual.createRDFResponse(Lang.TURTLE)), null, "TURTLE")
     val parsedExpected = ModelFactory.createDefaultModel().read(StringReader(expected.createRDFResponse(Lang.TURTLE)), null, "TURTLE")
 

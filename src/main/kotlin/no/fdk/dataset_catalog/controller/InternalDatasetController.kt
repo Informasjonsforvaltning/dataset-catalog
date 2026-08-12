@@ -24,62 +24,70 @@ import java.net.URI
 @RequestMapping("/internal/catalogs/{catalogId}/datasets")
 open class InternalDatasetController(
     private val datasetService: DatasetService,
-    private val endpointPermissions: EndpointPermissions
+    private val endpointPermissions: EndpointPermissions,
 ) {
-
     @GetMapping(value = ["/{id}"], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getDatasetById(
         @AuthenticationPrincipal jwt: Jwt,
         @PathVariable("catalogId") catalogId: String,
-        @PathVariable id: String
+        @PathVariable id: String,
     ): ResponseEntity<DatasetDBO> =
         if (endpointPermissions.hasOrgReadPermission(jwt, catalogId)) {
-            datasetService.getDatasetByID(catalogId, id)
+            datasetService
+                .getDatasetByID(catalogId, id)
                 ?.let { ResponseEntity(it, HttpStatus.OK) }
                 ?: ResponseEntity(HttpStatus.NOT_FOUND)
-        } else ResponseEntity(HttpStatus.FORBIDDEN)
+        } else {
+            ResponseEntity(HttpStatus.FORBIDDEN)
+        }
 
     @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getDatasetsByCatalogId(
         @AuthenticationPrincipal jwt: Jwt,
-        @PathVariable("catalogId") catalogId: String
+        @PathVariable("catalogId") catalogId: String,
     ): ResponseEntity<List<DatasetDBO>> =
         if (endpointPermissions.hasOrgReadPermission(jwt, catalogId)) {
             ResponseEntity(datasetService.getAllDatasets(catalogId), HttpStatus.OK)
-        } else ResponseEntity(HttpStatus.FORBIDDEN)
+        } else {
+            ResponseEntity(HttpStatus.FORBIDDEN)
+        }
 
     @PostMapping(
         consumes = [MediaType.APPLICATION_JSON_VALUE],
-        produces = [MediaType.APPLICATION_JSON_VALUE]
+        produces = [MediaType.APPLICATION_JSON_VALUE],
     )
     fun createDataset(
         @AuthenticationPrincipal jwt: Jwt,
         @PathVariable("catalogId") catalogId: String,
-        @RequestBody dataset: DatasetToCreate
+        @RequestBody dataset: DatasetToCreate,
     ): ResponseEntity<Void> {
         if (endpointPermissions.hasOrgWritePermission(jwt, catalogId)) {
             val datasetId = datasetService.createDataset(catalogId, dataset)
             return ResponseEntity
-                .created(URI("/internal/catalogs/${catalogId}/datasets/${datasetId}"))
+                .created(URI("/internal/catalogs/$catalogId/datasets/$datasetId"))
                 .build()
-        } else return ResponseEntity(HttpStatus.FORBIDDEN)
+        } else {
+            return ResponseEntity(HttpStatus.FORBIDDEN)
+        }
     }
 
     @DeleteMapping(value = ["/{id}"])
     fun removeDataset(
         @AuthenticationPrincipal jwt: Jwt,
         @PathVariable("catalogId") catalogId: String,
-        @PathVariable("id") id: String
+        @PathVariable("id") id: String,
     ): ResponseEntity<Unit> =
         if (endpointPermissions.hasOrgWritePermission(jwt, catalogId)) {
             datasetService.delete(catalogId, id)
             ResponseEntity(HttpStatus.OK)
-        } else ResponseEntity(HttpStatus.FORBIDDEN)
+        } else {
+            ResponseEntity(HttpStatus.FORBIDDEN)
+        }
 
     @PatchMapping(
         value = ["/{id}"],
         consumes = [MediaType.APPLICATION_JSON_VALUE],
-        produces = [MediaType.APPLICATION_JSON_VALUE]
+        produces = [MediaType.APPLICATION_JSON_VALUE],
     )
     fun updateDataset(
         @AuthenticationPrincipal jwt: Jwt,
@@ -88,9 +96,11 @@ open class InternalDatasetController(
         @RequestBody operations: List<JsonPatchOperation>,
     ): ResponseEntity<DatasetDBO> =
         if (endpointPermissions.hasOrgWritePermission(jwt, catalogId)) {
-            datasetService.updateDatasetDBO(catalogId, id, operations)
-                ?.let {ResponseEntity(it, HttpStatus.OK) }
+            datasetService
+                .updateDatasetDBO(catalogId, id, operations)
+                ?.let { ResponseEntity(it, HttpStatus.OK) }
                 ?: ResponseEntity(HttpStatus.NOT_FOUND)
-        } else ResponseEntity(HttpStatus.FORBIDDEN)
-
+        } else {
+            ResponseEntity(HttpStatus.FORBIDDEN)
+        }
 }

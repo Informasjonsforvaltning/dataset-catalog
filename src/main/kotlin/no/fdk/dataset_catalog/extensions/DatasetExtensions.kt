@@ -1,6 +1,8 @@
 package no.fdk.dataset_catalog.extensions
 
-import no.fdk.dataset_catalog.model.*
+import no.fdk.dataset_catalog.model.ApplicationProfile
+import no.fdk.dataset_catalog.model.DatasetDBO
+import no.fdk.dataset_catalog.model.DatasetToCreate
 
 fun DatasetDBO.addCreateValues(toCreate: DatasetToCreate) =
     copy(

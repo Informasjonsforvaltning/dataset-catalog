@@ -17,30 +17,39 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping(value = ["/internal/catalogs"])
 class InternalCatalogController(
     private val catalogService: CatalogService,
-    private val endpointPermissions: EndpointPermissions
+    private val endpointPermissions: EndpointPermissions,
 ) {
-
     @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun getAllPermitted(@AuthenticationPrincipal jwt: Jwt): ResponseEntity<List<CatalogCount>> {
+    fun getAllPermitted(
+        @AuthenticationPrincipal jwt: Jwt,
+    ): ResponseEntity<List<CatalogCount>> {
         val permittedOrgs = endpointPermissions.getOrgsByPermission(jwt, "read")
         return when {
-            endpointPermissions.hasSysAdminPermission(jwt) ->
+            endpointPermissions.hasSysAdminPermission(jwt) -> {
                 ResponseEntity(catalogService.getAll(), HttpStatus.OK)
-            permittedOrgs.isNotEmpty() ->
+            }
+
+            permittedOrgs.isNotEmpty() -> {
                 ResponseEntity(catalogService.getByIDs(permittedOrgs.toList()), HttpStatus.OK)
-            else -> ResponseEntity(emptyList(), HttpStatus.OK)
+            }
+
+            else -> {
+                ResponseEntity(emptyList(), HttpStatus.OK)
+            }
         }
     }
 
     @GetMapping(value = ["/{catalogId}"], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getCatalogById(
         @AuthenticationPrincipal jwt: Jwt,
-        @PathVariable catalogId: String
+        @PathVariable catalogId: String,
     ): ResponseEntity<CatalogCount> =
         if (endpointPermissions.hasOrgReadPermission(jwt, catalogId)) {
-            catalogService.getByID(catalogId)
+            catalogService
+                .getByID(catalogId)
                 ?.let { ResponseEntity(it, HttpStatus.OK) }
                 ?: ResponseEntity(HttpStatus.NOT_FOUND)
-        } else ResponseEntity(HttpStatus.FORBIDDEN)
-
+        } else {
+            ResponseEntity(HttpStatus.FORBIDDEN)
+        }
 }

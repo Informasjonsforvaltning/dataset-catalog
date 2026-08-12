@@ -22,7 +22,6 @@ import org.springframework.web.client.RestTemplate
 
 @Tag("unit")
 class PublishingServiceTest {
-
     private val applicationProperties: ApplicationProperties = mock()
     private val restTemplate: RestTemplate = mock()
     private val publishingService = PublishingService(applicationProperties, restTemplate)
@@ -36,10 +35,12 @@ class PublishingServiceTest {
     fun `sendNewDataSourceMessage forwards bearer token`() {
         whenever(applicationProperties.harvestAdminUri).thenReturn("https://harvest-admin")
 
-        val jwt = Jwt.withTokenValue("test-token")
-            .header("alg", "none")
-            .claim("sub", "user")
-            .build()
+        val jwt =
+            Jwt
+                .withTokenValue("test-token")
+                .header("alg", "none")
+                .claim("sub", "user")
+                .build()
         val auth = UsernamePasswordAuthenticationToken(jwt, "n/a", emptyList())
         SecurityContextHolder.getContext().authentication = auth
 
@@ -47,8 +48,8 @@ class PublishingServiceTest {
             restTemplate.postForEntity(
                 any<java.net.URI>(),
                 any<HttpEntity<Any>>(),
-                eq(Any::class.java)
-            )
+                eq(Any::class.java),
+            ),
         ).thenReturn(ResponseEntity.status(HttpStatus.CREATED).build())
 
         publishingService.createNewDataSource("123456789")
@@ -57,7 +58,7 @@ class PublishingServiceTest {
             verify(restTemplate, times(1)).postForEntity(
                 any<java.net.URI>(),
                 capture(),
-                eq(Any::class.java)
+                eq(Any::class.java),
             )
             val headers = firstValue.headers
             assert(headers.getFirst(HttpHeaders.AUTHORIZATION) == "Bearer test-token")
@@ -68,10 +69,12 @@ class PublishingServiceTest {
     fun `triggerHarvest forwards bearer token`() {
         whenever(applicationProperties.harvestAdminUri).thenReturn("https://harvest-admin")
 
-        val jwt = Jwt.withTokenValue("test-token-2")
-            .header("alg", "none")
-            .claim("sub", "user")
-            .build()
+        val jwt =
+            Jwt
+                .withTokenValue("test-token-2")
+                .header("alg", "none")
+                .claim("sub", "user")
+                .build()
         val auth = UsernamePasswordAuthenticationToken(jwt, "n/a", emptyList())
         SecurityContextHolder.getContext().authentication = auth
 
@@ -79,8 +82,8 @@ class PublishingServiceTest {
             restTemplate.postForEntity(
                 any<java.net.URI>(),
                 any<HttpEntity<Any>>(),
-                eq(Any::class.java)
-            )
+                eq(Any::class.java),
+            ),
         ).thenReturn(ResponseEntity.status(HttpStatus.OK).build())
 
         publishingService.triggerHarvest("123456789")
@@ -89,7 +92,7 @@ class PublishingServiceTest {
             verify(restTemplate, times(1)).postForEntity(
                 any<java.net.URI>(),
                 capture(),
-                eq(Any::class.java)
+                eq(Any::class.java),
             )
             val entity = firstValue
             val headers = entity.headers

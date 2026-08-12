@@ -16,74 +16,56 @@ import java.time.LocalDateTime
 data class DatasetDTO(
     val id: String,
     val catalogId: String,
-
     @param:JsonSerialize(using = LocalDateTimeSerializer::class)
     @param:JsonDeserialize(using = LocalDateTimeDeserializer::class)
     val lastModified: LocalDateTime?,
     val uri: String?,
-
     val published: Boolean? = false,
     val approved: Boolean? = false,
-
     val originalUri: String? = null,
     val specializedType: SpecializedType? = null,
     val applicationProfile: ApplicationProfile = ApplicationProfile.DCAT_AP_NO,
     val concepts: Set<String>? = null,
-
     val title: LocalizedStrings? = null,
     val description: LocalizedStrings? = null,
-
     val contactPoints: List<ContactPoint>? = null,
     val keywords: LocalizedStringLists? = null,
-
     @param:JsonSerialize(using = LocalDateSerializer::class)
     @param:JsonDeserialize(using = LocalDateDeserializer::class)
     val issued: LocalDate? = null,
-
     @param:JsonSerialize(using = LocalDateSerializer::class)
     @param:JsonDeserialize(using = LocalDateDeserializer::class)
     val modified: LocalDate? = null,
-
     val language: List<String>? = null,
     val landingPage: List<String>? = null,
-
     val euDataTheme: Set<String>? = null,
     val losTheme: Set<String>? = null,
     val mobilityTheme: Set<String>? = null,
-
     val distribution: List<DistributionDBO>? = null,
     val sample: List<DistributionDBO>? = null,
-
     val temporal: List<PeriodOfTimeDBO>? = null,
     val spatial: List<String>? = null,
-
     val accessRight: String? = null,
-
     val legalBasisForRestriction: List<UriWithLabel>? = null,
     val legalBasisForProcessing: List<UriWithLabel>? = null,
     val legalBasisForAccess: List<UriWithLabel>? = null,
-
     val accuracy: QualityAnnotationDBO? = null,
     val completeness: QualityAnnotationDBO? = null,
     val currentness: QualityAnnotationDBO? = null,
     val availability: QualityAnnotationDBO? = null,
     val relevance: QualityAnnotationDBO? = null,
-
     val references: List<ReferenceDBO>? = null,
     val relatedResources: List<UriWithLabel>? = null,
     val provenance: String? = null,
     val frequency: String? = null,
-
     val conformsTo: List<UriWithLabel>? = null,
     val informationModelsFromOtherSources: List<UriWithLabel>? = null,
     val informationModelsFromFDK: List<String>? = null,
     val qualifiedAttributions: Set<String>? = null,
     val type: List<String>? = null,
-
     val inSeries: String? = null,
     val seriesDatasetOrder: Map<String, Int>? = null,
-
-    val costs: List<Cost>? = null
+    val costs: List<Cost>? = null,
 )
 
 typealias DatasetDBO = DatasetDTO
@@ -96,70 +78,55 @@ data class DatasetToCreate(
     val specializedType: SpecializedType? = null,
     val applicationProfile: ApplicationProfile? = ApplicationProfile.DCAT_AP_NO,
     val concepts: Set<String>? = null,
-
     val title: LocalizedStrings? = null,
     val description: LocalizedStrings? = null,
-
     val contactPoints: List<ContactPoint>? = null,
     val keywords: LocalizedStringLists? = null,
-
     @param:JsonSerialize(using = LocalDateSerializer::class)
     @param:JsonDeserialize(using = LocalDateDeserializer::class)
     val issued: LocalDate? = null,
-
     @param:JsonSerialize(using = LocalDateSerializer::class)
     @param:JsonDeserialize(using = LocalDateDeserializer::class)
     val modified: LocalDate? = null,
-
     val language: List<String>? = null,
     val landingPage: List<String>? = null,
-
     val euDataTheme: Set<String>? = null,
     val losTheme: Set<String>? = null,
     val mobilityTheme: Set<String>? = null,
-
     val distribution: List<DistributionDBO>? = null,
     val sample: List<DistributionDBO>? = null,
-
     val temporal: List<PeriodOfTimeDBO>? = null,
     val spatial: List<String>? = null,
-
     val accessRight: String? = null,
-
     val legalBasisForRestriction: List<UriWithLabel>? = null,
     val legalBasisForProcessing: List<UriWithLabel>? = null,
     val legalBasisForAccess: List<UriWithLabel>? = null,
-
     val accuracy: QualityAnnotationDBO? = null,
     val completeness: QualityAnnotationDBO? = null,
     val currentness: QualityAnnotationDBO? = null,
     val availability: QualityAnnotationDBO? = null,
     val relevance: QualityAnnotationDBO? = null,
-
     val references: List<ReferenceDBO>? = null,
     val relatedResources: List<UriWithLabel>? = null,
     val provenance: String? = null,
     val frequency: String? = null,
-
     val conformsTo: List<UriWithLabel>? = null,
     val informationModelsFromOtherSources: List<UriWithLabel>? = null,
     val informationModelsFromFDK: List<String>? = null,
     val qualifiedAttributions: Set<String>? = null,
     val type: List<String>? = null,
-
     val inSeries: String? = null,
     val seriesDatasetOrder: Map<String, Int>? = null,
-
-    val costs: List<Cost>? = null
+    val costs: List<Cost>? = null,
 )
 
 enum class SpecializedType {
-    SERIES
+    SERIES,
 }
 
 enum class ApplicationProfile {
-  DCAT_AP_NO,
-  MOBILITYDCAT_AP,
+    DCAT_AP_NO,
+    MOBILITYDCAT_AP,
 }
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -199,14 +166,14 @@ data class PeriodOfTimeDBO(
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class QualityAnnotationDBO(
     val motivatedBy: String? = null,
-    val hasBody: LocalizedStrings? = null
+    val hasBody: LocalizedStrings? = null,
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class ReferenceDBO(
     val referenceType: String? = null,
-    val source: String? = null // referenced dataset uri
+    val source: String? = null, // referenced dataset uri
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -222,7 +189,7 @@ data class LocalizedStrings(
 data class LocalizedStringLists(
     val nb: List<String>? = null,
     val nn: List<String>? = null,
-    val en: List<String>? = null
+    val en: List<String>? = null,
 )
 
 data class User(

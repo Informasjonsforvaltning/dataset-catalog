@@ -7,15 +7,18 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator
-import org.springframework.security.oauth2.jwt.*
+import org.springframework.security.oauth2.jwt.JwtClaimValidator
+import org.springframework.security.oauth2.jwt.JwtDecoder
+import org.springframework.security.oauth2.jwt.JwtIssuerValidator
+import org.springframework.security.oauth2.jwt.JwtTimestampValidator
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.web.cors.CorsConfiguration
 
 @Configuration
 open class SecurityConfig(
-    private val securityProperties: SecurityProperties
+    private val securityProperties: SecurityProperties,
 ) {
-
     @Bean
     open fun filterChain(http: HttpSecurity): SecurityFilterChain {
         http
@@ -30,28 +33,34 @@ open class SecurityConfig(
 
                     config
                 }
-            }
-            .authorizeHttpRequests { authorize ->
+            }.authorizeHttpRequests { authorize ->
                 authorize
-                    .requestMatchers(HttpMethod.OPTIONS).permitAll()
-                    .requestMatchers(HttpMethod.GET, "/ping", "/ready", "/catalogs/**", "/swagger-ui/**", "/v3/**").permitAll()
-                    .anyRequest().authenticated()
-            }
-            .oauth2ResourceServer { resourceServer -> resourceServer.jwt { } }
+                    .requestMatchers(HttpMethod.OPTIONS)
+                    .permitAll()
+                    .requestMatchers(HttpMethod.GET, "/ping", "/ready", "/catalogs/**", "/swagger-ui/**", "/v3/**")
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated()
+            }.oauth2ResourceServer { resourceServer -> resourceServer.jwt { } }
         return http.build()
     }
 
     @Bean
     open fun jwtDecoder(properties: OAuth2ResourceServerProperties): JwtDecoder? {
-        val jwtDecoder = NimbusJwtDecoder.withJwkSetUri(properties.jwt.jwkSetUri).build()
+        val jwkSetUri =
+            requireNotNull(properties.jwt.jwkSetUri) {
+                "spring.security.oauth2.resourceserver.jwt.jwk-set-uri must be set"
+            }
+        val jwtDecoder = NimbusJwtDecoder.withJwkSetUri(jwkSetUri).build()
         jwtDecoder.setJwtValidator(
             DelegatingOAuth2TokenValidator(
                 listOf(
                     JwtTimestampValidator(),
                     JwtIssuerValidator(securityProperties.fdkIssuer),
-                    JwtClaimValidator("aud") { aud: List<String> -> aud.contains("fdk-registration-api") }
-                )
-            ))
+                    JwtClaimValidator("aud") { aud: List<String> -> aud.contains("fdk-registration-api") },
+                ),
+            ),
+        )
         return jwtDecoder
     }
 }

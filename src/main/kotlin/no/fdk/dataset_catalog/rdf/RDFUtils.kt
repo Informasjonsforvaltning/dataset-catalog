@@ -1,14 +1,34 @@
 package no.fdk.dataset_catalog.rdf
 
-import no.fdk.dataset_catalog.model.*
+import no.fdk.dataset_catalog.model.ContactPoint
+import no.fdk.dataset_catalog.model.Cost
+import no.fdk.dataset_catalog.model.DatasetDBO
+import no.fdk.dataset_catalog.model.DistributionDBO
+import no.fdk.dataset_catalog.model.LocalizedStringLists
+import no.fdk.dataset_catalog.model.LocalizedStrings
+import no.fdk.dataset_catalog.model.PeriodOfTimeDBO
+import no.fdk.dataset_catalog.model.QualityAnnotationDBO
+import no.fdk.dataset_catalog.model.ReferenceDBO
+import no.fdk.dataset_catalog.model.RightsDBO
+import no.fdk.dataset_catalog.model.UriWithLabel
 import no.fdk.dataset_catalog.utils.defaultLogger
 import no.fdk.dataset_catalog.utils.isValidURI
 import org.apache.jena.datatypes.xsd.XSDDatatype
-import org.apache.jena.rdf.model.*
+import org.apache.jena.rdf.model.Literal
+import org.apache.jena.rdf.model.Model
+import org.apache.jena.rdf.model.Property
+import org.apache.jena.rdf.model.Resource
+import org.apache.jena.rdf.model.ResourceFactory
 import org.apache.jena.riot.Lang
 import org.apache.jena.sparql.vocabulary.FOAF
 import org.apache.jena.util.URIref
-import org.apache.jena.vocabulary.*
+import org.apache.jena.vocabulary.DCAT
+import org.apache.jena.vocabulary.DCTerms
+import org.apache.jena.vocabulary.OA
+import org.apache.jena.vocabulary.RDF
+import org.apache.jena.vocabulary.RDFS
+import org.apache.jena.vocabulary.SKOS
+import org.apache.jena.vocabulary.VCARD4
 import org.springframework.http.HttpStatus
 import org.springframework.web.client.HttpServerErrorException
 import java.io.StringWriter
@@ -17,79 +37,138 @@ import java.net.URI
 import java.net.URL
 import java.time.LocalDate
 
-
 // -------- Helper functions --------
 
-
-fun Resource.safeAddLinkListProperty(property: Property, value: List<String>?): Resource {
+fun Resource.safeAddLinkListProperty(
+    property: Property,
+    value: List<String>?,
+): Resource {
     value?.forEach { safeAddLinkedProperty(property, it) }
     return this
 }
 
-fun Resource.safeAddLocalizedString(property: Property, langMap: LocalizedStrings?): Resource {
+fun Resource.safeAddLocalizedString(
+    property: Property,
+    langMap: LocalizedStrings?,
+): Resource {
     langMap?.nb?.let { safeAddLangLiteral(property, it, "nb") }
     langMap?.nn?.let { safeAddLangLiteral(property, it, "nn") }
     langMap?.en?.let { safeAddLangLiteral(property, it, "en") }
     return this
 }
 
-fun Resource.safeAddLocalizedStringList(property: Property, langMap: LocalizedStringLists?): Resource {
+fun Resource.safeAddLocalizedStringList(
+    property: Property,
+    langMap: LocalizedStringLists?,
+): Resource {
     langMap?.nb?.forEach { safeAddLangLiteral(property, it, "nb") }
     langMap?.nn?.forEach { safeAddLangLiteral(property, it, "nn") }
     langMap?.en?.forEach { safeAddLangLiteral(property, it, "en") }
     return this
 }
 
+fun Resource.safeAddStringLiteral(
+    property: Property,
+    value: String?,
+): Resource =
+    if (value.isNullOrEmpty()) {
+        this
+    } else {
+        addLiteral(property, value)
+    }
 
-fun Resource.safeAddStringLiteral(property: Property, value: String?): Resource =
-    if (value.isNullOrEmpty()) this
-    else addLiteral(property, value)
+fun Resource.safeAddLiteral(
+    property: Property,
+    value: Literal?,
+): Resource =
+    if (value == null) {
+        this
+    } else {
+        addLiteral(property, value)
+    }
 
-fun Resource.safeAddLiteral(property: Property, value: Literal?): Resource =
-    if (value == null) this
-    else addLiteral(property, value)
-
-fun Resource.safeAddLangLiteral(property: Property, value: String?, lang: String): Resource =
-    if (value.isNullOrEmpty()) this
-    else {
+fun Resource.safeAddLangLiteral(
+    property: Property,
+    value: String?,
+    lang: String,
+): Resource =
+    if (value.isNullOrEmpty()) {
+        this
+    } else {
         val literal = model.createLiteral(value, lang)
         addLiteral(property, literal)
     }
 
-fun Resource.safeAddProperty(property: Property, value: String?): Resource =
-    if (value.isNullOrEmpty()) this
-    else addProperty(property, value)
+fun Resource.safeAddProperty(
+    property: Property,
+    value: String?,
+): Resource =
+    if (value.isNullOrEmpty()) {
+        this
+    } else {
+        addProperty(property, value)
+    }
 
-fun Resource.safeAddProperty(property: Property, value: Resource?): Resource =
-    if (value == null) this
-    else addProperty(property, value)
+fun Resource.safeAddProperty(
+    property: Property,
+    value: Resource?,
+): Resource =
+    if (value == null) {
+        this
+    } else {
+        addProperty(property, value)
+    }
 
-fun Resource.safeAddResourceProperty(property: Property, value: Resource?): Resource =
-    if (value == null) this
-    else addProperty(property, value)
+fun Resource.safeAddResourceProperty(
+    property: Property,
+    value: Resource?,
+): Resource =
+    if (value == null) {
+        this
+    } else {
+        addProperty(property, value)
+    }
 
-fun Resource.safeAddDateTimeLiteral(property: Property, dateTime: LocalDate?): Resource =
+fun Resource.safeAddDateTimeLiteral(
+    property: Property,
+    dateTime: LocalDate?,
+): Resource =
     if (dateTime != null) {
         safeAddLiteral(property, model.createTypedLiteral(dateTime.toString(), XSDDatatype.XSDdate))
-    } else this
-
-fun Resource.safeAddFlexibleDateLiteral(property: Property, value: String?): Resource {
-    if (value.isNullOrEmpty()) return this
-    val xsdType = when (value.length) {
-        4 -> XSDDatatype.XSDgYear
-        7 -> XSDDatatype.XSDgYearMonth
-        10 -> XSDDatatype.XSDdate
-        else -> return this
+    } else {
+        this
     }
+
+fun Resource.safeAddFlexibleDateLiteral(
+    property: Property,
+    value: String?,
+): Resource {
+    if (value.isNullOrEmpty()) return this
+    val xsdType =
+        when (value.length) {
+            4 -> XSDDatatype.XSDgYear
+            7 -> XSDDatatype.XSDgYearMonth
+            10 -> XSDDatatype.XSDdate
+            else -> return this
+        }
     if (!xsdType.isValid(value)) return this
     return safeAddLiteral(property, model.createTypedLiteral(value, xsdType))
 }
 
-fun Resource.safeAddLinkedProperty(property: Property, value: String?): Resource =
-    if (value.isNullOrEmpty()) this
-    else addProperty(property, model.createResource(value))
+fun Resource.safeAddLinkedProperty(
+    property: Property,
+    value: String?,
+): Resource =
+    if (value.isNullOrEmpty()) {
+        this
+    } else {
+        addProperty(property, model.createResource(value))
+    }
 
-fun Resource.safeAddURLs(property: Property, value: List<String?>?): Resource {
+fun Resource.safeAddURLs(
+    property: Property,
+    value: List<String?>?,
+): Resource {
     value?.forEach {
         if (it.isValidURL()) {
             safeAddProperty(property, model.safeCreateLinkedResource(it))
@@ -97,7 +176,6 @@ fun Resource.safeAddURLs(property: Property, value: List<String?>?): Resource {
     }
     return this
 }
-
 
 fun String.addContactStringPrefix(prefix: String): String? =
     when {
@@ -110,11 +188,13 @@ fun String.addContactStringPrefix(prefix: String): String? =
 
 fun Resource.addContactPoints(contactPoints: List<ContactPoint>?): Resource {
     contactPoints?.forEach {
-        val resource = model.safeCreateResource()
-            .addProperty(RDF.type, VCARD4.Organization)
-            .safeAddLocalizedString(VCARD4.fn, it.name)
-            .safeAddURLs(VCARD4.hasURL, listOf(it.url))
-            .safeAddLinkedProperty(VCARD4.hasEmail, it.email?.addContactStringPrefix("mailto:"))
+        val resource =
+            model
+                .safeCreateResource()
+                .addProperty(RDF.type, VCARD4.Organization)
+                .safeAddLocalizedString(VCARD4.fn, it.name)
+                .safeAddURLs(VCARD4.hasURL, listOf(it.url))
+                .safeAddLinkedProperty(VCARD4.hasEmail, it.email?.addContactStringPrefix("mailto:"))
         if (!it.phone.isNullOrBlank()) {
             resource.addProperty(VCARD4.hasTelephone, model.telephoneResource(it.phone))
         }
@@ -128,35 +208,40 @@ fun Resource.addConformsTo(conformsTo: Collection<UriWithLabel>?): Resource {
         if (!it.uri.isNullOrEmpty() || it.prefLabel.isValidLangField()) {
             addProperty(
                 DCTerms.conformsTo,
-                model.safeCreateResource()
+                model
+                    .safeCreateResource()
                     .addProperty(RDF.type, DCTerms.Standard)
                     .safeAddLinkedProperty(RDFS.seeAlso, it.uri)
-                    .safeAddLocalizedString(DCTerms.title, it.prefLabel)
+                    .safeAddLocalizedString(DCTerms.title, it.prefLabel),
             )
         }
     }
     return this
 }
 
-
 fun Resource.addConformsToFromListOfUris(conformsTo: Collection<String>?): Resource {
     conformsTo?.forEach {
         addProperty(
             DCTerms.conformsTo,
-            model.safeCreateResource()
+            model
+                .safeCreateResource()
                 .addProperty(RDF.type, DCTerms.Standard)
-                .safeAddLinkedProperty(RDFS.seeAlso, it)
+                .safeAddLinkedProperty(RDFS.seeAlso, it),
         )
     }
     return this
 }
 
-fun Resource.addDatasetDistribution(property: Property, distributions: Collection<DistributionDBO>?): Resource {
+fun Resource.addDatasetDistribution(
+    property: Property,
+    distributions: Collection<DistributionDBO>?,
+): Resource {
     distributions?.forEach {
         if (it.hasNonNullOrEmptyProperty()) {
             addProperty(
                 property,
-                model.safeCreateResource()
+                model
+                    .safeCreateResource()
                     .addProperty(RDF.type, DCAT.Distribution)
                     .safeAddLocalizedString(DCTerms.title, it.title)
                     .safeAddLocalizedString(DCTerms.description, it.description)
@@ -169,7 +254,7 @@ fun Resource.addDatasetDistribution(property: Property, distributions: Collectio
                     .safeAddURLs(DCAT.mediaType, it.mediaType)
                     .addDistributionServices(it.accessServices)
                     .safeAddLinkedProperty(MOBILITYDCATAP.mobilityDataStandard, it.mobilityDataStandard)
-                    .addDistributionRights(it.rights)
+                    .addDistributionRights(it.rights),
             )
         }
     }
@@ -180,14 +265,14 @@ fun Resource.addDistributionRights(rights: RightsDBO?): Resource {
     rights?.type?.takeIf { it.isNotEmpty() }?.let { type ->
         addProperty(
             DCTerms.rights,
-            model.safeCreateResource()
+            model
+                .safeCreateResource()
                 .addProperty(RDF.type, DCTerms.RightsStatement)
-                .safeAddLinkedProperty(DCTerms.type, type)
+                .safeAddLinkedProperty(DCTerms.type, type),
         )
     }
     return this
 }
-
 
 private fun DistributionDBO.hasNonNullOrEmptyProperty(): Boolean =
     title?.run { listOf(nb, nn, en).any { !it.isNullOrEmpty() } } == true ||
@@ -204,22 +289,23 @@ private fun DistributionDBO.hasNonNullOrEmptyProperty(): Boolean =
 fun Resource.addDatasetThemes(ds: DatasetDBO): Resource {
     val uniqueThemes = mutableSetOf<String>()
 
-    ds.losTheme?.filter { it.isValidURI() }
+    ds.losTheme
+        ?.filter { it.isValidURI() }
         ?.let { uniqueThemes.addAll(it) }
 
-    ds.euDataTheme?.filter { it.isValidURI() }
+    ds.euDataTheme
+        ?.filter { it.isValidURI() }
         ?.let { uniqueThemes.addAll(it) }
     safeAddLinkListProperty(DCAT.theme, uniqueThemes.toList())
 
-    ds.mobilityTheme?.filter { it.isValidURI() }
+    ds.mobilityTheme
+        ?.filter { it.isValidURI() }
         ?.let { safeAddLinkListProperty(MOBILITYDCATAP.mobilityTheme, it) }
 
     return this
 }
 
-fun Resource.addDistributionServices(
-    accessServices: Set<String>?,
-): Resource {
+fun Resource.addDistributionServices(accessServices: Set<String>?): Resource {
     accessServices?.forEach {
         val accessServiceResource = model.safeCreateResource(it)
         if (accessServiceResource.isURIResource) {
@@ -237,25 +323,31 @@ fun Resource.addLegalBasis(ds: DatasetDBO): Resource {
     return this
 }
 
-private fun Resource.addRule(rule: UriWithLabel, ruleType: Resource): Resource {
+private fun Resource.addRule(
+    rule: UriWithLabel,
+    ruleType: Resource,
+): Resource {
     if (rule.uri.isValidURL() || rule.prefLabel.isValidLangField()) {
         addProperty(
             CPSV.follows,
-            model.createResource()
+            model
+                .createResource()
                 .addProperty(RDF.type, CPSV.Rule)
                 .addProperty(DCTerms.type, ruleType)
                 .addProperty(
                     CPSV.implements,
-                    model.createResource()
+                    model
+                        .createResource()
                         .addProperty(RDF.type, ELI.LegalResource)
                         .safeAddLinkedProperty(RDFS.seeAlso, rule.uri)
                         .addProperty(
                             DCTerms.type,
-                            model.createResource()
+                            model
+                                .createResource()
                                 .addProperty(RDF.type, SKOS.Concept)
-                                .safeAddLocalizedString(SKOS.prefLabel, rule.prefLabel)
-                        )
-                )
+                                .safeAddLocalizedString(SKOS.prefLabel, rule.prefLabel),
+                        ),
+                ),
         )
     }
     return this
@@ -266,24 +358,29 @@ fun Resource.addTemporal(temporal: List<PeriodOfTimeDBO>?): Resource {
         if (!it.startDate.isNullOrEmpty() || !it.endDate.isNullOrEmpty()) {
             addProperty(
                 DCTerms.temporal,
-                model.safeCreateResource()
+                model
+                    .safeCreateResource()
                     .addProperty(RDF.type, DCTerms.PeriodOfTime)
                     .safeAddFlexibleDateLiteral(Schema.startDate, it.startDate)
-                    .safeAddFlexibleDateLiteral(Schema.endDate, it.endDate)
+                    .safeAddFlexibleDateLiteral(Schema.endDate, it.endDate),
             )
         }
     }
     return this
 }
 
-fun Resource.addQualityAnnotation(qualityAnnotation: QualityAnnotationDBO?, dimension: Resource): Resource {
+fun Resource.addQualityAnnotation(
+    qualityAnnotation: QualityAnnotationDBO?,
+    dimension: Resource,
+): Resource {
     qualityAnnotation?.let {
         addProperty(
             DQV.hasQualityAnnotation,
-            model.safeCreateResource()
+            model
+                .safeCreateResource()
                 .addProperty(RDF.type, DQV.QualityAnnotation)
                 .safeAddLinkedProperty(DQV.inDimension, dimension.uri)
-                .addQualityAnnotationBody(it.hasBody)
+                .addQualityAnnotationBody(it.hasBody),
         )
     }
     return this
@@ -302,14 +399,18 @@ fun Resource.addQualityAnnotationBody(body: LocalizedStrings?): Resource {
     return this
 }
 
-fun Resource.addQualityAnnotationBody(text: String, lang: String) {
+fun Resource.addQualityAnnotationBody(
+    text: String,
+    lang: String,
+) {
     addProperty(
         OA.hasBody,
-        model.safeCreateResource()
+        model
+            .safeCreateResource()
             .addProperty(RDF.type, OA.TextualBody)
             .safeAddStringLiteral(RDF.value, text)
             .safeAddLinkedProperty(DCTerms.language, lang)
-            .safeAddLinkedProperty(DCTerms.format, "http://publications.europa.eu/resource/authority/file-type/TXT")
+            .safeAddLinkedProperty(DCTerms.format, "http://publications.europa.eu/resource/authority/file-type/TXT"),
     )
 }
 
@@ -327,7 +428,7 @@ fun Resource.addReferences(references: Collection<ReferenceDBO>?): Resource {
             referenceTypeToProperty(it.referenceType)?.let { referenceProperty ->
                 safeAddResourceProperty(
                     referenceProperty,
-                    model.safeCreateResource(it.source)
+                    model.safeCreateResource(it.source),
                 )
             }
         }
@@ -341,23 +442,22 @@ private fun ReferenceDBO.isValidReference(): Boolean =
         (referenceType.isNotEmpty()) &&
         source.isNotEmpty()
 
-
 fun Resource.addRelatedResources(relations: List<UriWithLabel>?): Resource {
     relations?.forEach {
         if (it.isValidRelation()) {
             addProperty(
                 DCTerms.relation,
-                model.safeCreateResource(it.uri)
+                model
+                    .safeCreateResource(it.uri)
                     .addProperty(RDF.type, RDFS.Resource)
-                    .safeAddLocalizedString(RDFS.label, it.prefLabel)
+                    .safeAddLocalizedString(RDFS.label, it.prefLabel),
             )
         }
     }
     return this
 }
 
-private fun UriWithLabel.isValidRelation(): Boolean =
-    !uri.isNullOrEmpty() || prefLabel.isValidLangField()
+private fun UriWithLabel.isValidRelation(): Boolean = !uri.isNullOrEmpty() || prefLabel.isValidLangField()
 
 private fun Map<String, String>?.isValidLangField(): Boolean =
     when {
@@ -382,16 +482,16 @@ fun Resource.addQualifiedAttributions(qualifiedAttributions: Collection<String>?
     qualifiedAttributions?.forEach {
         addProperty(
             PROV.qualifiedAttribution,
-            model.safeCreateResource()
+            model
+                .safeCreateResource()
                 .addProperty(RDF.type, PROV.Attribution)
                 .safeAddResourceProperty(
                     DCAT.hadRole,
-                    ResourceFactory.createResource(URIref.encode("http://registry.it.csiro.au/def/isotc211/CI_RoleCode/contributor"))
-                )
-                .safeAddResourceProperty(
+                    ResourceFactory.createResource(URIref.encode("http://registry.it.csiro.au/def/isotc211/CI_RoleCode/contributor")),
+                ).safeAddResourceProperty(
                     PROV.agent,
-                    ResourceFactory.createResource(URIref.encode("https://data.brreg.no/enhetsregisteret/api/enheter/$it"))
-                )
+                    ResourceFactory.createResource(URIref.encode("https://data.brreg.no/enhetsregisteret/api/enheter/$it")),
+                ),
         )
     }
     return this
@@ -401,7 +501,7 @@ fun Resource.addConcepts(subjects: Set<String>?): Resource {
     subjects?.forEach {
         addProperty(
             DCTerms.subject,
-            model.safeCreateResource(it)
+            model.safeCreateResource(it),
         )
     }
     return this
@@ -409,10 +509,12 @@ fun Resource.addConcepts(subjects: Set<String>?): Resource {
 
 fun Resource.addCosts(costs: Collection<Cost>?): Resource {
     costs?.forEach { cost ->
-        val costResource = model.safeCreateResource()
-            .addProperty(RDF.type, CV.Cost)
-            .safeAddLocalizedString(DCTerms.description, cost.description)
-            .safeAddURLs(FOAF.page, cost.documentation)
+        val costResource =
+            model
+                .safeCreateResource()
+                .addProperty(RDF.type, CV.Cost)
+                .safeAddLocalizedString(DCTerms.description, cost.description)
+                .safeAddURLs(FOAF.page, cost.documentation)
 
         cost.value?.let {
             costResource.addLiteral(CV.hasValue, model.createTypedLiteral(it))
@@ -431,7 +533,7 @@ fun Resource.addLanguages(language: List<String>?): Resource {
     language?.forEach {
         addProperty(
             DCTerms.language,
-            model.safeCreateResource(it)
+            model.safeCreateResource(it),
         )
     }
     return this
@@ -466,15 +568,19 @@ fun Resource.addDatasetType(datasetTypes: List<String>?): Resource {
 // -------- Model Extensions --------
 
 fun Model.telephoneResource(telephone: String): Resource =
-    telephone.trim { it <= ' ' }
+    telephone
+        .trim { it <= ' ' }
         .filterIndexed { index, c ->
             when {
-                index == 0 && c == '+' -> true // global-number-digits
-                c in '0'..'9' -> true // digit
+                index == 0 && c == '+' -> true
+
+                // global-number-digits
+                c in '0'..'9' -> true
+
+                // digit
                 else -> false // skip visual-separator and other content
             }
-        }
-        .let { createResource("tel:$it") }
+        }.let { createResource("tel:$it") }
 
 fun Model.createRDFResponse(lang: Lang): String =
     StringWriter().use { out ->
@@ -496,17 +602,20 @@ fun Model.safeCreateResource(value: String? = null): Resource =
 fun Model.safeCreateLinkedResource(value: String? = null): Resource? =
     if (!value.isNullOrEmpty()) {
         createResource(value)
-    } else null
+    } else {
+        null
+    }
 
 // -------- Utils --------
 
-fun String?.isValidURL(): Boolean =
-    this != null && runCatching { URI(this).toURL() }.isSuccess
+fun String?.isValidURL(): Boolean = this != null && runCatching { URI(this).toURL() }.isSuccess
 
-enum class LinguisticSystem(val uri: String) {
+enum class LinguisticSystem(
+    val uri: String,
+) {
     NOB("http://publications.europa.eu/resource/authority/language/NOB"),
     NNO("http://publications.europa.eu/resource/authority/language/NNO"),
-    ENG("http://publications.europa.eu/resource/authority/language/ENG")
+    ENG("http://publications.europa.eu/resource/authority/language/ENG"),
 }
 
 class SeriesData(
@@ -514,5 +623,5 @@ class SeriesData(
     val next: String?,
     val prev: String?,
     val first: String?,
-    val last: String?
+    val last: String?,
 )

@@ -1,9 +1,20 @@
 package no.fdk.dataset_catalog.contract
 
-import no.fdk.dataset_catalog.utils.*
+import no.fdk.dataset_catalog.utils.ApiTestContext
+import no.fdk.dataset_catalog.utils.DB_CATALOG_ID_1
+import no.fdk.dataset_catalog.utils.DB_CATALOG_ID_2
+import no.fdk.dataset_catalog.utils.DB_DATASET_ID_2
+import no.fdk.dataset_catalog.utils.DB_DATASET_ID_6
+import no.fdk.dataset_catalog.utils.TestResponseReader
+import no.fdk.dataset_catalog.utils.apiAuthorizedRequest
+import no.fdk.dataset_catalog.utils.checkIfIsomorphicAndPrintDiff
+import no.fdk.dataset_catalog.utils.resetDB
 import org.apache.jena.rdf.model.ModelFactory
 import org.apache.jena.riot.Lang
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.slf4j.LoggerFactory
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
@@ -18,10 +29,11 @@ private val logger = LoggerFactory.getLogger(RdfContractTest::class.java)
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 @SpringBootTest(
     properties = ["spring.profiles.active=contract-test"],
-    webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+    webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
+)
 @ContextConfiguration(initializers = [ApiTestContext.Initializer::class])
 @Tag("contract")
-class RdfContractTest: ApiTestContext() {
+class RdfContractTest : ApiTestContext() {
     private val responseReader = TestResponseReader()
 
     @Nested
@@ -30,10 +42,10 @@ class RdfContractTest: ApiTestContext() {
         fun `Gets all catalogs`() {
             resetDB()
 
-            val getAllTurtle = apiAuthorizedRequest("/catalogs", method="GET", accept=MediaType("text","turtle"))
-            val getAllN3 = apiAuthorizedRequest("/catalogs", method="GET", accept=MediaType("text","n3"))
-            val getAllTrig = apiAuthorizedRequest("/catalogs", method="GET", accept=MediaType("application","trig"))
-            val getAllTrix = apiAuthorizedRequest("/catalogs", method="GET", accept=MediaType("application","trix"))
+            val getAllTurtle = apiAuthorizedRequest("/catalogs", method = "GET", accept = MediaType("text", "turtle"))
+            val getAllN3 = apiAuthorizedRequest("/catalogs", method = "GET", accept = MediaType("text", "n3"))
+            val getAllTrig = apiAuthorizedRequest("/catalogs", method = "GET", accept = MediaType("application", "trig"))
+            val getAllTrix = apiAuthorizedRequest("/catalogs", method = "GET", accept = MediaType("application", "trix"))
 
             assertEquals(HttpStatus.OK.value(), getAllTurtle["status"])
             assertEquals(HttpStatus.OK.value(), getAllN3["status"])
@@ -42,7 +54,12 @@ class RdfContractTest: ApiTestContext() {
 
             val expectedGetAll = responseReader.parseFile("getAll.ttl", "TURTLE")
 
-            val actualGetAllTurtle = ModelFactory.createDefaultModel().read(StringReader(getAllTurtle["body"] as String), null, Lang.TURTLE.name)
+            val actualGetAllTurtle =
+                ModelFactory.createDefaultModel().read(
+                    StringReader(getAllTurtle["body"] as String),
+                    null,
+                    Lang.TURTLE.name,
+                )
             val actualGetAllN3 = ModelFactory.createDefaultModel().read(StringReader(getAllN3["body"] as String), null, Lang.N3.name)
             val actualGetAllTrig = ModelFactory.createDefaultModel().read(StringReader(getAllTrig["body"] as String), null, Lang.TRIG.name)
             val actualGetAllTrix = ModelFactory.createDefaultModel().read(StringReader(getAllTrix["body"] as String), null, Lang.TRIX.name)
@@ -57,10 +74,12 @@ class RdfContractTest: ApiTestContext() {
         fun `Gets single catalog`() {
             resetDB()
 
-            val getOneTurtle = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1", method="GET", accept=MediaType("text","turtle"))
-            val getOneXML = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1", method="GET", accept=MediaType("application","rdf+xml"))
-            val getOneJSON = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1", method="GET", accept=MediaType("application","rdf+json"))
-            val getOneNQuads = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1", method="GET", accept=MediaType("application","n-quads"))
+            val getOneTurtle = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1", method = "GET", accept = MediaType("text", "turtle"))
+            val getOneXML = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1", method = "GET", accept = MediaType("application", "rdf+xml"))
+            val getOneJSON =
+                apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1", method = "GET", accept = MediaType("application", "rdf+json"))
+            val getOneNQuads =
+                apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1", method = "GET", accept = MediaType("application", "n-quads"))
 
             assertEquals(HttpStatus.OK.value(), getOneTurtle["status"])
             assertEquals(HttpStatus.OK.value(), getOneXML["status"])
@@ -69,10 +88,25 @@ class RdfContractTest: ApiTestContext() {
 
             val expectedGetOne = responseReader.parseFile("getOne.ttl", "TURTLE")
 
-            val actualGetOneTurtle = ModelFactory.createDefaultModel().read(StringReader(getOneTurtle["body"] as String), null, Lang.TURTLE.name)
+            val actualGetOneTurtle =
+                ModelFactory.createDefaultModel().read(
+                    StringReader(getOneTurtle["body"] as String),
+                    null,
+                    Lang.TURTLE.name,
+                )
             val actualGetOneXML = ModelFactory.createDefaultModel().read(StringReader(getOneXML["body"] as String), null, Lang.RDFXML.name)
-            val actualGetOneJSON = ModelFactory.createDefaultModel().read(StringReader(getOneJSON["body"] as String), null, Lang.RDFJSON.name)
-            val actualGetOneNQUADS = ModelFactory.createDefaultModel().read(StringReader(getOneNQuads["body"] as String), null, Lang.NQUADS.name)
+            val actualGetOneJSON =
+                ModelFactory.createDefaultModel().read(
+                    StringReader(getOneJSON["body"] as String),
+                    null,
+                    Lang.RDFJSON.name,
+                )
+            val actualGetOneNQUADS =
+                ModelFactory.createDefaultModel().read(
+                    StringReader(getOneNQuads["body"] as String),
+                    null,
+                    Lang.NQUADS.name,
+                )
 
             assertTrue(checkIfIsomorphicAndPrintDiff(actualGetOneTurtle, expectedGetOne, "Get One turtle result", logger))
             assertTrue(checkIfIsomorphicAndPrintDiff(actualGetOneXML, expectedGetOne, "Get One xml result", logger))
@@ -84,9 +118,24 @@ class RdfContractTest: ApiTestContext() {
         fun `Gets Dataset`() {
             resetDB()
 
-            val responseTurtle = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/$DB_DATASET_ID_2", method="GET", accept=MediaType("text","turtle"))
-            val responseNTriples = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/$DB_DATASET_ID_2", method="GET", accept=MediaType("application","n-triples"))
-            val responseJsonLD = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_1/datasets/$DB_DATASET_ID_2", method="GET", accept=MediaType("application","ld+json"))
+            val responseTurtle =
+                apiAuthorizedRequest(
+                    "/catalogs/$DB_CATALOG_ID_1/datasets/$DB_DATASET_ID_2",
+                    method = "GET",
+                    accept = MediaType("text", "turtle"),
+                )
+            val responseNTriples =
+                apiAuthorizedRequest(
+                    "/catalogs/$DB_CATALOG_ID_1/datasets/$DB_DATASET_ID_2",
+                    method = "GET",
+                    accept = MediaType("application", "n-triples"),
+                )
+            val responseJsonLD =
+                apiAuthorizedRequest(
+                    "/catalogs/$DB_CATALOG_ID_1/datasets/$DB_DATASET_ID_2",
+                    method = "GET",
+                    accept = MediaType("application", "ld+json"),
+                )
 
             assertEquals(HttpStatus.OK.value(), responseTurtle["status"])
             assertEquals(HttpStatus.OK.value(), responseNTriples["status"])
@@ -94,9 +143,24 @@ class RdfContractTest: ApiTestContext() {
 
             val expected = responseReader.parseFile("dataset.ttl", "TURTLE")
 
-            val actualTurtle = ModelFactory.createDefaultModel().read(StringReader(responseTurtle["body"] as String), null, Lang.TURTLE.name)
-            val actualNTriples = ModelFactory.createDefaultModel().read(StringReader(responseNTriples["body"] as String), null, Lang.NTRIPLES.name)
-            val actualJsonLD = ModelFactory.createDefaultModel().read(StringReader(responseJsonLD["body"] as String), null, Lang.JSONLD.name)
+            val actualTurtle =
+                ModelFactory.createDefaultModel().read(
+                    StringReader(responseTurtle["body"] as String),
+                    null,
+                    Lang.TURTLE.name,
+                )
+            val actualNTriples =
+                ModelFactory.createDefaultModel().read(
+                    StringReader(responseNTriples["body"] as String),
+                    null,
+                    Lang.NTRIPLES.name,
+                )
+            val actualJsonLD =
+                ModelFactory.createDefaultModel().read(
+                    StringReader(responseJsonLD["body"] as String),
+                    null,
+                    Lang.JSONLD.name,
+                )
 
             assertTrue(checkIfIsomorphicAndPrintDiff(actualTurtle, expected, "Get Dataset turtle result", logger))
             assertTrue(checkIfIsomorphicAndPrintDiff(actualNTriples, expected, "Get Dataset n-triples result", logger))
@@ -105,7 +169,12 @@ class RdfContractTest: ApiTestContext() {
 
         @Test
         fun `Unpublished Dataset not found`() {
-            val getOne = apiAuthorizedRequest("/catalogs/$DB_CATALOG_ID_2/datasets/$DB_DATASET_ID_6", method="GET", accept=MediaType("text","turtle"))
+            val getOne =
+                apiAuthorizedRequest(
+                    "/catalogs/$DB_CATALOG_ID_2/datasets/$DB_DATASET_ID_6",
+                    method = "GET",
+                    accept = MediaType("text", "turtle"),
+                )
 
             assertEquals(HttpStatus.NOT_FOUND.value(), getOne["status"])
         }

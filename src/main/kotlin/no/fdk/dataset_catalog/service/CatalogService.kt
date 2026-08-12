@@ -8,17 +8,15 @@ import org.springframework.stereotype.Service
 class CatalogService(
     private val datasetOperations: DatasetOperations,
 ) {
-
     fun getAll(): List<CatalogCount> =
         datasetOperations.datasetCountForCatalogs(
-            datasetOperations.getAllCatalogIds()
+            datasetOperations.getAllCatalogIds(),
         )
 
-    fun getByIDs(permittedOrgs: List<String>): List<CatalogCount> =
-        datasetOperations.datasetCountForCatalogs(permittedOrgs)
+    fun getByIDs(permittedOrgs: List<String>): List<CatalogCount> = datasetOperations.datasetCountForCatalogs(permittedOrgs)
 
     fun getByID(id: String): CatalogCount? =
-        datasetOperations.datasetCountForCatalogs(listOf(id))
+        datasetOperations
+            .datasetCountForCatalogs(listOf(id))
             .firstOrNull()
-
 }

@@ -1,8 +1,19 @@
 package no.fdk.dataset_catalog.service
 
 import no.fdk.dataset_catalog.configuration.ApplicationProperties
-import no.fdk.dataset_catalog.model.*
-import no.fdk.dataset_catalog.utils.*
+import no.fdk.dataset_catalog.model.ApplicationProfile
+import no.fdk.dataset_catalog.model.CatalogCount
+import no.fdk.dataset_catalog.model.Cost
+import no.fdk.dataset_catalog.model.DatasetDBO
+import no.fdk.dataset_catalog.model.DistributionDBO
+import no.fdk.dataset_catalog.model.LocalizedStrings
+import no.fdk.dataset_catalog.model.ReferenceDBO
+import no.fdk.dataset_catalog.model.RightsDBO
+import no.fdk.dataset_catalog.model.UriWithLabel
+import no.fdk.dataset_catalog.utils.TEST_CATALOG_1
+import no.fdk.dataset_catalog.utils.TEST_DATASET_1
+import no.fdk.dataset_catalog.utils.TestResponseReader
+import no.fdk.dataset_catalog.utils.checkIfIsomorphicAndPrintDiff
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Tag
@@ -31,7 +42,6 @@ class RdfServiceTest {
 
     @Nested
     internal inner class Serialize {
-
         @Test
         fun `Empty catalog serializes correctly`() {
             whenever(catalogService.getByID("1")).thenReturn(CatalogCount(id = "1", datasetCount = 0))
@@ -41,24 +51,26 @@ class RdfServiceTest {
 
         @Test
         fun `Serializes dataset relations`() {
-            val dataset = DatasetDBO(
-                catalogId = "1",
-                published = true,
-                approved = true,
-                lastModified = LocalDateTime.now(),
-                id = "http://catalog/1/dataset/1",
-                uri = "http://catalog/1/dataset/1",
-                relatedResources = listOf(
-                    UriWithLabel(
-                        uri = "http://uri-1",
-                        prefLabel = LocalizedStrings(nb = "label-1-nb", en = "label-1-en")
-                    ),
-                    UriWithLabel(
-                        uri = "http://uri-2",
-                        prefLabel = LocalizedStrings(nb = "label-2-nb", en = "label-2-en")
-                    )
+            val dataset =
+                DatasetDBO(
+                    catalogId = "1",
+                    published = true,
+                    approved = true,
+                    lastModified = LocalDateTime.now(),
+                    id = "http://catalog/1/dataset/1",
+                    uri = "http://catalog/1/dataset/1",
+                    relatedResources =
+                        listOf(
+                            UriWithLabel(
+                                uri = "http://uri-1",
+                                prefLabel = LocalizedStrings(nb = "label-1-nb", en = "label-1-en"),
+                            ),
+                            UriWithLabel(
+                                uri = "http://uri-2",
+                                prefLabel = LocalizedStrings(nb = "label-2-nb", en = "label-2-en"),
+                            ),
+                        ),
                 )
-            )
 
             val catalog = CatalogCount(id = "1", datasetCount = 0)
 
@@ -74,23 +86,23 @@ class RdfServiceTest {
                     responseModel!!,
                     expected,
                     "Serializing dataset relations",
-                    logger
-                )
+                    logger,
+                ),
             )
-
         }
 
         @Test
         fun `Serializes dataset qualified attributions`() {
-            val dataset = DatasetDBO(
-                catalogId = "1",
-                published = true,
-                approved = true,
-                id = "http://catalog/1/dataset/1",
-                uri = "http://catalog/1/dataset/1",
-                qualifiedAttributions = setOf("123456789", "987654321"),
-                lastModified = LocalDateTime.now(),
-            )
+            val dataset =
+                DatasetDBO(
+                    catalogId = "1",
+                    published = true,
+                    approved = true,
+                    id = "http://catalog/1/dataset/1",
+                    uri = "http://catalog/1/dataset/1",
+                    qualifiedAttributions = setOf("123456789", "987654321"),
+                    lastModified = LocalDateTime.now(),
+                )
             val catalog = CatalogCount(id = "1", datasetCount = 1)
 
             whenever(catalogService.getByID("1")).thenReturn(catalog)
@@ -105,31 +117,33 @@ class RdfServiceTest {
                     responseModel!!,
                     expected,
                     "Serializing qualified attributions",
-                    logger
-                )
+                    logger,
+                ),
             )
         }
 
         @Test
         fun `Serializes dataset costs`() {
-            val dataset = DatasetDBO(
-                catalogId = "1",
-                published = true,
-                approved = true,
-                lastModified = LocalDateTime.now(),
-                id = "http://catalog/dataset",
-                uri = "http://catalog/dataset",
-                costs = listOf(
-                    Cost(
-                        value = 125.57,
-                        currency = "http://publications.europa.eu/resource/authority/currency/EUR",
-                    ),
-                    Cost(
-                        description = LocalizedStrings(nb = "med doc"),
-                        documentation = listOf("https://gebyr-doc.no"),
-                    )
+            val dataset =
+                DatasetDBO(
+                    catalogId = "1",
+                    published = true,
+                    approved = true,
+                    lastModified = LocalDateTime.now(),
+                    id = "http://catalog/dataset",
+                    uri = "http://catalog/dataset",
+                    costs =
+                        listOf(
+                            Cost(
+                                value = 125.57,
+                                currency = "http://publications.europa.eu/resource/authority/currency/EUR",
+                            ),
+                            Cost(
+                                description = LocalizedStrings(nb = "med doc"),
+                                documentation = listOf("https://gebyr-doc.no"),
+                            ),
+                        ),
                 )
-            )
 
             val catalog = CatalogCount(id = "1", datasetCount = 1)
 
@@ -145,30 +159,32 @@ class RdfServiceTest {
                     responseModel!!,
                     expected,
                     "Serializing dataset costs",
-                    logger
-                )
+                    logger,
+                ),
             )
         }
 
         @Test
         fun `Serializes mobilityDCAT dataset`() {
-            val dataset = DatasetDBO(
-                catalogId = "1",
-                published = true,
-                approved = true,
-                lastModified = LocalDateTime.now(),
-                id = "http://catalog/mobility-dataset",
-                uri = "http://catalog/mobility-dataset",
-                applicationProfile = ApplicationProfile.MOBILITYDCAT_AP,
-                mobilityTheme = setOf("http://mobility-theme-1", "http://mobility-theme-2"),
-                distribution = listOf(
-                    DistributionDBO(
-                        accessURL = listOf("http://access-url"),
-                        mobilityDataStandard = "http://mobility-data-standard",
-                        rights = RightsDBO(type = "http://rights-type"),
-                    )
-                ),
-            )
+            val dataset =
+                DatasetDBO(
+                    catalogId = "1",
+                    published = true,
+                    approved = true,
+                    lastModified = LocalDateTime.now(),
+                    id = "http://catalog/mobility-dataset",
+                    uri = "http://catalog/mobility-dataset",
+                    applicationProfile = ApplicationProfile.MOBILITYDCAT_AP,
+                    mobilityTheme = setOf("http://mobility-theme-1", "http://mobility-theme-2"),
+                    distribution =
+                        listOf(
+                            DistributionDBO(
+                                accessURL = listOf("http://access-url"),
+                                mobilityDataStandard = "http://mobility-data-standard",
+                                rights = RightsDBO(type = "http://rights-type"),
+                            ),
+                        ),
+                )
 
             val catalog = CatalogCount(id = "1", datasetCount = 1)
 
@@ -184,8 +200,8 @@ class RdfServiceTest {
                     responseModel!!,
                     expected,
                     "Serializing mobilityDCAT dataset",
-                    logger
-                )
+                    logger,
+                ),
             )
         }
 
@@ -193,16 +209,17 @@ class RdfServiceTest {
         fun `Serializes complete catalog`() {
             val dataset = TEST_DATASET_1
             val catalog = TEST_CATALOG_1
-            val references = listOf(
-                ReferenceDBO(
-                    referenceType = "http://purl.org/dc/terms/references",
-                    source = "http://referenced/dataset/resolved"
-                ),
-                ReferenceDBO(
-                    referenceType = "http://purl.org/dc/terms/hasPart",
-                    source = "http://has-part.no"
+            val references =
+                listOf(
+                    ReferenceDBO(
+                        referenceType = "http://purl.org/dc/terms/references",
+                        source = "http://referenced/dataset/resolved",
+                    ),
+                    ReferenceDBO(
+                        referenceType = "http://purl.org/dc/terms/hasPart",
+                        source = "http://has-part.no",
+                    ),
                 )
-            )
 
             whenever(catalogService.getByID(catalog.id)).thenReturn(catalog)
             whenever(datasetService.getAllDatasets(catalog.id)).thenReturn(listOf(dataset))

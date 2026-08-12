@@ -1,7 +1,12 @@
 package no.fdk.dataset_catalog.model
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import jakarta.persistence.*
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
+import jakarta.persistence.Id
+import jakarta.persistence.Table
 import org.hibernate.annotations.JdbcTypeCode
 import org.hibernate.type.SqlTypes
 import java.time.LocalDateTime
@@ -12,39 +17,38 @@ data class DatasetEntity(
     @Id
     @Column(name = "id")
     val id: String = "",
-
     @Column(name = "catalog_id", nullable = false)
     val catalogId: String = "",
-
     @Column(name = "last_modified")
     val lastModified: LocalDateTime? = null,
-
     @Column(name = "uri")
     val uri: String? = null,
-
     @Column(name = "published", nullable = false)
     val published: Boolean = false,
-
     @Column(name = "approved", nullable = false)
     val approved: Boolean = false,
-
     @Enumerated(EnumType.STRING)
     @Column(name = "specialized_type")
     val specializedType: SpecializedType? = null,
-
     @Enumerated(EnumType.STRING)
     @Column(name = "application_profile", nullable = false)
     val applicationProfile: ApplicationProfile = ApplicationProfile.DCAT_AP_NO,
-
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "data", columnDefinition = "jsonb")
     val data: Map<String, Any?>? = null,
 )
 
-private val METADATA_FIELDS = setOf(
-    "id", "catalogId", "lastModified", "uri", "published", "approved",
-    "specializedType", "applicationProfile"
-)
+private val METADATA_FIELDS =
+    setOf(
+        "id",
+        "catalogId",
+        "lastModified",
+        "uri",
+        "published",
+        "approved",
+        "specializedType",
+        "applicationProfile",
+    )
 
 fun DatasetDBO.toEntity(mapper: ObjectMapper): DatasetEntity {
     @Suppress("UNCHECKED_CAST")

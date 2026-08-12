@@ -33,28 +33,29 @@ private val mapper = jacksonObjectMapper()
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest(
     properties = ["spring.profiles.active=contract-test"],
-    webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT
+    webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
 )
 @ContextConfiguration(initializers = [ApiTestContext.Initializer::class])
 @Tag("contract")
 class InternalCatalogContractTest : ApiTestContext() {
-
     @Nested
     internal inner class GetCatalog {
         @Test
         fun `Unable to get when not logged in as a user with org access`() {
-            val notLoggedIn = apiAuthorizedRequest(
-                "/internal/catalogs/$DB_CATALOG_ID_1",
-                null,
-                null,
-                "GET"
-            )
-            val wrongOrg = apiAuthorizedRequest(
-                "/internal/catalogs/1",
-                null,
-                JwtToken(Access.ORG_READ).toString(),
-                "GET"
-            )
+            val notLoggedIn =
+                apiAuthorizedRequest(
+                    "/internal/catalogs/$DB_CATALOG_ID_1",
+                    null,
+                    null,
+                    "GET",
+                )
+            val wrongOrg =
+                apiAuthorizedRequest(
+                    "/internal/catalogs/1",
+                    null,
+                    JwtToken(Access.ORG_READ).toString(),
+                    "GET",
+                )
 
             assertEquals(HttpStatus.UNAUTHORIZED.value(), notLoggedIn["status"])
             assertEquals(HttpStatus.FORBIDDEN.value(), wrongOrg["status"])
@@ -62,18 +63,20 @@ class InternalCatalogContractTest : ApiTestContext() {
 
         @Test
         fun `Both read and write can read`() {
-            val responseRead = apiAuthorizedRequest(
-                "/internal/catalogs/$DB_CATALOG_ID_1",
-                null,
-                JwtToken(Access.ORG_READ).toString(),
-                "GET"
-            )
-            val responseWrite = apiAuthorizedRequest(
-                "/internal/catalogs/$DB_CATALOG_ID_1",
-                null,
-                JwtToken(Access.ORG_WRITE).toString(),
-                "GET"
-            )
+            val responseRead =
+                apiAuthorizedRequest(
+                    "/internal/catalogs/$DB_CATALOG_ID_1",
+                    null,
+                    JwtToken(Access.ORG_READ).toString(),
+                    "GET",
+                )
+            val responseWrite =
+                apiAuthorizedRequest(
+                    "/internal/catalogs/$DB_CATALOG_ID_1",
+                    null,
+                    JwtToken(Access.ORG_WRITE).toString(),
+                    "GET",
+                )
 
             assertTrue(HttpStatus.OK.value() == responseRead["status"])
             assertTrue(HttpStatus.OK.value() == responseWrite["status"])
@@ -88,12 +91,13 @@ class InternalCatalogContractTest : ApiTestContext() {
         @Test
         fun `Get All catalogs returns all permitted catalogs`() {
             resetDB()
-            val responseRead = apiAuthorizedRequest(
-                "/internal/catalogs",
-                null,
-                JwtToken(Access.ORG_READ).toString(),
-                "GET"
-            )
+            val responseRead =
+                apiAuthorizedRequest(
+                    "/internal/catalogs",
+                    null,
+                    JwtToken(Access.ORG_READ).toString(),
+                    "GET",
+                )
             val resultRead: List<CatalogCount> = mapper.readValue(responseRead["body"] as String)
 
             val expectedRead: List<CatalogCount> = listOf(CatalogCount(DB_CATALOG_ID_1, 3))
@@ -102,14 +106,14 @@ class InternalCatalogContractTest : ApiTestContext() {
             val responseRoot = apiAuthorizedRequest("/internal/catalogs", null, JwtToken(Access.ROOT).toString(), "GET")
             val resultRoot: List<CatalogCount> = mapper.readValue(responseRoot["body"] as String)
 
-            val expectedRoot: List<CatalogCount> = listOf(
-                CatalogCount(SERIES_CATALOG_ID, 4),
-                CatalogCount(DB_CATALOG_ID_1, 3),
-                CatalogCount(DB_CATALOG_ID_2, 3),
-            )
+            val expectedRoot: List<CatalogCount> =
+                listOf(
+                    CatalogCount(SERIES_CATALOG_ID, 4),
+                    CatalogCount(DB_CATALOG_ID_1, 3),
+                    CatalogCount(DB_CATALOG_ID_2, 3),
+                )
             assertEquals(expectedRoot, resultRoot.sortedBy { it.id })
         }
-
     }
 
     @Nested
@@ -121,18 +125,20 @@ class InternalCatalogContractTest : ApiTestContext() {
                 mapper.writeValueAsString(listOf(JsonPatchOperation(op = OpEnum.ADD, path = "/title/en", "en title")))
             val notLoggedIn =
                 apiAuthorizedRequest("/internal/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}", body, null, "PATCH")
-            val readAccess = apiAuthorizedRequest(
-                "/internal/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}",
-                body,
-                JwtToken(Access.ORG_READ).toString(),
-                "PATCH"
-            )
-            val wrongOrg = apiAuthorizedRequest(
-                "/internal/catalogs/$DB_CATALOG_ID_2/datasets/${DB_DATASET_ID_1}",
-                body,
-                JwtToken(Access.ORG_WRITE).toString(),
-                "PATCH"
-            )
+            val readAccess =
+                apiAuthorizedRequest(
+                    "/internal/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}",
+                    body,
+                    JwtToken(Access.ORG_READ).toString(),
+                    "PATCH",
+                )
+            val wrongOrg =
+                apiAuthorizedRequest(
+                    "/internal/catalogs/$DB_CATALOG_ID_2/datasets/${DB_DATASET_ID_1}",
+                    body,
+                    JwtToken(Access.ORG_WRITE).toString(),
+                    "PATCH",
+                )
 
             assertEquals(HttpStatus.UNAUTHORIZED.value(), notLoggedIn["status"])
             assertEquals(HttpStatus.FORBIDDEN.value(), readAccess["status"])
@@ -142,54 +148,58 @@ class InternalCatalogContractTest : ApiTestContext() {
         @Test
         fun `Invalid update`() {
             resetDB()
-            val doesNotExist = apiAuthorizedRequest(
-                "/internal/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_4}",
-                mapper.writeValueAsString(listOf(JsonPatchOperation(op = OpEnum.ADD, path = "/source", "brreg"))),
-                JwtToken(Access.ORG_WRITE).toString(),
-                "PATCH"
-            )
-            val invalidValue = apiAuthorizedRequest(
-                "/internal/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}",
-                mapper.writeValueAsString(
-                    listOf(
-                        JsonPatchOperation(
-                            op = OpEnum.ADD,
-                            path = "/keywords",
-                            "invalid value"
-                        )
-                    )
-                ),
-                JwtToken(Access.ORG_WRITE).toString(),
-                "PATCH"
-            )
-            val wrongOperation = apiAuthorizedRequest(
-                "/internal/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}",
-                mapper.writeValueAsString(
-                    listOf(
-                        JsonPatchOperation(
-                            op = OpEnum.REPLACE,
-                            path = "/source",
-                            "wrong operation"
-                        )
-                    )
-                ),
-                JwtToken(Access.ORG_WRITE).toString(),
-                "PATCH"
-            )
-            val invalidOperation = apiAuthorizedRequest(
-                "/internal/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}",
-                mapper.writeValueAsString(
-                    listOf(
-                        JsonPatchOperation(
-                            op = OpEnum.MOVE,
-                            path = "/source",
-                            "wrong operation"
-                        )
-                    )
-                ),
-                JwtToken(Access.ORG_WRITE).toString(),
-                "PATCH"
-            )
+            val doesNotExist =
+                apiAuthorizedRequest(
+                    "/internal/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_4}",
+                    mapper.writeValueAsString(listOf(JsonPatchOperation(op = OpEnum.ADD, path = "/source", "brreg"))),
+                    JwtToken(Access.ORG_WRITE).toString(),
+                    "PATCH",
+                )
+            val invalidValue =
+                apiAuthorizedRequest(
+                    "/internal/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}",
+                    mapper.writeValueAsString(
+                        listOf(
+                            JsonPatchOperation(
+                                op = OpEnum.ADD,
+                                path = "/keywords",
+                                "invalid value",
+                            ),
+                        ),
+                    ),
+                    JwtToken(Access.ORG_WRITE).toString(),
+                    "PATCH",
+                )
+            val wrongOperation =
+                apiAuthorizedRequest(
+                    "/internal/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}",
+                    mapper.writeValueAsString(
+                        listOf(
+                            JsonPatchOperation(
+                                op = OpEnum.REPLACE,
+                                path = "/source",
+                                "wrong operation",
+                            ),
+                        ),
+                    ),
+                    JwtToken(Access.ORG_WRITE).toString(),
+                    "PATCH",
+                )
+            val invalidOperation =
+                apiAuthorizedRequest(
+                    "/internal/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}",
+                    mapper.writeValueAsString(
+                        listOf(
+                            JsonPatchOperation(
+                                op = OpEnum.MOVE,
+                                path = "/source",
+                                "wrong operation",
+                            ),
+                        ),
+                    ),
+                    JwtToken(Access.ORG_WRITE).toString(),
+                    "PATCH",
+                )
 
             assertEquals(HttpStatus.NOT_FOUND.value(), doesNotExist["status"])
             assertEquals(HttpStatus.BAD_REQUEST.value(), invalidValue["status"])
@@ -200,29 +210,31 @@ class InternalCatalogContractTest : ApiTestContext() {
         @Test
         fun `Invalid fields are ignored on update`() {
             resetDB()
-            val preUpdate = apiAuthorizedRequest(
-                "/internal/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}",
-                null,
-                JwtToken(Access.ORG_WRITE).toString(),
-                "GET"
-            )
+            val preUpdate =
+                apiAuthorizedRequest(
+                    "/internal/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}",
+                    null,
+                    JwtToken(Access.ORG_WRITE).toString(),
+                    "GET",
+                )
             assertEquals(HttpStatus.OK.value(), preUpdate["status"])
             val bodyPreUpdate: DatasetDBO = mapper.readValue(preUpdate["body"] as String)
 
-            val invalidField = apiAuthorizedRequest(
-                "/internal/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}",
-                mapper.writeValueAsString(
-                    listOf(
-                        JsonPatchOperation(
-                            op = OpEnum.ADD,
-                            path = "/invalidField",
-                            "invalid field"
-                        )
-                    )
-                ),
-                JwtToken(Access.ORG_WRITE).toString(),
-                "PATCH"
-            )
+            val invalidField =
+                apiAuthorizedRequest(
+                    "/internal/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}",
+                    mapper.writeValueAsString(
+                        listOf(
+                            JsonPatchOperation(
+                                op = OpEnum.ADD,
+                                path = "/invalidField",
+                                "invalid field",
+                            ),
+                        ),
+                    ),
+                    JwtToken(Access.ORG_WRITE).toString(),
+                    "PATCH",
+                )
             assertEquals(HttpStatus.OK.value(), invalidField["status"])
             val bodyInvalidField: DatasetDBO = mapper.readValue(invalidField["body"] as String)
 
@@ -232,12 +244,13 @@ class InternalCatalogContractTest : ApiTestContext() {
         @Test
         fun `Able to get before and after update`() {
             resetDB()
-            val preUpdate = apiAuthorizedRequest(
-                "/internal/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}",
-                null,
-                JwtToken(Access.ORG_WRITE).toString(),
-                "GET"
-            )
+            val preUpdate =
+                apiAuthorizedRequest(
+                    "/internal/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}",
+                    null,
+                    JwtToken(Access.ORG_WRITE).toString(),
+                    "GET",
+                )
             assertEquals(HttpStatus.OK.value(), preUpdate["status"])
             val bodyPreUpdate: DatasetDBO = mapper.readValue(preUpdate["body"] as String)
             assertEquals(DB_DATASET_1, bodyPreUpdate)
@@ -245,20 +258,22 @@ class InternalCatalogContractTest : ApiTestContext() {
             val patchBody =
                 mapper.writeValueAsString(listOf(JsonPatchOperation(op = OpEnum.ADD, path = "/type", listOf("test"))))
 
-            val rspUpdate = apiAuthorizedRequest(
-                "/internal/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}",
-                patchBody,
-                JwtToken(Access.ORG_WRITE).toString(),
-                "PATCH"
-            )
+            val rspUpdate =
+                apiAuthorizedRequest(
+                    "/internal/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}",
+                    patchBody,
+                    JwtToken(Access.ORG_WRITE).toString(),
+                    "PATCH",
+                )
             assertEquals(HttpStatus.OK.value(), rspUpdate["status"])
 
-            val postUpdate = apiAuthorizedRequest(
-                "/internal/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}",
-                null,
-                JwtToken(Access.ORG_WRITE).toString(),
-                "GET"
-            )
+            val postUpdate =
+                apiAuthorizedRequest(
+                    "/internal/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}",
+                    null,
+                    JwtToken(Access.ORG_WRITE).toString(),
+                    "GET",
+                )
             assertEquals(HttpStatus.OK.value(), postUpdate["status"])
             val bodyPostUpdate: DatasetDBO = mapper.readValue(postUpdate["body"] as String)
             assertEquals(DB_DATASET_1.copy(lastModified = bodyPostUpdate.lastModified, type = listOf("test")), bodyPostUpdate)
@@ -269,20 +284,22 @@ class InternalCatalogContractTest : ApiTestContext() {
             resetDB()
             val update = listOf(JsonPatchOperation(OpEnum.ADD, "/type", listOf("test")))
 
-            val rspUpdate = apiAuthorizedRequest(
-                "/internal/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}",
-                mapper.writeValueAsString(update),
-                JwtToken(Access.ORG_WRITE).toString(),
-                "PATCH"
-            )
+            val rspUpdate =
+                apiAuthorizedRequest(
+                    "/internal/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}",
+                    mapper.writeValueAsString(update),
+                    JwtToken(Access.ORG_WRITE).toString(),
+                    "PATCH",
+                )
             assertEquals(HttpStatus.OK.value(), rspUpdate["status"])
 
-            val postUpdate = apiAuthorizedRequest(
-                "/internal/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}",
-                null,
-                JwtToken(Access.ORG_WRITE).toString(),
-                "GET"
-            )
+            val postUpdate =
+                apiAuthorizedRequest(
+                    "/internal/catalogs/$DB_CATALOG_ID_1/datasets/${DB_DATASET_ID_1}",
+                    null,
+                    JwtToken(Access.ORG_WRITE).toString(),
+                    "GET",
+                )
             assertEquals(HttpStatus.OK.value(), postUpdate["status"])
 
             val bodyPostUpdate: DatasetDBO = mapper.readValue(postUpdate["body"] as String)
@@ -291,7 +308,8 @@ class InternalCatalogContractTest : ApiTestContext() {
                 DB_DATASET_1.copy(
                     lastModified = bodyPostUpdate.lastModified,
                     type = listOf("test"),
-                ), bodyPostUpdate
+                ),
+                bodyPostUpdate,
             )
         }
     }

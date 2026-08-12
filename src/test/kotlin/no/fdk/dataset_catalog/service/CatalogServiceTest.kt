@@ -5,27 +5,27 @@ import no.fdk.dataset_catalog.repository.DatasetOperations
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.*
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.springframework.test.context.TestPropertySource
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
 @TestPropertySource(properties = ["application.openDataEnhet=test"])
-
 @Tag("unit")
 class CatalogServiceTest {
     private val datasetOperations: DatasetOperations = mock()
     private val catalogService = CatalogService(datasetOperations)
 
     @Nested
-    internal inner class GetById{
+    internal inner class GetById {
         @Test
         fun `non empty catalog when there exists datasets with queried catalogId`() {
             whenever(datasetOperations.datasetCountForCatalogs(listOf("existing-id")))
                 .thenReturn(listOf(CatalogCount("existing-id", 1)))
             val expected = CatalogCount("existing-id", 1)
             val catalog = catalogService.getByID("existing-id")
-            assertEquals(expected,catalog)
+            assertEquals(expected, catalog)
         }
 
         @Test
@@ -38,25 +38,27 @@ class CatalogServiceTest {
     }
 
     @Nested
-    internal inner class GetAll{
-       @Test
+    internal inner class GetAll {
+        @Test
         fun `getAll returns all catalogs`() {
             whenever(datasetOperations.getAllCatalogIds()).thenReturn(listOf("0", "1", "2"))
-           whenever(datasetOperations.datasetCountForCatalogs(listOf("0", "1", "2")))
-               .thenReturn(listOf(
-                   CatalogCount("0", 10),
-                   CatalogCount("1", 20),
-                   CatalogCount("2", 30))
-               )
+            whenever(datasetOperations.datasetCountForCatalogs(listOf("0", "1", "2")))
+                .thenReturn(
+                    listOf(
+                        CatalogCount("0", 10),
+                        CatalogCount("1", 20),
+                        CatalogCount("2", 30),
+                    ),
+                )
 
-            val expected = listOf(
-                CatalogCount("0", 10),
-                CatalogCount("1", 20),
-                CatalogCount("2", 30)
-            )
+            val expected =
+                listOf(
+                    CatalogCount("0", 10),
+                    CatalogCount("1", 20),
+                    CatalogCount("2", 30),
+                )
             val result = catalogService.getAll()
             assertEquals(expected, result)
         }
     }
-
 }

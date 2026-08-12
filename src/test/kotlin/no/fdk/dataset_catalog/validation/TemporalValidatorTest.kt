@@ -12,26 +12,27 @@ import kotlin.test.assertEquals
 
 @Tag("unit")
 class TemporalValidatorTest {
-
-    private fun dataset(vararg periods: PeriodOfTimeDBO) = DatasetDBO(
-        id = "id",
-        catalogId = "cat",
-        lastModified = LocalDateTime.now(),
-        uri = "uri",
-        temporal = periods.toList()
-    )
+    private fun dataset(vararg periods: PeriodOfTimeDBO) =
+        DatasetDBO(
+            id = "id",
+            catalogId = "cat",
+            lastModified = LocalDateTime.now(),
+            uri = "uri",
+            temporal = periods.toList(),
+        )
 
     private fun assertRejected(period: PeriodOfTimeDBO) {
-        val ex = assertThrows(ResponseStatusException::class.java) {
-            TemporalValidator.validate(dataset(period))
-        }
+        val ex =
+            assertThrows(ResponseStatusException::class.java) {
+                TemporalValidator.validate(dataset(period))
+            }
         assertEquals(HttpStatus.BAD_REQUEST, ex.statusCode)
     }
 
     @Test
     fun `null temporal accepted`() {
         TemporalValidator.validate(
-            DatasetDBO(id = "id", catalogId = "cat", lastModified = LocalDateTime.now(), uri = "uri", temporal = null)
+            DatasetDBO(id = "id", catalogId = "cat", lastModified = LocalDateTime.now(), uri = "uri", temporal = null),
         )
     }
 
@@ -144,14 +145,15 @@ class TemporalValidatorTest {
 
     @Test
     fun `error message identifies period index`() {
-        val ex = assertThrows(ResponseStatusException::class.java) {
-            TemporalValidator.validate(
-                dataset(
-                    PeriodOfTimeDBO(startDate = "2024"),
-                    PeriodOfTimeDBO(startDate = "bogus")
+        val ex =
+            assertThrows(ResponseStatusException::class.java) {
+                TemporalValidator.validate(
+                    dataset(
+                        PeriodOfTimeDBO(startDate = "2024"),
+                        PeriodOfTimeDBO(startDate = "bogus"),
+                    ),
                 )
-            )
-        }
+            }
         assertEquals(HttpStatus.BAD_REQUEST, ex.statusCode)
         assert(ex.reason!!.contains("temporal[1].startDate"))
     }

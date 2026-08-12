@@ -9,15 +9,22 @@ import org.apache.jena.vocabulary.DCAT
 import org.apache.jena.vocabulary.DCTerms
 import org.apache.jena.vocabulary.RDF
 
-fun Model.addDatasetResource(dataset: DatasetDBO, seriesData: SeriesData, baseCatalogURI: String, publisherURI: String): Resource {
-    val datasetURI = when {
-        dataset.originalUri.isValidURL() -> dataset.originalUri
-        dataset.uri.isValidURL() -> dataset.uri
-        else -> "${baseCatalogURI}/${dataset.catalogId}/datasets/${dataset.id}"
-    }
-    val datasetResource = safeCreateResource(datasetURI)
-        .safeAddLocalizedString(DCTerms.title, dataset.title)
-        .safeAddLocalizedString(DCTerms.description, dataset.description)
+fun Model.addDatasetResource(
+    dataset: DatasetDBO,
+    seriesData: SeriesData,
+    baseCatalogURI: String,
+    publisherURI: String,
+): Resource {
+    val datasetURI =
+        when {
+            dataset.originalUri.isValidURL() -> dataset.originalUri
+            dataset.uri.isValidURL() -> dataset.uri
+            else -> "$baseCatalogURI/${dataset.catalogId}/datasets/${dataset.id}"
+        }
+    val datasetResource =
+        safeCreateResource(datasetURI)
+            .safeAddLocalizedString(DCTerms.title, dataset.title)
+            .safeAddLocalizedString(DCTerms.description, dataset.description)
 
     if (dataset.specializedType == SpecializedType.SERIES) {
         datasetResource
