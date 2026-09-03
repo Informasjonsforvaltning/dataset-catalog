@@ -89,6 +89,14 @@ class CV {
     }
 }
 
+class DCATAP {
+    companion object {
+        const val URI = "http://data.europa.eu/r5r/"
+
+        val applicableLegislation: Property = ResourceFactory.createProperty("${URI}applicableLegislation")
+    }
+}
+
 class MOBILITYDCATAP {
     companion object {
         const val URI = "https://w3id.org/mobilitydcat-ap#"
