@@ -26,6 +26,33 @@ import org.junit.jupiter.api.TestInstance
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class RDFDatasetUtilsTest {
     @Test
+    fun testApplicableLegislationUsesEliUriAsResourceIdentity() {
+        val model = ModelFactory.createDefaultModel()
+        val resource = model.createResource("http://my-dataset1")
+        val eliUri = "http://data.europa.eu/eli/reg_impl/2023/138/oj"
+
+        resource.addApplicableLegislation(
+            listOf(UriWithLabel(uri = eliUri, prefLabel = LocalizedStrings(nb = "Åpne data-forskriften"))),
+        )
+
+        val legalResource = resource.getPropertyResourceValue(DCATAP.applicableLegislation)
+        assertNotNull(legalResource)
+        assertEquals(eliUri, legalResource.uri)
+        assertTrue { legalResource.hasProperty(RDF.type, ELI.LegalResource) }
+        assertEquals("Åpne data-forskriften", legalResource.getProperty(DCTerms.title).string)
+    }
+
+    @Test
+    fun testApplicableLegislationIsNotIncludedWhenEmpty() {
+        val model = ModelFactory.createDefaultModel()
+        val resource = model.createResource("http://my-dataset1")
+
+        resource.addApplicableLegislation(listOf(UriWithLabel()))
+
+        assertFalse { resource.hasProperty(DCATAP.applicableLegislation) }
+    }
+
+    @Test
     fun testIfEmptyDistributionIsNotIncluded() {
         val model = ModelFactory.createDefaultModel()
         val resource = model.createResource("http://my-dataset1")

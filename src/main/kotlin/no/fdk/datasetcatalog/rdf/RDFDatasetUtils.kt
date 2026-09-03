@@ -43,6 +43,7 @@ fun Model.addDatasetResource(dataset: DatasetDBO, seriesData: SeriesData, baseCa
             .safeAddLinkListProperty(DCTerms.spatial, dataset.spatial?.map { it })
             .safeAddLinkedProperty(DCTerms.accessRights, dataset.accessRight)
             .addLegalBasis(dataset)
+            .addApplicableLegislation(dataset.applicableLegislation)
             .addQualityAnnotation(dataset.accuracy, DQV.Accuracy)
             .addQualityAnnotation(dataset.completeness, DQV.Completeness)
             .addQualityAnnotation(dataset.currentness, DQV.Currentness)
