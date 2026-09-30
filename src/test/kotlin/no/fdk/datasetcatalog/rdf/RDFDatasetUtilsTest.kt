@@ -1,5 +1,6 @@
 package no.fdk.datasetcatalog.rdf
 
+import no.fdk.datasetcatalog.model.ApplicableLegislation
 import no.fdk.datasetcatalog.model.Cost
 import no.fdk.datasetcatalog.model.DatasetDBO
 import no.fdk.datasetcatalog.model.DistributionDBO
@@ -26,18 +27,16 @@ import org.junit.jupiter.api.TestInstance
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class RDFDatasetUtilsTest {
     @Test
-    fun testApplicableLegislationUsesEliUriAsResourceIdentity() {
+    fun testApplicableLegislationIsCreated() {
         val model = ModelFactory.createDefaultModel()
         val resource = model.createResource("http://my-dataset1")
-        val eliUri = "http://data.europa.eu/eli/reg_impl/2023/138/oj"
 
         resource.addApplicableLegislation(
-            listOf(UriWithLabel(uri = eliUri, prefLabel = LocalizedStrings(nb = "Åpne data-forskriften"))),
+            listOf(ApplicableLegislation(title = LocalizedStrings(nb = "Åpne data-forskriften"))),
         )
 
         val legalResource = resource.getPropertyResourceValue(DCATAP.applicableLegislation)
         assertNotNull(legalResource)
-        assertEquals(eliUri, legalResource.uri)
         assertTrue { legalResource.hasProperty(RDF.type, ELI.LegalResource) }
         assertEquals("Åpne data-forskriften", legalResource.getProperty(DCTerms.title).string)
     }
@@ -47,7 +46,7 @@ class RDFDatasetUtilsTest {
         val model = ModelFactory.createDefaultModel()
         val resource = model.createResource("http://my-dataset1")
 
-        resource.addApplicableLegislation(listOf(UriWithLabel()))
+        resource.addApplicableLegislation(listOf(ApplicableLegislation()))
 
         assertFalse { resource.hasProperty(DCATAP.applicableLegislation) }
     }

@@ -1,5 +1,6 @@
 package no.fdk.datasetcatalog.rdf
 
+import no.fdk.datasetcatalog.model.ApplicableLegislation
 import no.fdk.datasetcatalog.model.ContactPoint
 import no.fdk.datasetcatalog.model.Cost
 import no.fdk.datasetcatalog.model.DatasetDBO
@@ -11,7 +12,6 @@ import no.fdk.datasetcatalog.model.QualityAnnotationDBO
 import no.fdk.datasetcatalog.model.ReferenceDBO
 import no.fdk.datasetcatalog.model.RightsDBO
 import no.fdk.datasetcatalog.model.UriWithLabel
-import no.fdk.datasetcatalog.model.ApplicableLegislation
 import no.fdk.datasetcatalog.utils.defaultLogger
 import no.fdk.datasetcatalog.utils.isValidURI
 import org.apache.jena.datatypes.xsd.XSDDatatype
@@ -173,7 +173,7 @@ fun Resource.addConformsTo(conformsTo: Collection<UriWithLabel>?): Resource {
 
 fun Resource.addApplicableLegislation(applicableLegislation: List<ApplicableLegislation>?): Resource {
     applicableLegislation?.forEach {
-        if (it.title.isValidLangField() || it.description.isValidLangField() || !it.references.isNullOrEmpty() ) {
+        if (it.title.isValidLangField() || it.description.isValidLangField() || !it.references.isNullOrEmpty()) {
             addProperty(
                 DCATAP.applicableLegislation,
                 model
