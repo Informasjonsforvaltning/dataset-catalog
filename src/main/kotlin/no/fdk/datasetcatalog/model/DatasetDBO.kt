@@ -49,7 +49,7 @@ data class DatasetDTO(
     val legalBasisForRestriction: List<UriWithLabel>? = null,
     val legalBasisForProcessing: List<UriWithLabel>? = null,
     val legalBasisForAccess: List<UriWithLabel>? = null,
-    val applicableLegislation: List<UriWithLabel>? = null,
+    val applicableLegislation: List<ApplicableLegislation>? = null,
     val accuracy: QualityAnnotationDBO? = null,
     val completeness: QualityAnnotationDBO? = null,
     val currentness: QualityAnnotationDBO? = null,
