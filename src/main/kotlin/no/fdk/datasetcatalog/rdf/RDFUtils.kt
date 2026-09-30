@@ -176,6 +176,7 @@ fun Resource.addApplicableLegislation(applicableLegislation: Collection<UriWithL
             addProperty(
                 DCATAP.applicableLegislation,
                 model
+                    .safeCreateResource()
                     .addProperty(RDF.type, ELI.LegalResource)
                     .safeAddLocalizedString(DCTerms.title, it.title)
                     .safeAddLocalizedString(DCTerms.description, it.description)
