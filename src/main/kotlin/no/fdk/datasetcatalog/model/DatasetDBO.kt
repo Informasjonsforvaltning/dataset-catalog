@@ -49,7 +49,7 @@ data class DatasetDTO(
     val legalBasisForRestriction: List<UriWithLabel>? = null,
     val legalBasisForProcessing: List<UriWithLabel>? = null,
     val legalBasisForAccess: List<UriWithLabel>? = null,
-    val applicableLegislation: List<UriWithLabel>? = null,
+    val applicableLegislation: List<ApplicableLegislation>? = null,
     val accuracy: QualityAnnotationDBO? = null,
     val completeness: QualityAnnotationDBO? = null,
     val currentness: QualityAnnotationDBO? = null,
@@ -102,7 +102,7 @@ data class DatasetToCreate(
     val legalBasisForRestriction: List<UriWithLabel>? = null,
     val legalBasisForProcessing: List<UriWithLabel>? = null,
     val legalBasisForAccess: List<UriWithLabel>? = null,
-    val applicableLegislation: List<UriWithLabel>? = null,
+    val applicableLegislation: List<ApplicableLegislation>? = null,
     val accuracy: QualityAnnotationDBO? = null,
     val completeness: QualityAnnotationDBO? = null,
     val currentness: QualityAnnotationDBO? = null,
@@ -192,4 +192,12 @@ data class Cost(
     val description: LocalizedStrings? = null,
     val documentation: List<String>? = null,
     val currency: String? = null,
+)
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class ApplicableLegislation(
+    val title: LocalizedStrings? = null,
+    val description: LocalizedStrings? = null,
+    val references: List<String>? = null,
 )

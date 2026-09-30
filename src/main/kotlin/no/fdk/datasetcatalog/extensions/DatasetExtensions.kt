@@ -29,6 +29,7 @@ fun DatasetDBO.addCreateValues(toCreate: DatasetToCreate) = copy(
     legalBasisForRestriction = toCreate.legalBasisForRestriction,
     legalBasisForProcessing = toCreate.legalBasisForProcessing,
     legalBasisForAccess = toCreate.legalBasisForAccess,
+    applicableLegislation = toCreate.applicableLegislation,
     accuracy = toCreate.accuracy,
     completeness = toCreate.completeness,
     currentness = toCreate.currentness,

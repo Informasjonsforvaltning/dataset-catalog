@@ -1,5 +1,6 @@
 package no.fdk.datasetcatalog.rdf
 
+import no.fdk.datasetcatalog.model.ApplicableLegislation
 import no.fdk.datasetcatalog.model.ContactPoint
 import no.fdk.datasetcatalog.model.Cost
 import no.fdk.datasetcatalog.model.DatasetDBO
@@ -170,15 +171,17 @@ fun Resource.addConformsTo(conformsTo: Collection<UriWithLabel>?): Resource {
     return this
 }
 
-fun Resource.addApplicableLegislation(applicableLegislation: Collection<UriWithLabel>?): Resource {
+fun Resource.addApplicableLegislation(applicableLegislation: List<ApplicableLegislation>?): Resource {
     applicableLegislation?.forEach {
-        if (!it.uri.isNullOrEmpty() || it.prefLabel.isValidLangField()) {
+        if (it.title.isValidLangField() || it.description.isValidLangField() || !it.references.isNullOrEmpty()) {
             addProperty(
                 DCATAP.applicableLegislation,
                 model
-                    .safeCreateResource(it.uri)
+                    .safeCreateResource()
                     .addProperty(RDF.type, ELI.LegalResource)
-                    .safeAddLocalizedString(DCTerms.title, it.prefLabel),
+                    .safeAddLocalizedString(DCTerms.title, it.title)
+                    .safeAddLocalizedString(DCTerms.description, it.description)
+                    .safeAddURLs(RDFS.seeAlso, it.references),
             )
         }
     }
