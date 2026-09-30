@@ -172,13 +172,15 @@ fun Resource.addConformsTo(conformsTo: Collection<UriWithLabel>?): Resource {
 
 fun Resource.addApplicableLegislation(applicableLegislation: Collection<UriWithLabel>?): Resource {
     applicableLegislation?.forEach {
-        if (!it.uri.isNullOrEmpty() || it.prefLabel.isValidLangField()) {
+        if (!it.uri.isNullOrEmpty() || it.title.isValidLangField() || it.description.isValidLangField()) {
             addProperty(
                 DCATAP.applicableLegislation,
                 model
                     .safeCreateResource(it.uri)
                     .addProperty(RDF.type, ELI.LegalResource)
-                    .safeAddLocalizedString(DCTerms.title, it.prefLabel),
+                    .safeAddLocalizedString(DCTerms.title, it.title)
+                    .safeAddLocalizedString(DCTerms.description, it.description)
+                    .safeAddURLs(RDFS.seeAlso, it.references),
             )
         }
     }
