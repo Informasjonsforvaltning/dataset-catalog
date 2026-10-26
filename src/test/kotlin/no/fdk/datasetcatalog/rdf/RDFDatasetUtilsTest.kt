@@ -6,6 +6,8 @@ import no.fdk.datasetcatalog.model.DatasetDBO
 import no.fdk.datasetcatalog.model.DistributionDBO
 import no.fdk.datasetcatalog.model.LocalizedStrings
 import no.fdk.datasetcatalog.model.PeriodOfTimeDBO
+import no.fdk.datasetcatalog.model.QualityAnnotation
+import no.fdk.datasetcatalog.model.QualityAnnotationDBO
 import no.fdk.datasetcatalog.model.RightsDBO
 import no.fdk.datasetcatalog.model.UriWithLabel
 import org.apache.jena.datatypes.xsd.XSDDatatype
@@ -13,6 +15,7 @@ import org.apache.jena.rdf.model.ModelFactory
 import org.apache.jena.sparql.vocabulary.FOAF
 import org.apache.jena.vocabulary.DCAT
 import org.apache.jena.vocabulary.DCTerms
+import org.apache.jena.vocabulary.OA
 import org.apache.jena.vocabulary.RDF
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -548,6 +551,194 @@ class RDFDatasetUtilsTest {
         assertTrue {
             types.any { it.`object`.isLiteral && it.`object`.asLiteral().string == "Kodeliste" }
         }
+    }
+
+    @Test
+    fun qualityAnnotationIsSerializedAccordingToDqvApNo() {
+        val model = ModelFactory.createDefaultModel()
+        val resource = model.createResource("http://my-dataset-quality")
+
+        resource.addQualityAnnotations(
+            listOf(
+                QualityAnnotation(
+                    inDimension = listOf("https://data.norge.no/vocabulary/quality-dimension#currentness"),
+                    hasBody = LocalizedStrings(nb = "Oppdateres daglig", en = "Updated daily"),
+                ),
+            ),
+        )
+
+        val annotation = resource.getPropertyResourceValue(DQV.hasQualityAnnotation)
+        assertNotNull(annotation)
+        assertTrue { annotation.hasProperty(RDF.type, DQV.QualityAnnotation) }
+        assertTrue { annotation.hasProperty(OA.motivatedBy, DQV.qualityAssessment) }
+        assertTrue { annotation.hasProperty(OA.hasTarget, resource) }
+        assertEquals(
+            listOf("https://data.norge.no/vocabulary/quality-dimension#currentness"),
+            annotation.listProperties(DQV.inDimension).toList().map { it.`object`.asResource().uri },
+        )
+
+        val bodiesByLanguage =
+            annotation
+                .listProperties(OA.hasBody)
+                .toList()
+                .map { it.`object`.asResource() }
+                .associate { it.getPropertyResourceValue(DCTerms.language).uri to it.getProperty(RDF.value).string }
+        assertEquals(
+            mapOf(
+                LinguisticSystem.NOB.uri to "Oppdateres daglig",
+                LinguisticSystem.ENG.uri to "Updated daily",
+            ),
+            bodiesByLanguage,
+        )
+    }
+
+    @Test
+    fun eachQualityAnnotationIsSerializedAsSeparateNode() {
+        val model = ModelFactory.createDefaultModel()
+        val resource = model.createResource("http://my-dataset-quality")
+
+        resource.addQualityAnnotations(
+            listOf(
+                QualityAnnotation(
+                    inDimension = listOf("https://data.norge.no/vocabulary/quality-dimension#currentness"),
+                    hasBody = LocalizedStrings(nb = "Aktualitet"),
+                ),
+                QualityAnnotation(
+                    inDimension = listOf("https://data.norge.no/vocabulary/quality-dimension#delay"),
+                    hasBody = LocalizedStrings(nb = "Tidsdifferanse"),
+                ),
+            ),
+        )
+
+        val dimensions =
+            resource
+                .listProperties(DQV.hasQualityAnnotation)
+                .toList()
+                .map { it.`object`.asResource().getPropertyResourceValue(DQV.inDimension).uri }
+                .sorted()
+        assertEquals(
+            listOf(
+                "https://data.norge.no/vocabulary/quality-dimension#currentness",
+                "https://data.norge.no/vocabulary/quality-dimension#delay",
+            ),
+            dimensions,
+        )
+    }
+
+    @Test
+    fun qualityAnnotationWithMultipleDimensionsEmitsAllValidUris() {
+        val model = ModelFactory.createDefaultModel()
+        val resource = model.createResource("http://my-dataset-quality")
+
+        resource.addQualityAnnotations(
+            listOf(
+                QualityAnnotation(
+                    inDimension =
+                    listOf(
+                        "https://data.norge.no/vocabulary/quality-dimension#currentness",
+                        "not a uri",
+                        "https://data.norge.no/vocabulary/quality-dimension#delay",
+                    ),
+                    hasBody = LocalizedStrings(nb = "Tekst"),
+                ),
+            ),
+        )
+
+        val annotation = resource.getPropertyResourceValue(DQV.hasQualityAnnotation)
+        assertNotNull(annotation)
+        assertEquals(
+            listOf(
+                "https://data.norge.no/vocabulary/quality-dimension#currentness",
+                "https://data.norge.no/vocabulary/quality-dimension#delay",
+            ),
+            annotation
+                .listProperties(DQV.inDimension)
+                .toList()
+                .map { it.`object`.asResource().uri }
+                .sorted(),
+        )
+    }
+
+    @Test
+    fun qualityAnnotationWithInvalidDimensionIsSerializedWithoutDimension() {
+        val model = ModelFactory.createDefaultModel()
+        val resource = model.createResource("http://my-dataset-quality")
+
+        resource.addQualityAnnotations(
+            listOf(QualityAnnotation(inDimension = listOf("not a uri"), hasBody = LocalizedStrings(nb = "Tekst"))),
+        )
+
+        val annotation = resource.getPropertyResourceValue(DQV.hasQualityAnnotation)
+        assertNotNull(annotation)
+        assertFalse { annotation.hasProperty(DQV.inDimension) }
+        assertTrue { annotation.hasProperty(OA.hasBody) }
+    }
+
+    @Test
+    fun qualityAnnotationWithoutBodyTextIsNotSerialized() {
+        val model = ModelFactory.createDefaultModel()
+        val resource = model.createResource("http://my-dataset-quality")
+
+        resource.addQualityAnnotations(
+            listOf(
+                QualityAnnotation(inDimension = listOf("https://data.norge.no/vocabulary/quality-dimension#accuracy")),
+                QualityAnnotation(
+                    inDimension = listOf("https://data.norge.no/vocabulary/quality-dimension#accuracy"),
+                    hasBody = LocalizedStrings(nb = " ", en = ""),
+                ),
+            ),
+        )
+
+        assertFalse { resource.hasProperty(DQV.hasQualityAnnotation) }
+    }
+
+    @Test
+    fun nullQualityAnnotationsAddsNothing() {
+        val model = ModelFactory.createDefaultModel()
+        val resource = model.createResource("http://my-dataset-quality")
+
+        resource.addQualityAnnotations(null)
+
+        assertFalse { resource.hasProperty(DQV.hasQualityAnnotation) }
+    }
+
+    @Test
+    fun legacyAndNewQualityAnnotationsAreBothSerialized() {
+        val model = ModelFactory.createDefaultModel()
+        val dataset =
+            DatasetDBO(
+                id = "1",
+                catalogId = "1",
+                lastModified = null,
+                uri = "http://my-dataset-quality",
+                currentness = QualityAnnotationDBO(hasBody = LocalizedStrings(nb = "Legacy")),
+                qualityAnnotations =
+                listOf(
+                    QualityAnnotation(
+                        inDimension = listOf("https://data.norge.no/vocabulary/quality-dimension#currentness"),
+                        hasBody = LocalizedStrings(nb = "Ny"),
+                    ),
+                ),
+            )
+
+        val resource =
+            model.addDatasetResource(
+                dataset,
+                SeriesData(inSeries = null, next = null, prev = null, first = null, last = null),
+                "http://catalogs",
+                "http://publisher",
+            )
+
+        val annotations = resource.listProperties(DQV.hasQualityAnnotation).toList().map { it.`object`.asResource() }
+        assertEquals(2, annotations.size)
+        assertTrue { annotations.all { it.hasProperty(OA.motivatedBy, DQV.qualityAssessment) } }
+        assertEquals(
+            setOf(
+                DQV.Currentness.uri,
+                "https://data.norge.no/vocabulary/quality-dimension#currentness",
+            ),
+            annotations.map { it.getPropertyResourceValue(DQV.inDimension).uri }.toSet(),
+        )
     }
 
     @Test

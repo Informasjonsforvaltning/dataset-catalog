@@ -50,11 +50,17 @@ data class DatasetDTO(
     val legalBasisForProcessing: List<UriWithLabel>? = null,
     val legalBasisForAccess: List<UriWithLabel>? = null,
     val applicableLegislation: List<ApplicableLegislation>? = null,
+    @Deprecated(LEGACY_QUALITY_ANNOTATION_MESSAGE)
     val accuracy: QualityAnnotationDBO? = null,
+    @Deprecated(LEGACY_QUALITY_ANNOTATION_MESSAGE)
     val completeness: QualityAnnotationDBO? = null,
+    @Deprecated(LEGACY_QUALITY_ANNOTATION_MESSAGE)
     val currentness: QualityAnnotationDBO? = null,
+    @Deprecated(LEGACY_QUALITY_ANNOTATION_MESSAGE)
     val availability: QualityAnnotationDBO? = null,
+    @Deprecated(LEGACY_QUALITY_ANNOTATION_MESSAGE)
     val relevance: QualityAnnotationDBO? = null,
+    val qualityAnnotations: List<QualityAnnotation>? = null,
     val references: List<ReferenceDBO>? = null,
     val relatedResources: List<UriWithLabel>? = null,
     val provenance: String? = null,
@@ -70,6 +76,9 @@ data class DatasetDTO(
 )
 
 typealias DatasetDBO = DatasetDTO
+
+private const val LEGACY_QUALITY_ANNOTATION_MESSAGE =
+    "Legacy quality annotation, use qualityAnnotations."
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -103,11 +112,17 @@ data class DatasetToCreate(
     val legalBasisForProcessing: List<UriWithLabel>? = null,
     val legalBasisForAccess: List<UriWithLabel>? = null,
     val applicableLegislation: List<ApplicableLegislation>? = null,
+    @Deprecated(LEGACY_QUALITY_ANNOTATION_MESSAGE)
     val accuracy: QualityAnnotationDBO? = null,
+    @Deprecated(LEGACY_QUALITY_ANNOTATION_MESSAGE)
     val completeness: QualityAnnotationDBO? = null,
+    @Deprecated(LEGACY_QUALITY_ANNOTATION_MESSAGE)
     val currentness: QualityAnnotationDBO? = null,
+    @Deprecated(LEGACY_QUALITY_ANNOTATION_MESSAGE)
     val availability: QualityAnnotationDBO? = null,
+    @Deprecated(LEGACY_QUALITY_ANNOTATION_MESSAGE)
     val relevance: QualityAnnotationDBO? = null,
+    val qualityAnnotations: List<QualityAnnotation>? = null,
     val references: List<ReferenceDBO>? = null,
     val relatedResources: List<UriWithLabel>? = null,
     val provenance: String? = null,
@@ -159,7 +174,12 @@ data class PeriodOfTimeDBO(val startDate: String? = null, val endDate: String? =
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Deprecated(LEGACY_QUALITY_ANNOTATION_MESSAGE, ReplaceWith("QualityAnnotation"))
 data class QualityAnnotationDBO(val motivatedBy: String? = null, val hasBody: LocalizedStrings? = null)
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class QualityAnnotation(val inDimension: List<String>? = null, val hasBody: LocalizedStrings? = null)
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)

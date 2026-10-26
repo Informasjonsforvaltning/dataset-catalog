@@ -49,6 +49,7 @@ fun Model.addDatasetResource(dataset: DatasetDBO, seriesData: SeriesData, baseCa
             .addQualityAnnotation(dataset.currentness, DQV.Currentness)
             .addQualityAnnotation(dataset.availability, DQV.Availability)
             .addQualityAnnotation(dataset.relevance, DQV.Relevance)
+            .addQualityAnnotations(dataset.qualityAnnotations)
             .addReferences(dataset.references)
             .addRelatedResources(dataset.relatedResources)
             .safeAddLinkedProperty(DCTerms.provenance, dataset.provenance)

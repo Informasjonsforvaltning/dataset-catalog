@@ -514,26 +514,36 @@ components:
           items:
             $ref: "#/components/schemas/SkosConcept"
           description: Legal basis for access to dataset mapped as SkosConcept
-        hasAccuracyAnnotation:
+        accuracy:
+          deprecated: true
           type: object
-          $ref: "#/components/schemas/QualityAnnotation"
-          description: Existence of associated accuracy annotation
-        hasCompletenessAnnotation:
+          $ref: "#/components/schemas/LegacyQualityAnnotation"
+          description: Legacy accuracy annotation, use qualityAnnotations
+        completeness:
+          deprecated: true
           type: object
-          $ref: "#/components/schemas/QualityAnnotation"
-          description: Existence of associated completeness annotation
-        hasCurrentnessAnnotation:
+          $ref: "#/components/schemas/LegacyQualityAnnotation"
+          description: Legacy completeness annotation, use qualityAnnotations
+        currentness:
+          deprecated: true
           type: object
-          $ref: "#/components/schemas/QualityAnnotation"
-          description: Existence of associated currentness annotation
-        hasAvailabilityAnnotation:
+          $ref: "#/components/schemas/LegacyQualityAnnotation"
+          description: Legacy currentness annotation, use qualityAnnotations
+        availability:
+          deprecated: true
           type: object
-          $ref: "#/components/schemas/QualityAnnotation"
-          description: Existence of associated availability annotation
-        hasRelevanceAnnotation:
+          $ref: "#/components/schemas/LegacyQualityAnnotation"
+          description: Legacy availability annotation, use qualityAnnotations
+        relevance:
+          deprecated: true
           type: object
-          $ref: "#/components/schemas/QualityAnnotation"
-          description: Existence of associated relevance annotation
+          $ref: "#/components/schemas/LegacyQualityAnnotation"
+          description: Legacy relevance annotation, use qualityAnnotations
+        qualityAnnotations:
+          type: array
+          items:
+            $ref: "#/components/schemas/QualityAnnotation"
+          description: Quality annotations (dqv:hasQualityAnnotation) according to DQV-AP-NO
         references:
           type: array
           items:
@@ -868,11 +878,20 @@ components:
           description: Label of SkosConcept in a given language
     QualityAnnotation:
       type: object
-      description: Quality Annotation
       properties:
         inDimension:
-          type: string
-          description: Associated dimension
+          type: array
+          items:
+            type: string
+          description: URIs of quality dimensions, preferably from https://data.norge.no/vocabulary/quality-dimension
+        hasBody:
+          $ref: "#/components/schemas/MultiLanguageText"
+          description: Body text in a given language
+    LegacyQualityAnnotation:
+      type: object
+      deprecated: true
+      description: Legacy quality annotation, dimension is given by the dataset field it is stored in
+      properties:
         motivatedBy:
           type: string
           description: Associated motivation
