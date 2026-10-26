@@ -35,6 +35,7 @@ fun DatasetDBO.addCreateValues(toCreate: DatasetToCreate) = copy(
     currentness = toCreate.currentness,
     availability = toCreate.availability,
     relevance = toCreate.relevance,
+    qualityAnnotations = toCreate.qualityAnnotations,
     references = toCreate.references,
     relatedResources = toCreate.relatedResources,
     provenance = toCreate.provenance,

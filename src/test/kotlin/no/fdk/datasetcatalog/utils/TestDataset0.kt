@@ -6,6 +6,7 @@ import no.fdk.datasetcatalog.model.DistributionDBO
 import no.fdk.datasetcatalog.model.LocalizedStringLists
 import no.fdk.datasetcatalog.model.LocalizedStrings
 import no.fdk.datasetcatalog.model.PeriodOfTimeDBO
+import no.fdk.datasetcatalog.model.QualityAnnotation
 import no.fdk.datasetcatalog.model.QualityAnnotationDBO
 import no.fdk.datasetcatalog.model.ReferenceDBO
 import no.fdk.datasetcatalog.model.UriWithLabel
@@ -60,6 +61,22 @@ val QUALITYANNOTATION_EX =
         hasBody = LocalizedStrings(nb = "BodyText"),
     )
 
+val QUALITY_ANNOTATIONS_EX =
+    listOf(
+        QualityAnnotation(
+            inDimension =
+            listOf(
+                "https://data.norge.no/vocabulary/quality-dimension#currentness",
+                "https://data.norge.no/vocabulary/quality-dimension#delay",
+            ),
+            hasBody = LocalizedStrings(nb = "Aktualitet", en = "Currentness"),
+        ),
+        QualityAnnotation(
+            inDimension = listOf("https://data.norge.no/vocabulary/quality-dimension#under-coverage"),
+            hasBody = LocalizedStrings(nn = "Underdekning"),
+        ),
+    )
+
 val REFERENCE_EX =
     ReferenceDBO(
         referenceType = REFERENCETYPE_EX,
@@ -97,6 +114,7 @@ val TEST_DATASET_0 =
         currentness = QUALITYANNOTATION_EX,
         availability = QUALITYANNOTATION_EX,
         relevance = QUALITYANNOTATION_EX,
+        qualityAnnotations = QUALITY_ANNOTATIONS_EX,
         references = listOf(REFERENCE_EX),
         relatedResources = listOf(UriWithLabel(uri = "http://test.uri")),
         provenance = SKOSCODE_EX,

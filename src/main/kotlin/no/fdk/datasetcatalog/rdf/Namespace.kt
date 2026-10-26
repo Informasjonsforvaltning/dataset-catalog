@@ -31,6 +31,7 @@ class DQV {
         val inDimension: Property = ResourceFactory.createProperty("${URI}inDimension")
 
         val QualityAnnotation: Resource = ResourceFactory.createResource("${URI}QualityAnnotation")
+        val qualityAssessment: Resource = ResourceFactory.createResource("${URI}qualityAssessment")
         val Accuracy: Resource = ResourceFactory.createResource("${ISO}Accuracy")
         val Availability: Resource = ResourceFactory.createResource("${ISO}Availability")
         val Completeness: Resource = ResourceFactory.createResource("${ISO}Completeness")

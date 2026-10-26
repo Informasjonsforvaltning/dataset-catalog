@@ -7,6 +7,7 @@ import no.fdk.datasetcatalog.model.DistributionDBO
 import no.fdk.datasetcatalog.model.LocalizedStringLists
 import no.fdk.datasetcatalog.model.LocalizedStrings
 import no.fdk.datasetcatalog.model.PeriodOfTimeDBO
+import no.fdk.datasetcatalog.model.QualityAnnotation
 import no.fdk.datasetcatalog.model.QualityAnnotationDBO
 import no.fdk.datasetcatalog.model.ReferenceDBO
 import no.fdk.datasetcatalog.model.UriWithLabel
@@ -180,6 +181,25 @@ val TEST_DATASET_1 =
                 ),
             )
             ),
+        qualityAnnotations =
+        listOf(
+            QualityAnnotation(
+                inDimension =
+                listOf(
+                    "https://data.norge.no/vocabulary/quality-dimension#currentness",
+                    "https://data.norge.no/vocabulary/quality-dimension#delay",
+                ),
+                hasBody =
+                LocalizedStrings(
+                    nb = "Datasettet oppdateres daglig.",
+                    en = "The dataset is updated daily.",
+                ),
+            ),
+            QualityAnnotation(
+                inDimension = listOf("https://data.norge.no/vocabulary/quality-dimension#completeness"),
+                hasBody = LocalizedStrings(nb = "Endringer er med i datasettet innen 24 timer."),
+            ),
+        ),
         language =
         listOf(
             "http://publications.europa.eu/resource/authority/language/NOR",

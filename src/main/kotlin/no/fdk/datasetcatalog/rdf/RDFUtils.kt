@@ -8,6 +8,7 @@ import no.fdk.datasetcatalog.model.DistributionDBO
 import no.fdk.datasetcatalog.model.LocalizedStringLists
 import no.fdk.datasetcatalog.model.LocalizedStrings
 import no.fdk.datasetcatalog.model.PeriodOfTimeDBO
+import no.fdk.datasetcatalog.model.QualityAnnotation
 import no.fdk.datasetcatalog.model.QualityAnnotationDBO
 import no.fdk.datasetcatalog.model.ReferenceDBO
 import no.fdk.datasetcatalog.model.RightsDBO
@@ -345,10 +346,29 @@ fun Resource.addQualityAnnotation(qualityAnnotation: QualityAnnotationDBO?, dime
             model
                 .safeCreateResource()
                 .addProperty(RDF.type, DQV.QualityAnnotation)
+                .addProperty(OA.motivatedBy, DQV.qualityAssessment)
                 .safeAddLinkedProperty(DQV.inDimension, dimension.uri)
                 .addQualityAnnotationBody(it.hasBody),
         )
     }
+    return this
+}
+
+fun Resource.addQualityAnnotations(qualityAnnotations: List<QualityAnnotation>?): Resource {
+    qualityAnnotations
+        ?.filter { it.hasBody.isValidLangField() }
+        ?.forEach {
+            addProperty(
+                DQV.hasQualityAnnotation,
+                model
+                    .safeCreateResource()
+                    .addProperty(RDF.type, DQV.QualityAnnotation)
+                    .addProperty(OA.motivatedBy, DQV.qualityAssessment)
+                    .safeAddURLs(DQV.inDimension, it.inDimension)
+                    .addProperty(OA.hasTarget, this)
+                    .addQualityAnnotationBody(it.hasBody),
+            )
+        }
     return this
 }
 

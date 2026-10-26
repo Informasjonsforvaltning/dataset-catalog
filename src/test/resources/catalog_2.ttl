@@ -141,6 +141,7 @@
         dcat:landingPage                <http://testetaten.no/landingsside/nr1> ;
         dcat:theme                      <http://publications.europa.eu/resource/authority/data-theme/ENVI> , <http://publications.europa.eu/resource/authority/data-theme/GOVE> , <https://psi.norge.no/los/tema/lov-og-rett>;
         dqv:hasQualityAnnotation        [ a                dqv:QualityAnnotation ;
+                                          oa:motivatedBy   dqv:qualityAssessment ;
                                           dqv:inDimension  <http://iso.org/25012/2008/dataquality/Currentness> ;
                                           oa:hasBody     [ a    oa:TextualBody ;
                                             rdf:value       "Denne teksten sier noe om aktualiteten. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras mattis consectetur purus sit amet fermentum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus." ;
@@ -148,6 +149,7 @@
                                             dct:format       <http://publications.europa.eu/resource/authority/file-type/TXT> ]
                                         ] ;
         dqv:hasQualityAnnotation        [ a                dqv:QualityAnnotation ;
+                                          oa:motivatedBy   dqv:qualityAssessment ;
                                           dqv:inDimension  <http://iso.org/25012/2008/dataquality/Completeness> ;
                                           oa:hasBody     [ a    oa:TextualBody ;
                                             rdf:value       "Denne teksten sier noe om komplettheten. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras mattis consectetur purus sit amet fermentum." ;
@@ -155,6 +157,7 @@
                                             dct:format       <http://publications.europa.eu/resource/authority/file-type/TXT> ]
                                         ] ;
         dqv:hasQualityAnnotation        [ a                dqv:QualityAnnotation ;
+                                          oa:motivatedBy   dqv:qualityAssessment ;
                                           dqv:inDimension  <http://iso.org/25012/2008/dataquality/Accuracy> ;
                                           oa:hasBody     [ a    oa:TextualBody ;
                                             rdf:value       "Denne teksten sier noe om nøyaktigheten. Cras mattis consectetur purus sit." ;
@@ -162,6 +165,7 @@
                                             dct:format       <http://publications.europa.eu/resource/authority/file-type/TXT> ]
                                         ] ;
         dqv:hasQualityAnnotation        [ a                dqv:QualityAnnotation ;
+                                          oa:motivatedBy   dqv:qualityAssessment ;
                                           dqv:inDimension  <http://iso.org/25012/2008/dataquality/Availability> ;
                                           oa:hasBody     [ a    oa:TextualBody ;
                                             rdf:value       "Denne teksten sier noe om tilgjengeligheten. Vestibulum id ligula porta felis euismod semper. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras mattis consectetur purus sit amet fermentum." ;
@@ -169,9 +173,33 @@
                                             dct:format       <http://publications.europa.eu/resource/authority/file-type/TXT> ]
                                         ] ;
         dqv:hasQualityAnnotation        [ a                dqv:QualityAnnotation ;
+                                          oa:motivatedBy   dqv:qualityAssessment ;
                                           dqv:inDimension  <http://iso.org/25012/2008/dataquality/Relevance> ;
                                           oa:hasBody     [ a    oa:TextualBody ;
                                             rdf:value       "Denne teksten sier noe om relevansen. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras mattis consectetur purus sit amet fermentum. Cum sociis natoque penatibus et magnis dis parturient montes." ;
+                                            dct:language     <http://publications.europa.eu/resource/authority/language/NOB> ;
+                                            dct:format       <http://publications.europa.eu/resource/authority/file-type/TXT> ]
+                                        ] ;
+        dqv:hasQualityAnnotation        [ a                dqv:QualityAnnotation ;
+                                          oa:motivatedBy   dqv:qualityAssessment ;
+                                          dqv:inDimension  <https://data.norge.no/vocabulary/quality-dimension#currentness> ,
+                                                           <https://data.norge.no/vocabulary/quality-dimension#delay> ;
+                                          oa:hasTarget     <http://localhost:5050/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d> ;
+                                          oa:hasBody     [ a    oa:TextualBody ;
+                                            rdf:value       "Datasettet oppdateres daglig." ;
+                                            dct:language     <http://publications.europa.eu/resource/authority/language/NOB> ;
+                                            dct:format       <http://publications.europa.eu/resource/authority/file-type/TXT> ] ,
+                                                         [ a    oa:TextualBody ;
+                                            rdf:value       "The dataset is updated daily." ;
+                                            dct:language     <http://publications.europa.eu/resource/authority/language/ENG> ;
+                                            dct:format       <http://publications.europa.eu/resource/authority/file-type/TXT> ]
+                                        ] ;
+        dqv:hasQualityAnnotation        [ a                dqv:QualityAnnotation ;
+                                          oa:motivatedBy   dqv:qualityAssessment ;
+                                          dqv:inDimension  <https://data.norge.no/vocabulary/quality-dimension#completeness> ;
+                                          oa:hasTarget     <http://localhost:5050/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d> ;
+                                          oa:hasBody     [ a    oa:TextualBody ;
+                                            rdf:value       "Endringer er med i datasettet innen 24 timer." ;
                                             dct:language     <http://publications.europa.eu/resource/authority/language/NOB> ;
                                             dct:format       <http://publications.europa.eu/resource/authority/file-type/TXT> ]
                                         ] .
