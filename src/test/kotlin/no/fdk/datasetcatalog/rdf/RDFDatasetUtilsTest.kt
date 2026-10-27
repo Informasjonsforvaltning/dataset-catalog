@@ -413,10 +413,43 @@ class RDFDatasetUtilsTest {
             listOf(
                 DistributionDBO(mobilityDataStandard = "http://mobility-data-standard"),
                 DistributionDBO(rights = RightsDBO(type = "http://rights-type")),
+                DistributionDBO(status = "http://publications.europa.eu/resource/authority/distribution-status/COMPLETED"),
             ),
         )
 
-        assertEquals(2, resource.listProperties(DCAT.distribution).toList().size)
+        assertEquals(3, resource.listProperties(DCAT.distribution).toList().size)
+    }
+
+    @Test
+    fun distributionStatusEmittedAsLinkedUriForDistributionAndSample() {
+        val model = ModelFactory.createDefaultModel()
+        val resource = model.createResource("http://my-dataset-status")
+        val completed = "http://publications.europa.eu/resource/authority/distribution-status/COMPLETED"
+        val deprecated = "http://publications.europa.eu/resource/authority/distribution-status/DEPRECATED"
+
+        resource
+            .addDatasetDistribution(DCAT.distribution, listOf(DistributionDBO(status = completed)))
+            .addDatasetDistribution(ADMS.sample, listOf(DistributionDBO(status = deprecated)))
+
+        val distribution = resource.getProperty(DCAT.distribution).`object`.asResource()
+        assertEquals(completed, distribution.getProperty(ADMS.status).`object`.asResource().uri)
+
+        val sample = resource.getProperty(ADMS.sample).`object`.asResource()
+        assertEquals(deprecated, sample.getProperty(ADMS.status).`object`.asResource().uri)
+    }
+
+    @Test
+    fun distributionWithEmptyStatusIsNotEmitted() {
+        val model = ModelFactory.createDefaultModel()
+        val resource = model.createResource("http://my-dataset-status-empty")
+
+        resource.addDatasetDistribution(
+            DCAT.distribution,
+            listOf(DistributionDBO(accessURL = listOf("http://access"), status = "")),
+        )
+
+        val distribution = resource.getProperty(DCAT.distribution).`object`.asResource()
+        assertNull(distribution.getProperty(ADMS.status))
     }
 
     @Test

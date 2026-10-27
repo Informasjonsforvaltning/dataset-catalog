@@ -818,6 +818,9 @@ components:
           items:
             $ref: '#/components/schemas/SkosConcept'
           description: List of associated access services mapped as SkosConcept
+        status:
+          type: string
+          description: Status of the distribution (adms:status)
     PeriodOfTime:
       type: object
       description: Object representing a period of time

@@ -150,6 +150,7 @@ data class DistributionDBO(
     var accessServices: Set<String>? = null,
     val mobilityDataStandard: String? = null,
     val rights: RightsDBO? = null,
+    val status: String? = null,
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)

@@ -220,7 +220,8 @@ fun Resource.addDatasetDistribution(property: Property, distributions: Collectio
                     .safeAddURLs(DCAT.mediaType, it.mediaType)
                     .addDistributionServices(it.accessServices)
                     .safeAddLinkedProperty(MOBILITYDCATAP.mobilityDataStandard, it.mobilityDataStandard)
-                    .addDistributionRights(it.rights),
+                    .addDistributionRights(it.rights)
+                    .safeAddLinkedProperty(ADMS.status, it.status),
             )
         }
     }
@@ -249,7 +250,8 @@ private fun DistributionDBO.hasNonNullOrEmptyProperty(): Boolean = title?.run { 
     mediaType?.any { it.isNotEmpty() } == true ||
     !accessServices.isNullOrEmpty() ||
     !mobilityDataStandard.isNullOrEmpty() ||
-    !rights?.type.isNullOrEmpty()
+    !rights?.type.isNullOrEmpty() ||
+    !status.isNullOrEmpty()
 
 fun Resource.addDatasetThemes(ds: DatasetDBO): Resource {
     val uniqueThemes = mutableSetOf<String>()
