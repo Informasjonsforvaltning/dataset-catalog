@@ -1,3 +1,9 @@
+server:
+  port: 8080
+  compression:
+    enabled: true
+    min-response-size: 1024
+    additional-mime-types: text/turtle,text/n3,application/ld+json,application/rdf+xml,application/rdf+json,application/n-triples,application/n-quads,application/trig,application/trix
 spring:
   datasource:
     url: jdbc:postgresql://${POSTGRESQL_HOST}:${POSTGRESQL_PORT:5432}/${POSTGRESQL_DB:dataset_catalog}
@@ -11,7 +17,6 @@ spring:
   flyway:
     enabled: true
   security.oauth2.resourceserver.jwt.jwk-set-uri: ${OIDC_JWKS}
-server.port: 8080
 logging:
   level.root: WARN
   level.no: ${LOG_LEVEL:DEBUG}
