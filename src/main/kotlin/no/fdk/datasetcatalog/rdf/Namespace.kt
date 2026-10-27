@@ -10,6 +10,7 @@ class ADMS {
 
         val identifier: Property = ResourceFactory.createProperty("${URI}identifier")
         val sample: Property = ResourceFactory.createProperty("${URI}sample")
+        val status: Property = ResourceFactory.createProperty("${URI}status")
     }
 }
 
