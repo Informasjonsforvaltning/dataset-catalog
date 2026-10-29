@@ -106,3 +106,13 @@ class MOBILITYDCATAP {
         val mobilityDataStandard: Property = ResourceFactory.createProperty("${URI}mobilityDataStandard")
     }
 }
+
+class ODRS {
+    companion object {
+        const val URI = "http://schema.theodi.org/odrs#"
+
+        val RightsStatement: Resource = ResourceFactory.createResource("${URI}RightsStatement")
+
+        val reuserGuidelines: Property = ResourceFactory.createProperty("${URI}reuserGuidelines")
+    }
+}

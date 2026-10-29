@@ -821,6 +821,20 @@ components:
         status:
           type: string
           description: Status of the distribution (adms:status)
+        rights:
+          $ref: '#/components/schemas/RightsStatement'
+    RightsStatement:
+      type: object
+      description: Rights statement for a distribution (dct:rights)
+      properties:
+        type:
+          type: string
+          description: Conditions for access and usage (dct:type), used by mobilityDCAT-AP
+        reuserGuidelines:
+          type: array
+          items:
+            type: string
+          description: Links to guidelines for re-users (odrs:reuserGuidelines)
     PeriodOfTime:
       type: object
       description: Object representing a period of time

@@ -11,6 +11,7 @@ import no.fdk.datasetcatalog.rdf.CV
 import no.fdk.datasetcatalog.rdf.DQV
 import no.fdk.datasetcatalog.rdf.ELI
 import no.fdk.datasetcatalog.rdf.MOBILITYDCATAP
+import no.fdk.datasetcatalog.rdf.ODRS
 import no.fdk.datasetcatalog.rdf.PROV
 import no.fdk.datasetcatalog.rdf.SeriesData
 import no.fdk.datasetcatalog.rdf.addDatasetResource
@@ -192,6 +193,7 @@ class RDFService(
         setNsPrefix("eli", ELI.URI)
         setNsPrefix("cv", CV.URI)
         setNsPrefix("mobilitydcatap", MOBILITYDCATAP.URI)
+        setNsPrefix("odrs", ODRS.URI)
     }
 
     private fun organizationCatalogURI(organizationNumber: String) =

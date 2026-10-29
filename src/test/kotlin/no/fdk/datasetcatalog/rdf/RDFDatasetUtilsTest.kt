@@ -379,6 +379,7 @@ class RDFDatasetUtilsTest {
         val distribution = resource.getProperty(DCAT.distribution).`object`.asResource()
         val rightsStatement = distribution.getProperty(DCTerms.rights).`object`.asResource()
         assertTrue { rightsStatement.hasProperty(RDF.type, DCTerms.RightsStatement) }
+        assertFalse { rightsStatement.hasProperty(RDF.type, ODRS.RightsStatement) }
         assertEquals(
             "http://rights-type",
             rightsStatement
@@ -401,6 +402,76 @@ class RDFDatasetUtilsTest {
 
         val distribution = resource.getProperty(DCAT.distribution).`object`.asResource()
         assertNull(distribution.getProperty(DCTerms.rights))
+    }
+
+    @Test
+    fun distributionReuserGuidelinesEmittedAsOdrsRightsStatement() {
+        val model = ModelFactory.createDefaultModel()
+        val resource = model.createResource("http://my-dataset-reuser-guidelines")
+
+        resource.addDatasetDistribution(
+            DCAT.distribution,
+            listOf(
+                DistributionDBO(
+                    rights = RightsDBO(reuserGuidelines = listOf("http://guidelines-1", "http://guidelines-2")),
+                ),
+            ),
+        )
+
+        val distribution = resource.getProperty(DCAT.distribution).`object`.asResource()
+        val rightsStatement = distribution.getProperty(DCTerms.rights).`object`.asResource()
+        assertTrue { rightsStatement.hasProperty(RDF.type, DCTerms.RightsStatement) }
+        assertTrue { rightsStatement.hasProperty(RDF.type, ODRS.RightsStatement) }
+        assertNull(rightsStatement.getProperty(DCTerms.type))
+        val guidelines =
+            rightsStatement
+                .listProperties(ODRS.reuserGuidelines)
+                .toList()
+                .map { it.`object`.asResource().uri }
+                .sorted()
+        assertEquals(listOf("http://guidelines-1", "http://guidelines-2"), guidelines)
+    }
+
+    @Test
+    fun distributionRightsWithTypeAndReuserGuidelinesEmittedInOneStatement() {
+        val model = ModelFactory.createDefaultModel()
+        val resource = model.createResource("http://my-dataset-rights-combined")
+
+        resource.addDatasetDistribution(
+            DCAT.distribution,
+            listOf(
+                DistributionDBO(
+                    rights = RightsDBO(type = "http://rights-type", reuserGuidelines = listOf("http://guidelines")),
+                ),
+            ),
+        )
+
+        val distribution = resource.getProperty(DCAT.distribution).`object`.asResource()
+        assertEquals(1, distribution.listProperties(DCTerms.rights).toList().size)
+        val rightsStatement = distribution.getProperty(DCTerms.rights).`object`.asResource()
+        assertEquals("http://rights-type", rightsStatement.getProperty(DCTerms.type).`object`.asResource().uri)
+        assertEquals("http://guidelines", rightsStatement.getProperty(ODRS.reuserGuidelines).`object`.asResource().uri)
+    }
+
+    @Test
+    fun distributionRightsWithOnlyInvalidReuserGuidelinesIsNotEmitted() {
+        val model = ModelFactory.createDefaultModel()
+        val resource = model.createResource("http://my-dataset-invalid-guidelines")
+
+        resource.addDatasetDistribution(
+            DCAT.distribution,
+            listOf(
+                DistributionDBO(
+                    accessURL = listOf("http://access"),
+                    rights = RightsDBO(reuserGuidelines = listOf("", "not a url")),
+                ),
+                DistributionDBO(rights = RightsDBO(reuserGuidelines = listOf(""))),
+            ),
+        )
+
+        val distributions = resource.listProperties(DCAT.distribution).toList()
+        assertEquals(1, distributions.size)
+        assertNull(distributions.first().`object`.asResource().getProperty(DCTerms.rights))
     }
 
     @Test
