@@ -229,17 +229,22 @@ fun Resource.addDatasetDistribution(property: Property, distributions: Collectio
 }
 
 fun Resource.addDistributionRights(rights: RightsDBO?): Resource {
-    rights?.type?.takeIf { it.isNotEmpty() }?.let { type ->
-        addProperty(
-            DCTerms.rights,
+    if (rights?.hasContent() == true) {
+        val rightsStatement =
             model
                 .safeCreateResource()
                 .addProperty(RDF.type, DCTerms.RightsStatement)
-                .safeAddLinkedProperty(DCTerms.type, type),
-        )
+                .safeAddLinkedProperty(DCTerms.type, rights.type)
+                .safeAddURLs(ODRS.reuserGuidelines, rights.reuserGuidelines)
+        if (rightsStatement.hasProperty(ODRS.reuserGuidelines)) {
+            rightsStatement.addProperty(RDF.type, ODRS.RightsStatement)
+        }
+        addProperty(DCTerms.rights, rightsStatement)
     }
     return this
 }
+
+private fun RightsDBO.hasContent(): Boolean = !type.isNullOrEmpty() || reuserGuidelines?.any { it.isValidURL() } == true
 
 private fun DistributionDBO.hasNonNullOrEmptyProperty(): Boolean = title?.run { listOf(nb, nn, en).any { !it.isNullOrEmpty() } } == true ||
     description?.run { listOf(nb, nn, en).any { !it.isNullOrEmpty() } } == true ||
@@ -250,7 +255,7 @@ private fun DistributionDBO.hasNonNullOrEmptyProperty(): Boolean = title?.run { 
     mediaType?.any { it.isNotEmpty() } == true ||
     !accessServices.isNullOrEmpty() ||
     !mobilityDataStandard.isNullOrEmpty() ||
-    !rights?.type.isNullOrEmpty() ||
+    rights?.hasContent() == true ||
     !status.isNullOrEmpty()
 
 fun Resource.addDatasetThemes(ds: DatasetDBO): Resource {

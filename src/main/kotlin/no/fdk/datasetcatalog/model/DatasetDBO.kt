@@ -184,7 +184,7 @@ data class UriWithLabel(val uri: String? = null, val prefLabel: LocalizedStrings
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class RightsDBO(val type: String? = null)
+data class RightsDBO(val type: String? = null, val reuserGuidelines: List<String>? = null)
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
