@@ -55,7 +55,7 @@ fun Model.addDatasetResource(dataset: DatasetDBO, seriesData: SeriesData, baseCa
             .safeAddLinkedProperty(DCTerms.provenance, dataset.provenance)
             .safeAddLinkedProperty(DCTerms.accrualPeriodicity, dataset.frequency)
             .addConformsTo(dataset.conformsTo)
-            .addConformsTo(dataset.informationModelsFromOtherSources)
+            .addConformsToFromUrisWithLabel(dataset.informationModelsFromOtherSources)
             .addConformsToFromListOfUris(dataset.informationModelsFromFDK)
             .addQualifiedAttributions(dataset.qualifiedAttributions)
             .addDatasetType(dataset.type)
