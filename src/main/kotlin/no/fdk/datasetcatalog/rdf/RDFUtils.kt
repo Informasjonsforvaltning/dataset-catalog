@@ -12,6 +12,7 @@ import no.fdk.datasetcatalog.model.QualityAnnotation
 import no.fdk.datasetcatalog.model.QualityAnnotationDBO
 import no.fdk.datasetcatalog.model.ReferenceDBO
 import no.fdk.datasetcatalog.model.RightsDBO
+import no.fdk.datasetcatalog.model.StandardDBO
 import no.fdk.datasetcatalog.model.UriWithLabel
 import no.fdk.datasetcatalog.utils.defaultLogger
 import no.fdk.datasetcatalog.utils.isValidURI
@@ -156,7 +157,25 @@ fun Resource.addContactPoints(contactPoints: List<ContactPoint>?): Resource {
     return this
 }
 
-fun Resource.addConformsTo(conformsTo: Collection<UriWithLabel>?): Resource {
+fun Resource.addConformsTo(conformsTo: Collection<StandardDBO>?): Resource {
+    conformsTo?.forEach {
+        if (it.hasSeeAlso() || it.prefLabel.isValidLangField()) {
+            addProperty(
+                DCTerms.conformsTo,
+                model
+                    .safeCreateResource()
+                    .addProperty(RDF.type, DCTerms.Standard)
+                    .safeAddLinkListProperty(RDFS.seeAlso, it.seeAlso)
+                    .safeAddLocalizedString(DCTerms.title, it.prefLabel),
+            )
+        }
+    }
+    return this
+}
+
+private fun StandardDBO.hasSeeAlso(): Boolean = seeAlso?.any { it.isNotEmpty() } == true
+
+fun Resource.addConformsToFromUrisWithLabel(conformsTo: Collection<UriWithLabel>?): Resource {
     conformsTo?.forEach {
         if (!it.uri.isNullOrEmpty() || it.prefLabel.isValidLangField()) {
             addProperty(
@@ -251,7 +270,7 @@ private fun DistributionDBO.hasNonNullOrEmptyProperty(): Boolean = title?.run { 
     description?.run { listOf(nb, nn, en).any { !it.isNullOrEmpty() } } == true ||
     accessURL?.any { it.isNotEmpty() } == true ||
     !license.isNullOrEmpty() ||
-    conformsTo?.any { !it.uri.isNullOrEmpty() } == true ||
+    conformsTo?.any { it.hasSeeAlso() || it.prefLabel.isValidLangField() } == true ||
     format?.any { it.isNotEmpty() } == true ||
     mediaType?.any { it.isNotEmpty() } == true ||
     !accessServices.isNullOrEmpty() ||

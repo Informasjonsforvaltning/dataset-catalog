@@ -9,7 +9,7 @@ import no.fdk.datasetcatalog.model.PeriodOfTimeDBO
 import no.fdk.datasetcatalog.model.QualityAnnotation
 import no.fdk.datasetcatalog.model.QualityAnnotationDBO
 import no.fdk.datasetcatalog.model.RightsDBO
-import no.fdk.datasetcatalog.model.UriWithLabel
+import no.fdk.datasetcatalog.model.StandardDBO
 import org.apache.jena.datatypes.xsd.XSDDatatype
 import org.apache.jena.rdf.model.ModelFactory
 import org.apache.jena.sparql.vocabulary.FOAF
@@ -17,6 +17,7 @@ import org.apache.jena.vocabulary.DCAT
 import org.apache.jena.vocabulary.DCTerms
 import org.apache.jena.vocabulary.OA
 import org.apache.jena.vocabulary.RDF
+import org.apache.jena.vocabulary.RDFS
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -76,7 +77,7 @@ class RDFDatasetUtilsTest {
                     title = LocalizedStrings(nb = ""),
                     description = LocalizedStrings(nb = ""),
                     accessURL = listOf(""),
-                    conformsTo = listOf(UriWithLabel(uri = "", prefLabel = LocalizedStrings(nb = ""))),
+                    conformsTo = listOf(StandardDBO(prefLabel = LocalizedStrings(nb = ""), seeAlso = listOf(""))),
                     format = listOf(""),
                     license = "",
                     page = listOf(""),
@@ -475,6 +476,64 @@ class RDFDatasetUtilsTest {
         val distributions = resource.listProperties(DCAT.distribution).toList()
         assertEquals(1, distributions.size)
         assertNull(distributions.first().`object`.asResource().getProperty(DCTerms.rights))
+    }
+
+    @Test
+    fun standardEmitsOneSeeAlsoPerLink() {
+        val model = ModelFactory.createDefaultModel()
+        val resource = model.createResource("http://my-dataset-standard")
+
+        resource.addConformsTo(
+            listOf(
+                StandardDBO(
+                    prefLabel = LocalizedStrings(nb = "SOSI"),
+                    seeAlso = listOf("http://standard-1", "", "http://standard-2"),
+                ),
+            ),
+        )
+
+        val standards = resource.listProperties(DCTerms.conformsTo).toList()
+        assertEquals(1, standards.size)
+        val standard = standards.first().`object`.asResource()
+        assertTrue { standard.hasProperty(RDF.type, DCTerms.Standard) }
+        assertEquals("SOSI", standard.getProperty(DCTerms.title).string)
+        val seeAlso =
+            standard
+                .listProperties(RDFS.seeAlso)
+                .toList()
+                .map { it.`object`.asResource().uri }
+                .sorted()
+        assertEquals(listOf("http://standard-1", "http://standard-2"), seeAlso)
+    }
+
+    @Test
+    fun distributionWithOnlyStandardLinkIsIncluded() {
+        val model = ModelFactory.createDefaultModel()
+        val resource = model.createResource("http://my-dataset-standard-only")
+
+        resource.addDatasetDistribution(
+            DCAT.distribution,
+            listOf(DistributionDBO(conformsTo = listOf(StandardDBO(seeAlso = listOf("http://standard"))))),
+        )
+
+        val distribution = resource.getProperty(DCAT.distribution).`object`.asResource()
+        val standard = distribution.getProperty(DCTerms.conformsTo).`object`.asResource()
+        assertEquals("http://standard", standard.getProperty(RDFS.seeAlso).`object`.asResource().uri)
+    }
+
+    @Test
+    fun distributionWithOnlyStandardTitleIsIncluded() {
+        val model = ModelFactory.createDefaultModel()
+        val resource = model.createResource("http://my-dataset-standard-title-only")
+
+        resource.addDatasetDistribution(
+            DCAT.distribution,
+            listOf(DistributionDBO(conformsTo = listOf(StandardDBO(prefLabel = LocalizedStrings(nb = "SOSI"))))),
+        )
+
+        val distribution = resource.getProperty(DCAT.distribution).`object`.asResource()
+        val standard = distribution.getProperty(DCTerms.conformsTo).`object`.asResource()
+        assertEquals("SOSI", standard.getProperty(DCTerms.title).string)
     }
 
     @Test

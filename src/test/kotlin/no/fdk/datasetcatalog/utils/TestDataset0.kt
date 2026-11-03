@@ -9,6 +9,7 @@ import no.fdk.datasetcatalog.model.PeriodOfTimeDBO
 import no.fdk.datasetcatalog.model.QualityAnnotation
 import no.fdk.datasetcatalog.model.QualityAnnotationDBO
 import no.fdk.datasetcatalog.model.ReferenceDBO
+import no.fdk.datasetcatalog.model.StandardDBO
 import no.fdk.datasetcatalog.model.UriWithLabel
 import org.apache.jena.vocabulary.DCTerms
 import java.time.LocalDate
@@ -36,7 +37,7 @@ val DISTRIBUTION_EX =
         downloadURL = listOf("www.hjemmeside.no"),
         accessURL = listOf("www.borteside.no"),
         license = "https://license.com",
-        conformsTo = listOf(UriWithLabel("http://test.uri")),
+        conformsTo = listOf(StandardDBO(seeAlso = listOf("http://test.uri"))),
         format = listOf("Formats"),
         mediaType = listOf("MediaTypes"),
         accessServices = setOf("http://test.uri"),
@@ -119,7 +120,7 @@ val TEST_DATASET_0 =
         relatedResources = listOf(UriWithLabel(uri = "http://test.uri")),
         provenance = SKOSCODE_EX,
         frequency = SKOSCODE_EX,
-        conformsTo = listOf(UriWithLabel(uri = "http://test.uri")),
+        conformsTo = listOf(StandardDBO(seeAlso = listOf("http://test.uri"))),
         informationModelsFromOtherSources = listOf(UriWithLabel(uri = "http://test.uri")),
         qualifiedAttributions = setOf("910244132"),
         type = listOf("type"),

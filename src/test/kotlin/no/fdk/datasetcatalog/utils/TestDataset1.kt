@@ -10,6 +10,7 @@ import no.fdk.datasetcatalog.model.PeriodOfTimeDBO
 import no.fdk.datasetcatalog.model.QualityAnnotation
 import no.fdk.datasetcatalog.model.QualityAnnotationDBO
 import no.fdk.datasetcatalog.model.ReferenceDBO
+import no.fdk.datasetcatalog.model.StandardDBO
 import no.fdk.datasetcatalog.model.UriWithLabel
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -66,9 +67,9 @@ val CONTACTS =
     )
 
 val CONFORMS_TO =
-    UriWithLabel(
-        uri = "https://www.kartverket.no/geodataarbeid/standarder/sosi/",
+    StandardDBO(
         prefLabel = LocalizedStrings(nb = "SOSI"),
+        seeAlso = listOf("https://www.kartverket.no/geodataarbeid/standarder/sosi/"),
     )
 
 val DISTRIBUTION =

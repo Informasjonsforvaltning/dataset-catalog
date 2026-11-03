@@ -65,7 +65,7 @@ data class DatasetDTO(
     val relatedResources: List<UriWithLabel>? = null,
     val provenance: String? = null,
     val frequency: String? = null,
-    val conformsTo: List<UriWithLabel>? = null,
+    val conformsTo: List<StandardDBO>? = null,
     val informationModelsFromOtherSources: List<UriWithLabel>? = null,
     val informationModelsFromFDK: List<String>? = null,
     val qualifiedAttributions: Set<String>? = null,
@@ -127,7 +127,7 @@ data class DatasetToCreate(
     val relatedResources: List<UriWithLabel>? = null,
     val provenance: String? = null,
     val frequency: String? = null,
-    val conformsTo: List<UriWithLabel>? = null,
+    val conformsTo: List<StandardDBO>? = null,
     val informationModelsFromOtherSources: List<UriWithLabel>? = null,
     val informationModelsFromFDK: List<String>? = null,
     val qualifiedAttributions: Set<String>? = null,
@@ -158,7 +158,7 @@ data class DistributionDBO(
     val downloadURL: List<String>? = null,
     val accessURL: List<String>? = null,
     val license: String? = null,
-    val conformsTo: List<UriWithLabel>? = null,
+    val conformsTo: List<StandardDBO>? = null,
     val page: List<String>? = null,
     val format: List<String>? = null,
     val mediaType: List<String>? = null,
@@ -201,6 +201,10 @@ data class User(val id: String, val name: String? = null, val email: String? = n
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class UriWithLabel(val uri: String? = null, val prefLabel: LocalizedStrings? = null)
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class StandardDBO(val prefLabel: LocalizedStrings? = null, val seeAlso: List<String>? = null)
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
