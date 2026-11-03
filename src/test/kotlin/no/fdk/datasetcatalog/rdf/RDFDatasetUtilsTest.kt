@@ -522,6 +522,21 @@ class RDFDatasetUtilsTest {
     }
 
     @Test
+    fun distributionWithOnlyStandardTitleIsIncluded() {
+        val model = ModelFactory.createDefaultModel()
+        val resource = model.createResource("http://my-dataset-standard-title-only")
+
+        resource.addDatasetDistribution(
+            DCAT.distribution,
+            listOf(DistributionDBO(conformsTo = listOf(StandardDBO(prefLabel = LocalizedStrings(nb = "SOSI"))))),
+        )
+
+        val distribution = resource.getProperty(DCAT.distribution).`object`.asResource()
+        val standard = distribution.getProperty(DCTerms.conformsTo).`object`.asResource()
+        assertEquals("SOSI", standard.getProperty(DCTerms.title).string)
+    }
+
+    @Test
     fun distributionWithOnlyMobilityFieldsIsIncluded() {
         val model = ModelFactory.createDefaultModel()
         val resource = model.createResource("http://my-dataset-mobility-only")

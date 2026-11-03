@@ -270,7 +270,7 @@ private fun DistributionDBO.hasNonNullOrEmptyProperty(): Boolean = title?.run { 
     description?.run { listOf(nb, nn, en).any { !it.isNullOrEmpty() } } == true ||
     accessURL?.any { it.isNotEmpty() } == true ||
     !license.isNullOrEmpty() ||
-    conformsTo?.any { it.hasSeeAlso() } == true ||
+    conformsTo?.any { it.hasSeeAlso() || it.prefLabel.isValidLangField() } == true ||
     format?.any { it.isNotEmpty() } == true ||
     mediaType?.any { it.isNotEmpty() } == true ||
     !accessServices.isNullOrEmpty() ||
