@@ -46,6 +46,19 @@ class RDFDatasetUtilsTest {
     }
 
     @Test
+    fun testApplicableLegislationTypeIsCreated() {
+        val model = ModelFactory.createDefaultModel()
+        val resource = model.createResource("http://my-dataset1")
+        val act = "https://data.norge.no/vocabulary/legal-resource-type#act"
+
+        resource.addApplicableLegislation(listOf(ApplicableLegislation(type = act)))
+
+        val legalResource = resource.getPropertyResourceValue(DCATAP.applicableLegislation)
+        assertNotNull(legalResource)
+        assertEquals(act, legalResource.getPropertyResourceValue(DCTerms.type).uri)
+    }
+
+    @Test
     fun testApplicableLegislationIsNotIncludedWhenEmpty() {
         val model = ModelFactory.createDefaultModel()
         val resource = model.createResource("http://my-dataset1")
