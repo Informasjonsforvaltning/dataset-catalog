@@ -193,7 +193,12 @@ fun Resource.addConformsToFromUrisWithLabel(conformsTo: Collection<UriWithLabel>
 
 fun Resource.addApplicableLegislation(applicableLegislation: List<ApplicableLegislation>?): Resource {
     applicableLegislation?.forEach {
-        if (it.title.isValidLangField() || it.description.isValidLangField() || !it.references.isNullOrEmpty()) {
+        if (
+            it.title.isValidLangField() ||
+            it.description.isValidLangField() ||
+            !it.references.isNullOrEmpty() ||
+            !it.type.isNullOrEmpty()
+        ) {
             addProperty(
                 DCATAP.applicableLegislation,
                 model
@@ -201,7 +206,8 @@ fun Resource.addApplicableLegislation(applicableLegislation: List<ApplicableLegi
                     .addProperty(RDF.type, ELI.LegalResource)
                     .safeAddLocalizedString(DCTerms.title, it.title)
                     .safeAddLocalizedString(DCTerms.description, it.description)
-                    .safeAddURLs(RDFS.seeAlso, it.references),
+                    .safeAddURLs(RDFS.seeAlso, it.references)
+                    .safeAddLinkedProperty(DCTerms.type, it.type),
             )
         }
     }

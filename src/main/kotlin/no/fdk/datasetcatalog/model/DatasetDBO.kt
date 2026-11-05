@@ -225,4 +225,5 @@ data class ApplicableLegislation(
     val title: LocalizedStrings? = null,
     val description: LocalizedStrings? = null,
     val references: List<String>? = null,
+    val type: String? = null,
 )
