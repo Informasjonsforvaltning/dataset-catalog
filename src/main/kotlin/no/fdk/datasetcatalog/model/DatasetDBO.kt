@@ -46,9 +46,6 @@ data class DatasetDTO(
     val temporal: List<PeriodOfTimeDBO>? = null,
     val spatial: List<String>? = null,
     val accessRight: String? = null,
-    val legalBasisForRestriction: List<UriWithLabel>? = null,
-    val legalBasisForProcessing: List<UriWithLabel>? = null,
-    val legalBasisForAccess: List<UriWithLabel>? = null,
     val applicableLegislation: List<ApplicableLegislation>? = null,
     @Deprecated(LEGACY_QUALITY_ANNOTATION_MESSAGE)
     val accuracy: QualityAnnotationDBO? = null,
@@ -108,9 +105,6 @@ data class DatasetToCreate(
     val temporal: List<PeriodOfTimeDBO>? = null,
     val spatial: List<String>? = null,
     val accessRight: String? = null,
-    val legalBasisForRestriction: List<UriWithLabel>? = null,
-    val legalBasisForProcessing: List<UriWithLabel>? = null,
-    val legalBasisForAccess: List<UriWithLabel>? = null,
     val applicableLegislation: List<ApplicableLegislation>? = null,
     @Deprecated(LEGACY_QUALITY_ANNOTATION_MESSAGE)
     val accuracy: QualityAnnotationDBO? = null,

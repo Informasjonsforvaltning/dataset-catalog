@@ -313,41 +313,6 @@ fun Resource.addDistributionServices(accessServices: Set<String>?): Resource {
     return this
 }
 
-fun Resource.addLegalBasis(ds: DatasetDBO): Resource {
-    ds.legalBasisForAccess?.forEach { addRule(it, CPSVNO.ruleForDisclosure) }
-    ds.legalBasisForProcessing?.forEach { addRule(it, CPSVNO.ruleForDataProcessing) }
-    ds.legalBasisForRestriction?.forEach { addRule(it, CPSVNO.ruleForNonDisclosure) }
-
-    return this
-}
-
-private fun Resource.addRule(rule: UriWithLabel, ruleType: Resource): Resource {
-    if (rule.uri.isValidURL() || rule.prefLabel.isValidLangField()) {
-        addProperty(
-            CPSV.follows,
-            model
-                .createResource()
-                .addProperty(RDF.type, CPSV.Rule)
-                .addProperty(DCTerms.type, ruleType)
-                .addProperty(
-                    CPSV.implements,
-                    model
-                        .createResource()
-                        .addProperty(RDF.type, ELI.LegalResource)
-                        .safeAddLinkedProperty(RDFS.seeAlso, rule.uri)
-                        .addProperty(
-                            DCTerms.type,
-                            model
-                                .createResource()
-                                .addProperty(RDF.type, SKOS.Concept)
-                                .safeAddLocalizedString(SKOS.prefLabel, rule.prefLabel),
-                        ),
-                ),
-        )
-    }
-    return this
-}
-
 fun Resource.addTemporal(temporal: List<PeriodOfTimeDBO>?): Resource {
     temporal?.forEach {
         if (!it.startDate.isNullOrEmpty() || !it.endDate.isNullOrEmpty()) {

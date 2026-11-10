@@ -5,8 +5,6 @@ import no.fdk.datasetcatalog.model.CatalogCount
 import no.fdk.datasetcatalog.model.DatasetDBO
 import no.fdk.datasetcatalog.model.SpecializedType
 import no.fdk.datasetcatalog.rdf.ADMS
-import no.fdk.datasetcatalog.rdf.CPSV
-import no.fdk.datasetcatalog.rdf.CPSVNO
 import no.fdk.datasetcatalog.rdf.CV
 import no.fdk.datasetcatalog.rdf.DQV
 import no.fdk.datasetcatalog.rdf.ELI
@@ -188,8 +186,6 @@ class RDFService(
         setNsPrefix("skos", SKOS.uri)
         setNsPrefix("oa", OA.NS)
         setNsPrefix("schema", "http://schema.org/")
-        setNsPrefix("cpsv", CPSV.URI)
-        setNsPrefix("cpsvno", CPSVNO.URI)
         setNsPrefix("eli", ELI.URI)
         setNsPrefix("cv", CV.URI)
         setNsPrefix("mobilitydcatap", MOBILITYDCATAP.URI)

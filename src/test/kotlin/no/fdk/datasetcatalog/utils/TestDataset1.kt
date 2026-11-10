@@ -215,20 +215,6 @@ val TEST_DATASET_1 =
             UriWithLabel("http://uri-1", LocalizedStrings(nb = "label-1-nb", en = "label-1-en")),
             UriWithLabel("http://uri-2", LocalizedStrings(nb = "label-2-nb", en = "label-2-en")),
         ),
-        legalBasisForRestriction =
-        listOf(
-            UriWithLabel("https://lovdata.no/dokument/NL/lov/1992-12-04-126", LocalizedStrings(nb = "Lov om arkiv [arkivlova]")),
-            UriWithLabel("http://lovdata/paragraph/20", LocalizedStrings(nb = "Den spesifikke loven § 20")),
-            UriWithLabel(prefLabel = LocalizedStrings(nb = "Den mindre spesifikke loven, som ikke har tilhørende uri")),
-        ),
-        legalBasisForProcessing =
-        listOf(
-            UriWithLabel("http://lovdata/paragraph/2", LocalizedStrings(nb = "Den andre loven med lenger tittel § 2")),
-        ),
-        legalBasisForAccess =
-        listOf(
-            UriWithLabel("http://lovdata/paragraph/10", LocalizedStrings(nb = "Den siste loven med den lengste tittelen § 10")),
-        ),
         distribution = listOf(DISTRIBUTION),
         sample = listOf(SAMPLE),
     )

@@ -58,27 +58,6 @@ class ELI {
     }
 }
 
-class CPSV {
-    companion object {
-        const val URI = "http://purl.org/vocab/cpsv#"
-
-        val Rule: Resource = ResourceFactory.createResource("${URI}Rule")
-
-        val follows: Property = ResourceFactory.createProperty("${URI}follows")
-        val implements: Property = ResourceFactory.createProperty("${URI}implements")
-    }
-}
-
-class CPSVNO {
-    companion object {
-        const val URI = "https://data.norge.no/vocabulary/cpsvno#"
-
-        val ruleForDataProcessing: Resource = ResourceFactory.createResource("${URI}ruleForDataProcessing")
-        val ruleForDisclosure: Resource = ResourceFactory.createResource("${URI}ruleForDisclosure")
-        val ruleForNonDisclosure: Resource = ResourceFactory.createResource("${URI}ruleForNonDisclosure")
-    }
-}
-
 class CV {
     companion object {
         const val URI = "http://data.europa.eu/m8g/"
