@@ -14,8 +14,6 @@
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 @prefix oa:  <http://www.w3.org/ns/oa#> .
 @prefix eli:  <http://data.europa.eu/eli/ontology#> .
-@prefix cpsv:  <http://purl.org/vocab/cpsv#> .
-@prefix cpsvno:  <https://data.norge.no/vocabulary/cpsvno#> .
 
 
 <http://localhost:5050/catalogs/987654321>
@@ -33,48 +31,6 @@
 <http://localhost:5050/catalogs/987654321/datasets/72a54592-692c-4cfa-a938-cd1a56a2ed8d>
         a                               dcat:Dataset ;
         dct:publisher    <http://localhost:5050/organizations/987654321> ;
-        cpsv:follows [ a cpsv:Rule ;
-            dct:type cpsvno:ruleForDisclosure ;
-            cpsv:implements [ a eli:LegalResource ;
-                rdfs:seeAlso <http://lovdata/paragraph/10> ;
-                dct:type [ a    skos:Concept ;
-                    skos:prefLabel     "Den siste loven med den lengste tittelen § 10"@nb ;
-                ]
-            ] ;
-        ] , [
-            a cpsv:Rule ;
-            dct:type cpsvno:ruleForDataProcessing ;
-            cpsv:implements [
-                a eli:LegalResource ;
-                rdfs:seeAlso <http://lovdata/paragraph/2> ;
-                dct:type [ a    skos:Concept ;
-                    skos:prefLabel     "Den andre loven med lenger tittel § 2"@nb ;
-                ]
-            ] ;
-        ] , [ a cpsv:Rule ;
-            dct:type cpsvno:ruleForNonDisclosure ;
-            cpsv:implements [ a eli:LegalResource ;
-                rdfs:seeAlso <https://lovdata.no/dokument/NL/lov/1992-12-04-126> ;
-                dct:type [ a    skos:Concept ;
-                    skos:prefLabel     "Lov om arkiv [arkivlova]"@nb ;
-                ]
-            ] ;
-        ] , [ a cpsv:Rule ;
-            dct:type cpsvno:ruleForNonDisclosure ;
-            cpsv:implements [ a eli:LegalResource ;
-                rdfs:seeAlso <http://lovdata/paragraph/20> ;
-                dct:type [ a    skos:Concept ;
-                    skos:prefLabel     "Den spesifikke loven § 20"@nb ;
-                ]
-            ] ;
-        ] , [ a cpsv:Rule ;
-            dct:type cpsvno:ruleForNonDisclosure ;
-            cpsv:implements [ a eli:LegalResource ;
-                dct:type [ a    skos:Concept ;
-                    skos:prefLabel     "Den mindre spesifikke loven, som ikke har tilhørende uri"@nb ;
-                ]
-            ] ;
-        ] ;
         dct:accessRights                <http://publications.europa.eu/resource/authority/access-right/RESTRICTED> ;
         dct:accrualPeriodicity          <http://publications.europa.eu/resource/authority/frequency/ANNUAL> ;
         dct:conformsTo                  [ a              dct:Standard ;

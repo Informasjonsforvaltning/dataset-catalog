@@ -499,21 +499,6 @@ components:
           type: object
           $ref: "#/components/schemas/SkosCode"
           description: Associated access rights mapped as SkosCode
-        legalBasisForRestriction:
-          type: array
-          items:
-            $ref: "#/components/schemas/SkosConcept"
-          description: Legal basis for restriction of dataset mapped as SkosConcept
-        legalBasisForProcessing:
-          type: array
-          items:
-            $ref: "#/components/schemas/SkosConcept"
-          description: Legal basis for processing of dataset mapped as SkosConcept
-        legalBasisForAccess:
-          type: array
-          items:
-            $ref: "#/components/schemas/SkosConcept"
-          description: Legal basis for access to dataset mapped as SkosConcept
         accuracy:
           deprecated: true
           type: object
