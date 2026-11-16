@@ -330,17 +330,19 @@ fun Resource.addTemporal(temporal: List<PeriodOfTimeDBO>?): Resource {
 }
 
 fun Resource.addQualityAnnotation(qualityAnnotation: QualityAnnotationDBO?, dimension: Resource): Resource {
-    qualityAnnotation?.let {
-        addProperty(
-            DQV.hasQualityAnnotation,
-            model
-                .safeCreateResource()
-                .addProperty(RDF.type, DQV.QualityAnnotation)
-                .addProperty(OA.motivatedBy, DQV.qualityAssessment)
-                .safeAddLinkedProperty(DQV.inDimension, dimension.uri)
-                .addQualityAnnotationBody(it.hasBody),
-        )
-    }
+    qualityAnnotation
+        ?.takeIf { it.hasBody.isValidLangField() }
+        ?.let {
+            addProperty(
+                DQV.hasQualityAnnotation,
+                model
+                    .safeCreateResource()
+                    .addProperty(RDF.type, DQV.QualityAnnotation)
+                    .addProperty(OA.motivatedBy, DQV.qualityAssessment)
+                    .safeAddLinkedProperty(DQV.inDimension, dimension.uri)
+                    .addQualityAnnotationBody(it.hasBody),
+            )
+        }
     return this
 }
 
