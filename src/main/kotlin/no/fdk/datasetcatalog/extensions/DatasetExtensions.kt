@@ -18,6 +18,7 @@ fun DatasetDBO.addCreateValues(toCreate: DatasetToCreate) = copy(
     modified = toCreate.modified,
     language = toCreate.language,
     landingPage = toCreate.landingPage,
+    page = toCreate.page,
     euDataTheme = toCreate.euDataTheme,
     losTheme = toCreate.losTheme,
     mobilityTheme = toCreate.mobilityTheme,

@@ -207,6 +207,7 @@ val TEST_DATASET_1 =
             "http://publications.europa.eu/resource/authority/language/ENG",
         ),
         landingPage = listOf("http://testetaten.no/landingsside/nr1", "www.this.can.happen/also"),
+        page = listOf("http://testetaten.no/dokumentasjon/nr1"),
         euDataTheme = THEMES,
         losTheme = setOf("https://psi.norge.no/los/tema/lov-og-rett"),
         references = listOf(ReferenceDBO("references", "http://mycatalog/${CATALOG_ID}/datasets/1")),

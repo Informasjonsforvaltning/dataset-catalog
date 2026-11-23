@@ -5,6 +5,7 @@ import no.fdk.datasetcatalog.model.SpecializedType
 import org.apache.jena.rdf.model.Model
 import org.apache.jena.rdf.model.Resource
 import org.apache.jena.rdf.model.ResourceFactory
+import org.apache.jena.sparql.vocabulary.FOAF
 import org.apache.jena.vocabulary.DCAT
 import org.apache.jena.vocabulary.DCTerms
 import org.apache.jena.vocabulary.RDF
@@ -36,6 +37,7 @@ fun Model.addDatasetResource(dataset: DatasetDBO, seriesData: SeriesData, baseCa
             .safeAddDateTimeLiteral(DCTerms.issued, dataset.issued)
             .safeAddDateTimeLiteral(DCTerms.modified, dataset.modified)
             .safeAddURLs(DCAT.landingPage, dataset.landingPage)
+            .safeAddURLs(FOAF.page, dataset.page)
             .addDatasetThemes(dataset)
             .addDatasetDistribution(DCAT.distribution, dataset.distribution)
             .addDatasetDistribution(ADMS.sample, dataset.sample)

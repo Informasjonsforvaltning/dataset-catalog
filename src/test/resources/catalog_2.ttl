@@ -95,6 +95,7 @@
                                         ];
         dcat:keyword                    "Bestemmelse"@nb , "statlig bestemmelse"@nb , "regulering"@nb , "jord"@nb ;
         dcat:landingPage                <http://testetaten.no/landingsside/nr1> ;
+        foaf:page                       <http://testetaten.no/dokumentasjon/nr1> ;
         dcat:theme                      <http://publications.europa.eu/resource/authority/data-theme/ENVI> , <http://publications.europa.eu/resource/authority/data-theme/GOVE> , <https://psi.norge.no/los/tema/lov-og-rett>;
         dqv:hasQualityAnnotation        [ a                dqv:QualityAnnotation ;
                                           oa:motivatedBy   dqv:qualityAssessment ;
