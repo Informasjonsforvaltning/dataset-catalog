@@ -10,6 +10,7 @@ import no.fdk.datasetcatalog.extensions.addCreateValues
 import no.fdk.datasetcatalog.model.DatasetDBO
 import no.fdk.datasetcatalog.model.DatasetToCreate
 import no.fdk.datasetcatalog.model.JsonPatchOperation
+import no.fdk.datasetcatalog.model.OpEnum
 import no.fdk.datasetcatalog.model.ReferenceDBO
 import no.fdk.datasetcatalog.model.SpecializedType
 import no.fdk.datasetcatalog.model.toApiModel
@@ -91,11 +92,53 @@ class DatasetService(
                 id = id,
                 catalogId = catalogId,
                 specializedType = dataset.specializedType,
+                published = dataset.published,
                 lastModified = LocalDateTime.now(),
             )?.allAffectedSeriesDatasets(dataset)
             ?.let { persistAndHarvestDatasets(it, catalogId) }
 
         return getDatasetByID(catalogId, id)
+    }
+
+    fun publish(catalogId: String, id: String): DatasetDBO {
+        val dataset = getDatasetByID(catalogId, id) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+
+        if (dataset.published == true) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Dataset $id in catalog $catalogId is already published")
+        }
+
+        if (dataset.approved != true) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Dataset $id in catalog $catalogId is not approved")
+        }
+
+        val isFirstPublishInCatalog = getAllDatasets(catalogId).none { it.published == true }
+
+        val saved =
+            datasetRepository
+                .save(dataset.copy(published = true, lastModified = LocalDateTime.now()).toEntity(mapper))
+                .toApiModel(mapper)
+
+        if (isFirstPublishInCatalog) publishingService.createNewDataSource(catalogId)
+        publishingService.triggerHarvest(catalogId)
+
+        return saved
+    }
+
+    fun unpublish(catalogId: String, id: String): DatasetDBO {
+        val dataset = getDatasetByID(catalogId, id) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+
+        if (dataset.published != true) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Dataset $id in catalog $catalogId is not published")
+        }
+
+        val saved =
+            datasetRepository
+                .save(dataset.copy(published = false, lastModified = LocalDateTime.now()).toEntity(mapper))
+                .toApiModel(mapper)
+
+        publishingService.triggerHarvest(catalogId)
+
+        return saved
     }
 
     fun delete(catalogId: String, id: String) {
@@ -193,26 +236,15 @@ class DatasetService(
     }
 
     private fun persistAndHarvestDatasets(datasets: List<DatasetDBO>, catalogId: String) {
-        val isFirstPublished = isFirstPublishedDatasetForCatalog(datasets, catalogId)
-
         datasetRepository
             .saveAll(datasets.map { it.toEntity(mapper) })
-            .also {
-                if (isFirstPublished) publishingService.createNewDataSource(catalogId)
-                triggerHarvest(datasets, catalogId)
-            }
+            .also { triggerHarvest(datasets, catalogId) }
     }
 
     private fun triggerHarvest(datasets: List<DatasetDBO>, catalogId: String) {
         if (datasets.any { it.published == true }) {
             publishingService.triggerHarvest(catalogId)
         }
-    }
-
-    private fun isFirstPublishedDatasetForCatalog(datasets: List<DatasetDBO>, catalogId: String): Boolean = when {
-        datasets.none { it.published == true } -> false
-        getAllDatasets(catalogId).any { it.published == true } -> false
-        else -> true
     }
 
     private fun DatasetDBO.update(operations: List<JsonPatchOperation>): DatasetDBO {
@@ -262,7 +294,15 @@ class DatasetService(
         if (operations.any { it.path in invalidPaths }) {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Patch of paths $invalidPaths is not permitted")
         }
+        if (operations.any { it.path.isPublishedPath() || (it.op == OpEnum.MOVE && it.from?.isPublishedPath() == true) }) {
+            throw ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Patch of /published is not permitted, use the publish or unpublish endpoints",
+            )
+        }
     }
+
+    private fun String.isPublishedPath(): Boolean = this == "/published" || startsWith("/published/")
 
     private fun specializedTypeFromString(string: String?): SpecializedType? = try {
         string?.uppercase()?.let { SpecializedType.valueOf(it) }

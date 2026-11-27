@@ -302,6 +302,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Dataset"
+        '400':
+          description: Bad request, e.g. patch of a protected path or invalid value
         '401':
           description: Not logged in
         '403':
@@ -339,6 +341,80 @@ paths:
         '403':
           description: Forbidden
 
+  /catalogs/{catalogId}/datasets/{id}/publish:
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - dataset
+      summary: Publish dataset in specified catalog
+      description: Publish dataset in specified catalog
+      operationId: publishDataset
+      parameters:
+        - name: catalogId
+          in: path
+          description: catalog id
+          required: true
+          schema:
+            type: string
+        - name: id
+          in: path
+          description: dataset id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dataset"
+        '400':
+          description: Dataset is already published or is not approved
+        '401':
+          description: Not logged in
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  /catalogs/{catalogId}/datasets/{id}/unpublish:
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - dataset
+      summary: Unpublish dataset in specified catalog
+      description: Unpublish dataset in specified catalog
+      operationId: unpublishDataset
+      parameters:
+        - name: catalogId
+          in: path
+          description: catalog id
+          required: true
+          schema:
+            type: string
+        - name: id
+          in: path
+          description: dataset id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dataset"
+        '400':
+          description: Dataset is not published
+        '401':
+          description: Not logged in
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
 components:
   schemas:
     Catalog:

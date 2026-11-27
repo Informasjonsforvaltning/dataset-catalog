@@ -96,4 +96,26 @@ open class InternalDatasetController(private val datasetService: DatasetService,
     } else {
         ResponseEntity(HttpStatus.FORBIDDEN)
     }
+
+    @PostMapping(value = ["/{id}/publish"], produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun publishDataset(
+        @AuthenticationPrincipal jwt: Jwt,
+        @PathVariable("catalogId") catalogId: String,
+        @PathVariable id: String,
+    ): ResponseEntity<DatasetDBO> = if (endpointPermissions.hasOrgWritePermission(jwt, catalogId)) {
+        ResponseEntity(datasetService.publish(catalogId, id), HttpStatus.OK)
+    } else {
+        ResponseEntity(HttpStatus.FORBIDDEN)
+    }
+
+    @PostMapping(value = ["/{id}/unpublish"], produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun unpublishDataset(
+        @AuthenticationPrincipal jwt: Jwt,
+        @PathVariable("catalogId") catalogId: String,
+        @PathVariable id: String,
+    ): ResponseEntity<DatasetDBO> = if (endpointPermissions.hasOrgWritePermission(jwt, catalogId)) {
+        ResponseEntity(datasetService.unpublish(catalogId, id), HttpStatus.OK)
+    } else {
+        ResponseEntity(HttpStatus.FORBIDDEN)
+    }
 }

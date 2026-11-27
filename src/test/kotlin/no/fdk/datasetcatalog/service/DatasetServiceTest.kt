@@ -415,61 +415,7 @@ class DatasetServiceTest {
         }
 
         @Test
-        fun `adds datasource on first published dataset in catalog`() {
-            val ds =
-                DatasetDBO(
-                    "dsId",
-                    "catId",
-                    uri = "http://uri",
-                    published = false,
-                    approved = true,
-                    lastModified = LocalDateTime.now(),
-                )
-
-            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds.asEntity()))
-            whenever(applicationProperties.datasetCatalogUriHost).thenReturn("http://mycatalog")
-
-            datasetService.createDataset("catId", DatasetToCreate(approved = true))
-            datasetService.updateDatasetDBO(
-                "catId",
-                "dsId",
-                listOf(JsonPatchOperation(OpEnum.REPLACE, "/published", true)),
-            )
-
-            verify(publishingService, times(1)).createNewDataSource("catId")
-        }
-
-        @Test
-        fun `does not add datasource on already added catalog`() {
-            val ds0 =
-                DatasetDBO(
-                    "dsId0",
-                    "catId",
-                    uri = "http://uri",
-                    published = false,
-                    approved = true,
-                    lastModified = LocalDateTime.now(),
-                )
-            val ds1 =
-                DatasetDBO(
-                    "dsId1",
-                    "catId",
-                    uri = "http://uri",
-                    published = false,
-                    approved = true,
-                    lastModified = LocalDateTime.now(),
-                )
-
-            whenever(datasetRepository.findById("dsId1")).thenReturn(Optional.of(ds1.asEntity()))
-            whenever(datasetRepository.findByCatalogId("catId")).thenReturn(listOf(ds0.asEntity()))
-
-            datasetService.createDataset("catId", DatasetToCreate(approved = true))
-
-            verify(publishingService, times(0)).createNewDataSource(any())
-        }
-
-        @Test
-        fun `triggers harvest and adds datasource on first published dataset in catalog`() {
+        fun `does not add datasource on update`() {
             val ds =
                 DatasetDBO(
                     "dsId",
@@ -481,12 +427,131 @@ class DatasetServiceTest {
                 )
 
             whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(ds.asEntity()))
-            whenever(applicationProperties.datasetCatalogUriHost).thenReturn("http://mycatalog")
 
             datasetService.updateDatasetDBO("catId", "dsId", emptyList())
 
             verify(publishingService, times(1)).triggerHarvest("catId")
+            verify(publishingService, times(0)).createNewDataSource(any())
+        }
+    }
+
+    @Nested
+    internal inner class Publish {
+        private val draft =
+            DatasetDBO(
+                "dsId",
+                "catId",
+                uri = "http://uri",
+                published = false,
+                approved = true,
+                lastModified = LocalDateTime.now(),
+            )
+
+        private fun mockSaveReturnsArgument() {
+            whenever(datasetRepository.save(any<DatasetEntity>())).thenAnswer { it.arguments[0] }
+        }
+
+        @Test
+        fun `publish sets published, triggers harvest and adds datasource on first published dataset in catalog`() {
+            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(draft.asEntity()))
+            whenever(datasetRepository.findByCatalogId("catId")).thenReturn(listOf(draft.asEntity()))
+            mockSaveReturnsArgument()
+
+            val result = datasetService.publish("catId", "dsId")
+
+            assertEquals(true, result.published)
+            argumentCaptor<DatasetEntity>().apply {
+                verify(datasetRepository, times(1)).save(capture())
+                assertTrue(firstValue.published)
+            }
             verify(publishingService, times(1)).createNewDataSource("catId")
+            verify(publishingService, times(1)).triggerHarvest("catId")
+        }
+
+        @Test
+        fun `publish does not add datasource when catalog already has published datasets`() {
+            val other = draft.copy(id = "other", published = true)
+            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(draft.asEntity()))
+            whenever(datasetRepository.findByCatalogId("catId")).thenReturn(listOf(draft.asEntity(), other.asEntity()))
+            mockSaveReturnsArgument()
+
+            datasetService.publish("catId", "dsId")
+
+            verify(publishingService, times(0)).createNewDataSource(any())
+            verify(publishingService, times(1)).triggerHarvest("catId")
+        }
+
+        @Test
+        fun `publish of already published dataset is bad request`() {
+            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(draft.copy(published = true).asEntity()))
+
+            val ex = assertThrows<ResponseStatusException> { datasetService.publish("catId", "dsId") }
+
+            assertEquals(400, ex.statusCode.value())
+            verify(datasetRepository, times(0)).save(any<DatasetEntity>())
+        }
+
+        @Test
+        fun `publish of dataset that is not approved is bad request`() {
+            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(draft.copy(approved = false).asEntity()))
+
+            val ex = assertThrows<ResponseStatusException> { datasetService.publish("catId", "dsId") }
+
+            assertEquals(400, ex.statusCode.value())
+            verify(datasetRepository, times(0)).save(any<DatasetEntity>())
+            verify(publishingService, times(0)).triggerHarvest(any())
+        }
+
+        @Test
+        fun `publish of dataset in other catalog is not found`() {
+            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(draft.asEntity()))
+
+            val ex = assertThrows<ResponseStatusException> { datasetService.publish("otherCat", "dsId") }
+
+            assertEquals(404, ex.statusCode.value())
+        }
+
+        @Test
+        fun `unpublish sets published to false and triggers harvest`() {
+            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(draft.copy(published = true).asEntity()))
+            mockSaveReturnsArgument()
+
+            val result = datasetService.unpublish("catId", "dsId")
+
+            assertEquals(false, result.published)
+            verify(publishingService, times(1)).triggerHarvest("catId")
+            verify(publishingService, times(0)).createNewDataSource(any())
+        }
+
+        @Test
+        fun `unpublish of draft dataset is bad request`() {
+            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(draft.asEntity()))
+
+            val ex = assertThrows<ResponseStatusException> { datasetService.unpublish("catId", "dsId") }
+
+            assertEquals(400, ex.statusCode.value())
+            verify(datasetRepository, times(0)).save(any<DatasetEntity>())
+        }
+
+        @Test
+        fun `patch of published is bad request`() {
+            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(draft.asEntity()))
+
+            listOf(
+                JsonPatchOperation(OpEnum.REPLACE, "/published", true),
+                JsonPatchOperation(OpEnum.ADD, "/published", true),
+                JsonPatchOperation(OpEnum.REMOVE, "/published"),
+                JsonPatchOperation(OpEnum.MOVE, "/published", from = "/approved"),
+                JsonPatchOperation(OpEnum.COPY, "/published", from = "/approved"),
+                JsonPatchOperation(OpEnum.MOVE, "/approved", from = "/published"),
+            ).forEach { operation ->
+                val ex =
+                    assertThrows<ResponseStatusException> {
+                        datasetService.updateDatasetDBO("catId", "dsId", listOf(operation))
+                    }
+                assertEquals(400, ex.statusCode.value(), operation.toString())
+            }
+            verify(datasetRepository, times(0)).saveAll(any<List<DatasetEntity>>())
         }
     }
 

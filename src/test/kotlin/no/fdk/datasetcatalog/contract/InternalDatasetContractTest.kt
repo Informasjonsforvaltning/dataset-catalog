@@ -292,4 +292,96 @@ class InternalDatasetContractTest : ApiTestContext() {
             assertEquals(HttpStatus.NOT_FOUND.value(), rspGet["status"])
         }
     }
+
+    @Nested
+    internal inner class PublishDataset {
+        private val datasetPath = "/internal/catalogs/$DB_CATALOG_ID_1/datasets/$DB_DATASET_ID_1"
+
+        @Test
+        fun `Illegal publish and unpublish`() {
+            resetDB()
+            listOf("publish", "unpublish").forEach { action ->
+                val notLoggedIn = apiAuthorizedRequest("$datasetPath/$action", null, null, "POST")
+                val readAccess =
+                    apiAuthorizedRequest("$datasetPath/$action", null, JwtToken(Access.ORG_READ).toString(), "POST")
+                val wrongOrg =
+                    apiAuthorizedRequest(
+                        "/internal/catalogs/$DB_CATALOG_ID_2/datasets/$DB_DATASET_ID_1/$action",
+                        null,
+                        JwtToken(Access.ORG_WRITE).toString(),
+                        "POST",
+                    )
+
+                assertEquals(HttpStatus.UNAUTHORIZED.value(), notLoggedIn["status"])
+                assertEquals(HttpStatus.FORBIDDEN.value(), readAccess["status"])
+                assertEquals(HttpStatus.FORBIDDEN.value(), wrongOrg["status"])
+            }
+        }
+
+        @Test
+        fun `Not found when dataset does not exist in catalog`() {
+            resetDB()
+            listOf("publish", "unpublish").forEach { action ->
+                val rsp =
+                    apiAuthorizedRequest(
+                        "/internal/catalogs/$DB_CATALOG_ID_1/datasets/$DB_DATASET_ID_4/$action",
+                        null,
+                        JwtToken(Access.ORG_WRITE).toString(),
+                        "POST",
+                    )
+                assertEquals(HttpStatus.NOT_FOUND.value(), rsp["status"])
+            }
+        }
+
+        @Test
+        fun `Unpublish and publish dataset`() {
+            resetDB()
+            val token = JwtToken(Access.ORG_WRITE).toString()
+
+            val unpublished = apiAuthorizedRequest("$datasetPath/unpublish", null, token, "POST")
+            assertEquals(HttpStatus.OK.value(), unpublished["status"])
+            assertEquals(false, mapper.readValue<DatasetDBO>(unpublished["body"] as String).published)
+
+            val unpublishAgain = apiAuthorizedRequest("$datasetPath/unpublish", null, token, "POST")
+            assertEquals(HttpStatus.BAD_REQUEST.value(), unpublishAgain["status"])
+
+            val published = apiAuthorizedRequest("$datasetPath/publish", null, token, "POST")
+            assertEquals(HttpStatus.OK.value(), published["status"])
+            assertEquals(true, mapper.readValue<DatasetDBO>(published["body"] as String).published)
+
+            val publishAgain = apiAuthorizedRequest("$datasetPath/publish", null, token, "POST")
+            assertEquals(HttpStatus.BAD_REQUEST.value(), publishAgain["status"])
+        }
+
+        @Test
+        fun `Bad request when publishing dataset that is not approved`() {
+            resetDB()
+            val path = "/internal/catalogs/$DB_CATALOG_ID_2/datasets/$DB_DATASET_ID_6"
+            val token = JwtToken(Access.ROOT).toString()
+
+            val rsp = apiAuthorizedRequest("$path/publish", null, token, "POST")
+            assertEquals(HttpStatus.BAD_REQUEST.value(), rsp["status"])
+
+            val rspGet = apiAuthorizedRequest(path, null, token, "GET")
+            assertEquals(false, mapper.readValue<DatasetDBO>(rspGet["body"] as String).published)
+        }
+
+        @Test
+        fun `Bad request when publishing via patch`() {
+            resetDB()
+            val token = JwtToken(Access.ORG_WRITE).toString()
+
+            listOf(
+                """[{"op":"replace","path":"/published","value":false}]""",
+                """[{"op":"remove","path":"/published"}]""",
+                """[{"op":"move","from":"/published","path":"/approved"}]""",
+            ).forEach { body ->
+                val rsp = apiAuthorizedRequest(datasetPath, body, token, "PATCH")
+                assertEquals(HttpStatus.BAD_REQUEST.value(), rsp["status"], body)
+            }
+
+            val rspGet = apiAuthorizedRequest(datasetPath, null, token, "GET")
+            assertEquals(true, mapper.readValue<DatasetDBO>(rspGet["body"] as String).published)
+        }
+    }
 }
