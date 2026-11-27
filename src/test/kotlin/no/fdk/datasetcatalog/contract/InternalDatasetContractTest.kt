@@ -354,6 +354,19 @@ class InternalDatasetContractTest : ApiTestContext() {
         }
 
         @Test
+        fun `Bad request when publishing dataset that is not approved`() {
+            resetDB()
+            val path = "/internal/catalogs/$DB_CATALOG_ID_2/datasets/$DB_DATASET_ID_6"
+            val token = JwtToken(Access.ROOT).toString()
+
+            val rsp = apiAuthorizedRequest("$path/publish", null, token, "POST")
+            assertEquals(HttpStatus.BAD_REQUEST.value(), rsp["status"])
+
+            val rspGet = apiAuthorizedRequest(path, null, token, "GET")
+            assertEquals(false, mapper.readValue<DatasetDBO>(rspGet["body"] as String).published)
+        }
+
+        @Test
         fun `Bad request when publishing via patch`() {
             resetDB()
             val token = JwtToken(Access.ORG_WRITE).toString()

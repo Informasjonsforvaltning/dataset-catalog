@@ -107,6 +107,10 @@ class DatasetService(
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Dataset $id in catalog $catalogId is already published")
         }
 
+        if (dataset.approved != true) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Dataset $id in catalog $catalogId is not approved")
+        }
+
         val isFirstPublishInCatalog = getAllDatasets(catalogId).none { it.published == true }
 
         val saved =

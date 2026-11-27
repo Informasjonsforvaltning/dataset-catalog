@@ -492,6 +492,17 @@ class DatasetServiceTest {
         }
 
         @Test
+        fun `publish of dataset that is not approved is bad request`() {
+            whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(draft.copy(approved = false).asEntity()))
+
+            val ex = assertThrows<ResponseStatusException> { datasetService.publish("catId", "dsId") }
+
+            assertEquals(400, ex.statusCode.value())
+            verify(datasetRepository, times(0)).save(any<DatasetEntity>())
+            verify(publishingService, times(0)).triggerHarvest(any())
+        }
+
+        @Test
         fun `publish of dataset in other catalog is not found`() {
             whenever(datasetRepository.findById("dsId")).thenReturn(Optional.of(draft.asEntity()))
 

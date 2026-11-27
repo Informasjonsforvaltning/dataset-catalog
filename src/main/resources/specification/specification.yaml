@@ -371,7 +371,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Dataset"
         '400':
-          description: Dataset is already published
+          description: Dataset is already published or is not approved
         '401':
           description: Not logged in
         '403':
